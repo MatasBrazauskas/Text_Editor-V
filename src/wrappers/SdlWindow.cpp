@@ -1,7 +1,7 @@
-#include "SdlWrapper.hpp"
+#include "SdlWindow.hpp"
 #include <stdexcept>
 
-Wrapper::SdlWrapper::SdlWrapper() {
+Wrapper::SdlWindow::SdlWindow() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         throw std::runtime_error(SDL_GetError());
     }
@@ -20,7 +20,7 @@ Wrapper::SdlWrapper::SdlWrapper() {
     }
 }
 
-Wrapper::SdlWrapper::~SdlWrapper() noexcept {
+Wrapper::SdlWindow::~SdlWindow() noexcept {
     if (window_) {
         SDL_DestroyWindow(window_);
     }

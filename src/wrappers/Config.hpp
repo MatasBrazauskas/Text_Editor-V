@@ -7,7 +7,7 @@ namespace Wrapper {
     namespace Tabs {
         constexpr std::string_view editor = "editor";
         constexpr std::string_view font   = "font";
-        constexpr std::string_view color  = "color";
+        constexpr std::string_view color  = "colors";
     }
 
     namespace EditorFields {

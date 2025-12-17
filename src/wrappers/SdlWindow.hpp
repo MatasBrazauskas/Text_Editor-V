@@ -4,10 +4,10 @@
 #include <SDL2/SDL.h>
 
 namespace Wrapper {
-    class SdlWrapper {
+    class SdlWindow {
     public:
-        SdlWrapper();
-        ~SdlWrapper() noexcept;
+        SdlWindow();
+        ~SdlWindow() noexcept;
     private:
         SDL_Window *window_ = nullptr;
     };

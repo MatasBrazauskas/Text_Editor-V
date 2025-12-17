@@ -11,8 +11,8 @@ add_executable(Text_Editor
         src/buffer/Matrix.cpp
         src/buffer/Matrix.hpp
         src/wrappers/Config.hpp
-        src/wrappers/SdlWrapper.hpp
-        src/wrappers/SdlWrapper.cpp
+        src/wrappers/SdlWindow.hpp
+        src/wrappers/SdlWindow.cpp
         src/includes/Json.hpp
         src/wrappers/Config.cpp
 )
