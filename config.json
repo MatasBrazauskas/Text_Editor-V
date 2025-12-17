@@ -1,0 +1,21 @@
+{
+    "editor":
+    {
+        "tab_size": 8,
+        "auto_save": false,
+        "auto_save_interval_ms": 500,
+        "cursor_blink_ms": 500
+    },
+    "font":
+    {
+        "font_path": "",
+        "font_size": 18
+    },
+    "colors":
+    {
+        "background_color": "",
+        "foreground_color": "",
+        "cursor_color": "",
+        "selection_color": ""
+    }
+}

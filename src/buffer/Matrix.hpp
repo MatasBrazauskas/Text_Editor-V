@@ -1,9 +1,9 @@
 #pragma once
 
-import std::vector;
-import std::string;
+import <vector>;
+import <string>;
 
-using Vec = std::vector<std::string>
+using Vec = std::vector<std::string>;
 
 class Matrix : public ITextBuffer {
     public :
