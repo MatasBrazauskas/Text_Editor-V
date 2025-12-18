@@ -1,18 +1,16 @@
-#ifndef TEXT_EDITOR_SDLWRAPPER_HPP
-#define TEXT_EDITOR_SDLWRAPPER_HPP
+#pragma once
 
 #include <SDL2/SDL.h>
 
 namespace Wrapper {
     class SdlWindow {
     public:
-        SdlWindow();
+        SdlWindow(const char* title);
+        SdlWindow() = delete;
         ~SdlWindow() noexcept;
     private:
-        SDL_Window *window_ = nullptr;
+        SDL_Window *window_;
     };
 
-    void Run(size_t seconds);
+    bool WindowOpen();
 }
-
-#endif

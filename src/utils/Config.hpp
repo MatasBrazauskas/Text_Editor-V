@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
-#include "../includes//Json.hpp"
+#include <filesystem>
+#include "../includes/Json.hpp"
 
-namespace Wrapper {
+namespace Utils{
 
     namespace Tabs {
         constexpr std::string_view editor = "editor";
@@ -36,7 +37,7 @@ namespace Wrapper {
         static EditorConfig getEditorConfig(const Json& json);
         EditorConfig() = default;
         ~EditorConfig() noexcept = default;
-    private:
+    //private:
         size_t tab_size;
         bool auto_save;
         size_t auto_save_intervals_ms;
@@ -49,10 +50,10 @@ namespace Wrapper {
         static FontConfig getFontConfig(const Json& json);
         FontConfig() = default;
         ~FontConfig() noexcept = default;
-    private:
+    //private:
         std::string font_path;
-        size_t font_size;
-        FontConfig(const std::string &fontPath, size_t fontSize);
+        size_t font_size{};
+        FontConfig(std::string fontPath, size_t fontSize);
     };
 
     class ColorsConfig {
@@ -60,22 +61,24 @@ namespace Wrapper {
         static ColorsConfig getColorConfig(const Json& json);
         ColorsConfig() = default;
         ~ColorsConfig() noexcept = default;
-    private:
+    //private:
         std::string background_color;
         std::string foreground_color;
         std::string cursor_color;
         std::string selection_color;
-        ColorsConfig(const std::string &backgroundColor, const std::string &foregroundColor, const std::string &cursorColor, const std::string &selectionColor);
+        ColorsConfig(std::string backgroundColor, std::string foregroundColor, std::string cursorColor, std::string selectionColor);
     };
 
     class Config {
     public:
-        explicit Config(const std::string& configPath);
+        Config(const std::filesystem::path& configPath);
         Config() = delete;
         ~Config() noexcept;
-    private:
+    //private:
         EditorConfig editor_;
         FontConfig font_;
         ColorsConfig colors_;
+
+        explicit Config(const Json& json);
     };
 }
