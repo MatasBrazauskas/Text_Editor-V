@@ -1,9 +1,16 @@
+#include "SdlTtf.h"
 #include "src/wrappers/SdlWindow.hpp"
-#include "src/wrappers/Config.hpp"
+#include "src/utils/Config.hpp"
 
 int main() {
-    Wrapper::Config config {"config.json"};
+    const std::filesystem::path filesPath = "config.json";
+    Utils::Config config (filesPath);
 
-    Wrapper::SdlWindow app;
-    Wrapper::Run(2);
+    const auto title = "Text Editor";
+    Wrapper::SdlWindow window{title};
+
+    Wrapper::SdlTtf font{config.font_};
+    while (Wrapper::WindowOpen()) {
+
+    }
 }

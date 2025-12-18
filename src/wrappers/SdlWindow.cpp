@@ -1,13 +1,13 @@
 #include "SdlWindow.hpp"
 #include <stdexcept>
 
-Wrapper::SdlWindow::SdlWindow() {
+Wrapper::SdlWindow::SdlWindow(const char* title) : window_(nullptr) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         throw std::runtime_error(SDL_GetError());
     }
 
     window_ = SDL_CreateWindow(
-        "TEMP",
+        title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         800, 600,
@@ -27,6 +27,12 @@ Wrapper::SdlWindow::~SdlWindow() noexcept {
     SDL_Quit();
 }
 
-void Wrapper::Run(size_t seconds) {
-    SDL_Delay(seconds * 1000);
+bool Wrapper::WindowOpen() {
+    SDL_Event e;
+    if (SDL_PollEvent(&e)) {
+        if (e.type == SDL_QUIT) {
+            return false;
+        }
+    }
+    return true;
 }

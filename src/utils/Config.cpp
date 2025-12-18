@@ -1,9 +1,8 @@
 #include "Config.hpp"
-
 #include <fstream>
 #include <stdexcept>
 
-using namespace Wrapper;
+using namespace Utils;
 
 EditorConfig::EditorConfig(const size_t tabSize,const bool autoSave, const size_t autoSaveIntervalMs,const size_t cursorBlinkMs)
     : tab_size(tabSize), auto_save(autoSave), auto_save_intervals_ms(autoSaveIntervalMs), cursor_blink_ms(cursorBlinkMs) {}
@@ -19,8 +18,8 @@ EditorConfig EditorConfig::getEditorConfig(const Json &json) {
     };
 }
 
-FontConfig::FontConfig(const std::string& fontPath, const size_t fontSize)
-    : font_path(fontPath), font_size(fontSize) {}
+FontConfig::FontConfig(std::string fontPath, const size_t fontSize)
+    : font_path(std::move(fontPath)), font_size(fontSize) {}
 
 FontConfig FontConfig::getFontConfig(const Json &json) {
     const auto& e = json.at(Tabs::font);
@@ -31,8 +30,8 @@ FontConfig FontConfig::getFontConfig(const Json &json) {
     };
 }
 
-ColorsConfig::ColorsConfig(const std::string& backgroundColor,const std::string& foregroundColor,const std::string& cursorColor,const std::string& selectionColor)
-    : background_color(backgroundColor), foreground_color(foregroundColor), cursor_color(cursorColor), selection_color(selectionColor) {}
+ColorsConfig::ColorsConfig(std::string backgroundColor,std::string foregroundColor,std::string cursorColor,std::string selectionColor)
+    : background_color(std::move(backgroundColor)), foreground_color(std::move(foregroundColor)), cursor_color(std::move(cursorColor)), selection_color(std::move(selectionColor)) {}
 
 ColorsConfig ColorsConfig::getColorConfig(const Json &json) {
     const auto& e = json.at(Tabs::color);
@@ -45,7 +44,7 @@ ColorsConfig ColorsConfig::getColorConfig(const Json &json) {
     };
 }
 
-Config::Config(const std::string& configPath): editor_(), font_(), colors_() {
+static Json loadJson(const std::string &configPath) {
     if (configPath.empty()) {
         throw std::runtime_error("Config path must be non-empty.");
     }
@@ -54,10 +53,15 @@ Config::Config(const std::string& configPath): editor_(), font_(), colors_() {
 
     Json json;
     configFile >> json;
-
-    editor_ =EditorConfig::getEditorConfig(json);
-    font_ = FontConfig::getFontConfig(json);
-    colors_ = ColorsConfig::getColorConfig(json);
+    return json;
 }
+
+Config::Config(const std::filesystem::path& configPath) : Config(loadJson(configPath)) {}
+
+Config::Config(const Json &json) :
+    editor_(EditorConfig::getEditorConfig(json)),
+    font_(FontConfig::getFontConfig(json)),
+    colors_(ColorsConfig::getColorConfig(json))
+{}
 
 Config::~Config() noexcept = default;
