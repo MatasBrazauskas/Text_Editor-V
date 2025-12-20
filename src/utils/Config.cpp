@@ -2,8 +2,6 @@
 #include <fstream>
 #include <stdexcept>
 
-using namespace Utils;
-
 EditorConfig::EditorConfig(const size_t tabSize,const bool autoSave, const size_t autoSaveIntervalMs,const size_t cursorBlinkMs)
     : tab_size(tabSize), auto_save(autoSave), auto_save_intervals_ms(autoSaveIntervalMs), cursor_blink_ms(cursorBlinkMs) {}
 

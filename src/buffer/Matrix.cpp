@@ -1,22 +1,13 @@
-#include "ITextBuffer.hpp"
-#include <vector>
-#include <string>
-#include <utility>
+#include "Matrix.hpp"
 
-using Vec = std::vector<std::string>;
+void Matrix::init(std::vector<std::string> lines) {
+    lines_ = std::move(lines);
+}
 
-namespace Buffer {
-    class Matrix : public ITextBuffer {
-    public :
-        Matrix() = default;
+std::string_view Matrix::row(size_t row) const {
+    return lines_.at(row);
+}
 
-        [[nodiscard]] char at(const size_t row, const size_t column) const override {
-            return vec.at(row).at(column);
-        }
-        void init(Vec& matrix) override {
-            vec = std::move(matrix);
-        }
-    private :
-        Vec vec;
-    };
+size_t Matrix::size() const {
+    return lines_.size();
 }
