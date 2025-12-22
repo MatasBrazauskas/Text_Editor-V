@@ -1,18 +1,15 @@
 #pragma once
 #include <cstdint>
-#include "buffer/Cursor.hpp"
 #include <string>
 #include <SDL.h>
 
-
+//Commands: get keystroke -> convert to some action
 class Commands {
 public:
     enum class Modes : std::uint8_t {Normal, Insert};
     Commands();
     ~Commands() = default;
-    void HandleInput();
 
     std::string input;
     Modes mode;
-    //Cursor cursor;
 };

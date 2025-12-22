@@ -1,14 +1,14 @@
 #include "Sdl.hpp"
 #include <stdexcept>
 
-Sdl::Sdl(const char* title, const char* fontsPath, const size_t fontSize) : window_(nullptr), renderer_(nullptr), font_(nullptr) {
+Sdl::Sdl(const Config& config) : window_(nullptr), renderer_(nullptr), font_(nullptr) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         throw std::runtime_error(SDL_GetError());
     }
 
 
     window_ = SDL_CreateWindow(
-        title,
+        config.editor_.title.c_str(),
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         800, 600,
@@ -35,7 +35,7 @@ Sdl::Sdl(const char* title, const char* fontsPath, const size_t fontSize) : wind
         throw std::runtime_error("Failed to initialize TTF.");
     }
 
-    font_ = TTF_OpenFont(fontsPath, static_cast<int>(fontSize));
+    font_ = TTF_OpenFont(config.font_.font_path.c_str(), static_cast<int>(config.font_.font_size));
 
     if (!font_) {
         throw std::runtime_error("Failed to open font.");

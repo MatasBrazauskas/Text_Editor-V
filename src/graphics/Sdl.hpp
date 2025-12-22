@@ -7,10 +7,13 @@
 #include <SDL_ttf.h>
 #include <string_view>
 
+#include "utils/Config.hpp"
+
 class Sdl {
 public:
     Sdl() = delete;
-    Sdl(const char* title, const char* fontsPath, const size_t fontSize);
+    //Sdl(const char* title, const char* fontsPath, const size_t fontSize);
+    Sdl(const Config& config);
     ~Sdl();
     void RenderLine(std::string_view line, const SDL_Color& color, const size_t rowX);
     //bool WindowOpen();

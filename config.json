@@ -1,6 +1,7 @@
 {
     "editor":
     {
+        "title": "Text Editor",
         "tab_size": 8,
         "auto_save": false,
         "auto_save_interval_ms": 500,

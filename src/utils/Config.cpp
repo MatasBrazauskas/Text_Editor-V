@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <algorithm>
 
-EditorConfig::EditorConfig(const size_t tabSize,const bool autoSave, const size_t autoSaveIntervalMs,const size_t cursorBlinkMs)
-    : tab_size(tabSize), auto_save(autoSave), auto_save_intervals_ms(autoSaveIntervalMs), cursor_blink_ms(cursorBlinkMs) {}
+EditorConfig::EditorConfig(const size_t tabSize,const bool autoSave, const size_t autoSaveIntervalMs,const size_t cursorBlinkMs, std::string title)
+    : tab_size(tabSize), auto_save(autoSave), auto_save_intervals_ms(autoSaveIntervalMs), cursor_blink_ms(cursorBlinkMs), title(std::move(title)) {}
 
 EditorConfig EditorConfig::getEditorConfig(const Json &json) {
     const auto& e = json.at(Tabs::editor);
@@ -13,7 +13,8 @@ EditorConfig EditorConfig::getEditorConfig(const Json &json) {
         e.at(EditorFields::tabSize).get<size_t>(),
         e.at(EditorFields::autoSave).get<bool>(),
         e.at(EditorFields::autoSaveIntervalMs).get<size_t>(),
-        e.at(EditorFields::cursorBlinkMs).get<size_t>()
+        e.at(EditorFields::cursorBlinkMs).get<size_t>(),
+        e.at(EditorFields::title).get<std::string>()
     };
 }
 

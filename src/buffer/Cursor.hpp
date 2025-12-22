@@ -1,17 +1,14 @@
 #pragma once
 #include <cstddef>
-#include "utils/Config.hpp"
-#include "graphics/Sdl.hpp"
+#include "buffer/ITextBuffer.hpp"
 
 class Cursor {
 public:
     Cursor() = delete;
-    Cursor(const Config& config);
+    Cursor(const ITextBuffer& textBuffer);
 
-    bool state;
-    const Config& config;
-    std::size_t x;
-    std::size_t y;
-
-    void RenderCursor(Sdl& sdl_) const;
+    bool state_;
+    std::size_t x_;
+    std::size_t y_;
+    const ITextBuffer& textBuffer_;
 };

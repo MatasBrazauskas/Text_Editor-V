@@ -13,6 +13,7 @@ namespace Tabs {
 }
 
 namespace EditorFields {
+    constexpr auto title = "title"sv;
     constexpr auto tabSize= "tab_size"sv;
     constexpr auto autoSave = "auto_save"sv;
     constexpr auto autoSaveIntervalMs = "auto_save_interval_ms"sv;
@@ -37,13 +38,14 @@ class EditorConfig {
 public:
     static EditorConfig getEditorConfig(const Json& json);
     EditorConfig() = default;
+    EditorConfig(size_t tabSize, bool autoSave, size_t autoSaveIntervalMs, size_t cursorBlinkMs, std::string title);
     ~EditorConfig() noexcept = default;
 //private:
     size_t tab_size;
     bool auto_save;
     size_t auto_save_intervals_ms;
     size_t cursor_blink_ms;
-    EditorConfig(size_t tabSize, bool autoSave, size_t autoSaveIntervalMs, size_t cursorBlinkMs);
+    std::string title;
 };
 
 class FontConfig {
