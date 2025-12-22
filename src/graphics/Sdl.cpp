@@ -29,6 +29,7 @@ Sdl::Sdl(const char* title, const char* fontsPath, const size_t fontSize) : wind
     }
 
     SDL_StartTextInput();
+    //SDL_StopTextInput();
 
     if (TTF_Init() == -1) {
         throw std::runtime_error("Failed to initialize TTF.");
@@ -67,13 +68,3 @@ void Sdl::RenderLine(std::string_view line, const SDL_Color& color, const size_t
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
 }
-
-/*bool Sdl::WindowOpen() {
-    SDL_Event e;
-    if (SDL_PollEvent(&e)) {
-        if (e.type == SDL_QUIT) {
-            return false;
-        }
-    }
-    return true;
-}*/

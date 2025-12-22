@@ -2,30 +2,33 @@
 #include <string>
 #include <filesystem>
 #include "../includes/Json.hpp"
+#include <SDL_pixels.h>
+
+using namespace std::string_view_literals;
 
 namespace Tabs {
-    constexpr std::string_view editor = "editor";
-    constexpr std::string_view font   = "font";
-    constexpr std::string_view color  = "colors";
+    constexpr auto editor = "editor"sv;
+    constexpr auto font   = "font"sv;
+    constexpr auto color  = "colors"sv;
 }
 
 namespace EditorFields {
-    constexpr std::string_view tabSize= "tab_size";
-    constexpr std::string_view autoSave = "auto_save";
-    constexpr std::string_view autoSaveIntervalMs = "auto_save_interval_ms";
-    constexpr std::string_view cursorBlinkMs = "cursor_blink_ms";
+    constexpr auto tabSize= "tab_size"sv;
+    constexpr auto autoSave = "auto_save"sv;
+    constexpr auto autoSaveIntervalMs = "auto_save_interval_ms"sv;
+    constexpr auto cursorBlinkMs = "cursor_blink_ms"sv;
 }
 
 namespace FontFields {
-    constexpr std::string_view fontPath= "font_path";
-    constexpr std::string_view fontSize = "font_size";
+    constexpr auto fontPath= "font_path"sv;
+    constexpr auto fontSize = "font_size"sv;
 }
 
 namespace  ColorFields {
-    constexpr std::string_view backgroundColor = "background_color";
-    constexpr std::string_view foregroundColor = "foreground_color";
-    constexpr std::string_view cursorColor = "cursor_color";
-    constexpr std::string_view selectionColor = "selection_color";
+    constexpr auto backgroundColor = "background_color"sv;
+    constexpr auto foregroundColor = "foreground_color"sv;
+    constexpr auto cursorColor = "cursor_color"sv;
+    constexpr auto selectionColor = "selection_color"sv;
 }
 
 using Json = nlohmann::json;
@@ -60,11 +63,13 @@ public:
     ColorsConfig() = default;
     ~ColorsConfig() noexcept = default;
 //private:
-    std::string background_color;
-    std::string foreground_color;
-    std::string cursor_color;
-    std::string selection_color;
-    ColorsConfig(std::string backgroundColor, std::string foregroundColor, std::string cursorColor, std::string selectionColor);
+    SDL_Color background_color;
+    SDL_Color foreground_color;
+    SDL_Color cursor_color;
+    SDL_Color selection_color;
+private:
+    ColorsConfig(const SDL_Color& backgroundColor, const SDL_Color& foregroundColor, const SDL_Color& cursorColor, const SDL_Color& selectionColor);
+    static SDL_Color getColorFromHex(std::string& hexStr);
 };
 
 class Config {

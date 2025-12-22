@@ -2,15 +2,16 @@
 #include <iostream>
 
 #include "src/graphics/Sdl.hpp"
-#include "src/graphics/SdlInput.hpp"
 
 #include "src/utils/Config.hpp"
 #include "src/utils/FileHandler.hpp"
 
 #include "buffer/Matrix.hpp"
 
-constexpr double Fps = 30;
-constexpr double ticksPerFrame = 1.0 / Fps;
+#include "commands/Commands.hpp"
+
+constexpr auto Fps = 60.0;
+constexpr auto ticksPerFrame = 1.0 / Fps;
 
 
 int main() {
@@ -28,31 +29,37 @@ int main() {
 
     //Graphics
     const auto title = "Text Editor";
-    //Graphics::SdlWindow window{title};
-
-    //Graphics::SdlTtf font{config.font_};
-
     Sdl sdl{title, (config.font_.font_path.c_str()), config.font_.font_size};
-    SdlInput input{};
 
     EditorTextArea editorTextArea {config, matrix, sdl};
 
+    //Commands
+    Commands commands{};
+
+    Cursor cursor{config};
+
     const Uint64 freq = SDL_GetPerformanceFrequency();
-    Uint64 frameStart = SDL_GetPerformanceCounter();
+    Uint64 renderStart = SDL_GetPerformanceCounter();
+    Uint64 cursorStart = SDL_GetPerformanceCounter();
 
     while (true) {
 
-        Uint64 frameEnd = SDL_GetPerformanceCounter();
-        double frameTime = static_cast<double>(frameEnd - frameStart) / freq;
+        Uint64 end = SDL_GetPerformanceCounter();
+        double frameTime = static_cast<double>(end - renderStart) / freq;
+        double cursorTime = static_cast<double>(end - cursorStart) / freq;
 
-        const auto captured = input.getInput();
+        commands.HandleInput();
 
-        if (!captured.empty()) {
-            SDL_Log("Input captured: %s", captured.c_str());
+        if (cursorTime >= 0.5) {
+            std::cout << "Is it runnder?\n";
+            cursorStart = end;
+            cursor.state = !cursor.state;
+            cursor.RenderCursor(sdl);
         }
-        if (frameTime >= ticksPerFrame) {
-            frameStart = frameEnd;
+
+        /*if (frameTime >= ticksPerFrame) {
+            renderStart = end;
             editorTextArea.RenderText();
-        }
+        }*/
     }
 }

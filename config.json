@@ -13,9 +13,9 @@
     },
     "colors":
     {
-        "background_color": "",
-        "foreground_color": "",
-        "cursor_color": "",
-        "selection_color": ""
+        "background_color": "000000",
+        "foreground_color": "ffffff",
+        "cursor_color": "ff00ff",
+        "selection_color": "00ff00"
     }
 }

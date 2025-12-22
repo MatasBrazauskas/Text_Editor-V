@@ -18,7 +18,7 @@ add_executable(Text_Editor
         src/commands/Insert.hpp
         src/commands/Normal.cpp
         src/commands/Normal.hpp
-        src/commands/ICommand.hpp
+        src/commands/Commands.hpp
         src/core/EditorTextArea.cpp
         src/core/EditorTextArea.hpp
         src/graphics/Sdl.cpp
@@ -26,9 +26,8 @@ add_executable(Text_Editor
         src/utils/FileHandler.hpp
         src/buffer/Matrix.hpp
         src/buffer/Cursor.cpp
-        src/buffer/Cursor.h
-        src/graphics/SdlInput.cpp
-        src/graphics/SdlInput.hpp
+        src/buffer/Cursor.hpp
+        src/commands/Commands.cpp
 )
 
 target_link_libraries(Text_Editor PRIVATE
