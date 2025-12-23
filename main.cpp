@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Renderer.hpp"
 #include "src/graphics/Sdl.hpp"
 
@@ -10,12 +8,12 @@
 
 #include "buffer/Cursor.hpp"
 
-#include "commands/Commands.hpp"
 #include "core/Editor.hpp"
 
 constexpr auto Fps = 60.0;
 constexpr auto ticksPerFrame = 1.0 / Fps;
 
+constexpr double InputReset = 4.0;
 
 int main() {
     //Config
@@ -31,9 +29,9 @@ int main() {
     matrix.init(lines);
 
     Cursor cursor{matrix};
-    Commands commands{};
+    cursor.visible_ = true;
 
-    Editor editor {matrix, cursor, config, commands};
+    Editor editor {matrix, cursor};
 
     //Graphics
     Sdl sdl{config};
@@ -42,16 +40,16 @@ int main() {
     const Uint64 freq = SDL_GetPerformanceFrequency();
     Uint64 renderStart = SDL_GetPerformanceCounter();
 
-    while (true) {
+    while (editor.running_) {
 
         Uint64 end = SDL_GetPerformanceCounter();
-        double frameTime = static_cast<double>(end - renderStart) / freq;
+        double renderTime = static_cast<double>(end - renderStart) / freq;
 
         editor.HandleKeyboardInput();
 
-        if (frameTime >= ticksPerFrame) {
+        if (renderTime >= ticksPerFrame) {
             renderStart = end;
-            renderer.RenderText();
+            renderer.Render();
         }
     }
 }

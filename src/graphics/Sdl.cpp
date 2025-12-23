@@ -61,7 +61,7 @@ void Sdl::RenderLine(std::string_view line, const SDL_Color& color, const size_t
     SDL_Surface* surface = TTF_RenderText_Blended(font_, line.data(), color);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-    SDL_Rect rect = {0,static_cast<int>(rowX), surface->w,surface->h};
+    const SDL_Rect rect = {0,static_cast<int>(rowX), surface->w,surface->h};
 
     SDL_RenderCopy(renderer_, texture, nullptr, &rect);
 

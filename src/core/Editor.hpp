@@ -1,19 +1,28 @@
 #pragma once
 #include "buffer/Cursor.hpp"
 #include "buffer/ITextBuffer.hpp"
-#include "commands/Commands.hpp"
-#include "utils/Config.hpp"
+#include "commands/Insert.hpp"
+#include "commands/Normal.hpp"
+#include <memory>
 
 //Get event and then process it; action -> actual change
 class Editor {
 public:
-    Editor() = delete;
-    Editor(ITextBuffer& textBuffer, Cursor& cursor, const Config& config, Commands& commands);
-    void HandleKeyboardInput();
+    Editor();
+    Editor(ITextBuffer& textBuffer, Cursor& cursor);
     ~Editor() = default;
+
+    void HandleKeyboardInput();
+    void switchToInsertMode();
+    void switchToNormalMode();
 
     ITextBuffer& textBuffer_;
     Cursor& cursor_;
-    const Config& config_;
-    Commands& commands_;
+
+    bool running_;
+    std::string input_;
+
+    std::unique_ptr<NormalMode> normalMode_;
+    std::unique_ptr<InsertMode> insertMode_;
+    IMode* mode_;
 };

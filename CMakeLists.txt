@@ -15,21 +15,20 @@ add_executable(Text_Editor
         src/utils/Config.cpp
         src/utils/FileHandler.cpp
         src/commands/Insert.cpp
-        src/commands/Insert.hpp
         src/commands/Normal.cpp
-        src/commands/Normal.hpp
-        src/commands/Commands.hpp
         src/graphics/Sdl.cpp
         src/graphics/Sdl.hpp
         src/utils/FileHandler.hpp
         src/buffer/Matrix.hpp
         src/buffer/Cursor.cpp
         src/buffer/Cursor.hpp
-        src/commands/Commands.cpp
         src/core/Editor.cpp
         src/core/Editor.hpp
         src/graphics/Renderer.cpp
         src/graphics/Renderer.hpp
+        src/commands/IMode.hpp
+        src/commands/Insert.hpp
+        src/commands/Normal.hpp
 )
 
 target_link_libraries(Text_Editor PRIVATE

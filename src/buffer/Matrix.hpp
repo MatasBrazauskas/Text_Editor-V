@@ -9,7 +9,8 @@ public:
 
     void init(std::vector<std::string> lines) override;
 
-    [[nodiscard]] std::string_view row(size_t row) const override;
+    [[nodiscard]] std::string_view rowView(size_t row) override;
+    [[nodiscard]] virtual std::string& rowRef(size_t row) override;
     [[nodiscard]] size_t size() const override;
 
 private:

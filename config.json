@@ -9,14 +9,14 @@
     },
     "font":
     {
-        "font_path": "fonts/Anonymous Pro Minus.ttf",
-        "font_size": 18
+        "font_path": "fonts/Anonymous Pro Minus B.ttf",
+        "font_size": 20
     },
     "colors":
     {
         "background_color": "000000",
         "foreground_color": "ffffff",
-        "cursor_color": "ff00ff",
-        "selection_color": "00ff00"
+        "cursor_color": "ffffff",
+        "selection_color": "000000"
     }
 }

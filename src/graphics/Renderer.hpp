@@ -7,12 +7,15 @@
 class Renderer {
 public:
     Renderer() = delete;
-    Renderer(const ITextBuffer& textBuffer, const Cursor& cursor, const Config& config, Sdl& sdl);
+    Renderer(ITextBuffer& textBuffer, const Cursor& cursor, const Config& config, Sdl& sdl);
     ~Renderer() = default;
 
-    void RenderText() const;
+    void Render() const;
 
-    const ITextBuffer& textBuffer_;
+    int width;
+    int height;
+
+    ITextBuffer& textBuffer_;
     const Cursor& cursor_;
     const Config& config_;
     Sdl& sdl_;

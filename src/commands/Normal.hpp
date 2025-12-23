@@ -1,4 +1,25 @@
 #pragma once
 
-class Normal {
+#include "commands/IMode.hpp"
+#include "buffer/ITextBuffer.hpp"
+#include "buffer/Cursor.hpp"
+#include <unordered_map>
+#include <functional>
+
+using namespace std::string_view_literals;
+
+class NormalMode final : public IMode {
+public:
+    NormalMode();
+
+    [[nodiscard]] std::string_view name() const noexcept override;
+
+    void HandleKeyboardInput(std::string& input, ITextBuffer& textBuffer,Cursor& cursor) override;
+
+    void moveCursorLeft(ITextBuffer&, Cursor&);
+    void moveCursorDown(ITextBuffer&, Cursor&);
+    void moveCursorUp(ITextBuffer&, Cursor&);
+    void moveCursorRight(ITextBuffer&, Cursor&);
+
+    std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&)>> commands_;
 };
