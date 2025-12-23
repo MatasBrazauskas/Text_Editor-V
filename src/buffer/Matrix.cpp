@@ -15,3 +15,7 @@ std::string &Matrix::rowRef(const size_t row) {
 size_t Matrix::size() const {
     return lines_.size();
 }
+
+void Matrix::erase(size_t row) {
+    lines_.erase(lines_.begin() + row);
+}

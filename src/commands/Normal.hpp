@@ -21,5 +21,13 @@ public:
     void moveCursorUp(ITextBuffer&, Cursor&);
     void moveCursorRight(ITextBuffer&, Cursor&);
 
+    void moveCursorTopFile(ITextBuffer&, Cursor&);
+    void moveCursorBottomFile(ITextBuffer&, Cursor&);
+
+    void moveRightMost(ITextBuffer&, Cursor&);
+    void moveLeftMost(ITextBuffer&, Cursor&);
+
+    void deleteLine(ITextBuffer&, Cursor&);
+
     std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&)>> commands_;
 };

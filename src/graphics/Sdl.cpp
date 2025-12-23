@@ -11,7 +11,7 @@ Sdl::Sdl(const Config& config) : window_(nullptr), renderer_(nullptr), font_(nul
         config.editor_.title.c_str(),
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        800, 600,
+        1000, 800,
         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE //| SDL_WINDOW_BORDERLESS
     );
 
