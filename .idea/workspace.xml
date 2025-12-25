@@ -30,13 +30,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/ITextBuffer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/ITextBuffer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/Normal.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/Normal.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/Normal.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/Normal.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Text Editor.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/text.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,7 +140,7 @@
       <workItem from="1766417300516" duration="41869000" />
       <workItem from="1766573600883" duration="73000" />
       <workItem from="1766649345763" duration="3012000" />
-      <workItem from="1766683309610" duration="6004000" />
+      <workItem from="1766683309610" duration="8771000" />
     </task>
     <servers />
   </component>

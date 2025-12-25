@@ -1,4 +1,5 @@
 #include "Matrix.hpp"
+#include <iostream>
 
 #include <algorithm>
 #include <string>
@@ -30,20 +31,32 @@ void Matrix::erase(const size_t row) {
 
 std::optional<size_t> Matrix::firstCharAccuranceRight(size_t row, size_t col, char c) const {
 	const auto rowLine = rowView(row);
-	const size_t index = std::find(rowLine.begin() + col, rowLine.end(), c);
 
-	if (index <= col) {
+	if (col + 1 >= rowLine.length()) {
 		return std::nullopt;
 	}
+
+	const size_t index = rowLine.find(c, col + 1);
+
+	if (index == std::string::npos || index <= col) {
+		return std::nullopt;
+	}
+
 	return index;
 }
 
 std::optional<size_t> Matrix::firstCharAccuranceLeft(size_t row, size_t col, char c) const {
 	const auto rowLine = rowView(row);
-	const auto index = std::find(rowLine.begin(), rowLine.end() - col, c);
 
-	if (index <= col) {
+	if (col - 1 < 0) {
 		return std::nullopt;
 	}
+
+	const size_t index = rowLine.rfind(c, col - 1);
+
+	if (index == std::string::npos || index >= col) {
+		return std::nullopt;
+	}
+
 	return index;
 }

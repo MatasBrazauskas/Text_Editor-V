@@ -8,6 +8,9 @@
 
 using namespace std::string_view_literals;
 
+using FixedFunc = std::function<void(ITextBuffer&, Cursor&)>;
+using ParamFunc = std::function<void(ITextBuffer&, Cursor&, char)>;
+
 class NormalMode final : public IMode {
 public:
 	NormalMode();
@@ -37,6 +40,9 @@ public:
 	void findFirstCharRight(ITextBuffer&, Cursor&, char);
 	void findFirstCharLeft(ITextBuffer&, Cursor&, char);
 
-	std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&)> > fixedCommands_;
-	std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&, char)>> paramCommands_;
+	std::unordered_map<std::string, FixedFunc> fixedCommands_;
+	std::unordered_map<std::string, ParamFunc> paramCommands_;
+
+	bool isParam;
+	ParamFunc paramFunc;
 };

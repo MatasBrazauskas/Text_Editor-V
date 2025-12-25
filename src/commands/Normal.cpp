@@ -73,29 +73,37 @@ void NormalMode::deleteLine(ITextBuffer& tb, Cursor& c) {
 	c.x_ = std::min(tb.rowLength(c.y_) - 1, c.x_);
 }
 
-void NormalMode::findFirstCharRight(ITextBuffer&, Cursor&, char) {
+void NormalMode::findFirstCharRight(ITextBuffer& tb, Cursor& c, char symb) {
+	const auto index = tb.firstCharAccuranceRight(c.y_, c.x_, symb);
 
+	if (index.has_value()) {
+		c.x_ = index.value();
+	}
 }
-void NormalMode::findFirstCharLeft(ITextBuffer&, Cursor&, char) {
+void NormalMode::findFirstCharLeft(ITextBuffer& tb, Cursor& c, char symb) {
+	const auto index = tb.firstCharAccuranceLeft(c.y_, c.x_, symb);
 
+	if (index.has_value()) {
+		c.x_ = index.value();
+	}
 }
 
-NormalMode::NormalMode() {
+NormalMode::NormalMode(): isParam{false}, paramFunc{nullptr} {
 	paramCommands_ = {
-		{"f", [this](ITextBuffer& tb, Cursor& c, char symb) {findFirstCharRight(tb, c, symb);}},
-		{"F", [this](ITextBuffer& tb, Cursor& c, char symb) {findFirstCharLeft(tb, c, symb);}},
+		{"f", [this](ITextBuffer& tb, Cursor& c, char symb) {return findFirstCharRight(tb, c, symb);}},
+		{"F", [this](ITextBuffer& tb, Cursor& c, char symb) {return findFirstCharLeft(tb, c, symb);}},
 	};
 
 	fixedCommands_ = {
-			{"h", [this](ITextBuffer& tb, Cursor& c) {moveCursorLeft(tb, c);}},
-			{"j", [this](ITextBuffer& tb, Cursor& c) {moveCursorDown(tb, c);}},
-			{"k", [this](ITextBuffer& tb, Cursor& c) {moveCursorUp(tb, c);}},
-			{"l", [this](ITextBuffer& tb, Cursor& c) {moveCursorRight(tb, c);}},
-			{"gg", [this](ITextBuffer& tb, Cursor& c) {moveCursorTopFile(tb, c);}},
-			{"G", [this](ITextBuffer& tb, Cursor& c) {moveCursorBottomFile(tb, c);}},
-			{"$", [this](ITextBuffer& tb, Cursor& c) {moveRightMost(tb, c);}},
-			{"0", [this](ITextBuffer& tb, Cursor& c) {moveLeftMost(tb, c);}},
-			{"dd", [this](ITextBuffer& tb, Cursor& c) {deleteLine(tb, c);}},
+		{"h", [this](ITextBuffer& tb, Cursor& c) {moveCursorLeft(tb, c);}},
+		{"j", [this](ITextBuffer& tb, Cursor& c) {moveCursorDown(tb, c);}},
+		{"k", [this](ITextBuffer& tb, Cursor& c) {moveCursorUp(tb, c);}},
+		{"l", [this](ITextBuffer& tb, Cursor& c) {moveCursorRight(tb, c);}},
+		{"gg", [this](ITextBuffer& tb, Cursor& c) {moveCursorTopFile(tb, c);}},
+		{"G", [this](ITextBuffer& tb, Cursor& c) {moveCursorBottomFile(tb, c);}},
+		{"$", [this](ITextBuffer& tb, Cursor& c) {moveRightMost(tb, c);}},
+		{"0", [this](ITextBuffer& tb, Cursor& c) {moveLeftMost(tb, c);}},
+		{"dd", [this](ITextBuffer& tb, Cursor& c) {deleteLine(tb, c);}},
 	};
 }
 
@@ -104,19 +112,35 @@ std::string_view NormalMode::name() const noexcept {
 }
 
 void NormalMode::HandleKeyboardInput(std::string& input, ITextBuffer& textBuffer, Cursor& cursor) {
-	std::cout << input << '\n';
-	bool flag = std::ranges::any_of(fixedCommands_, [input](const auto& c) {
-		return c.first.starts_with(input);
-	});
 
-	if (!flag) {
+	std::cout << '|' << input << "|\n";
+
+	if (isParam && !input.empty()) {
+		paramFunc(textBuffer, cursor, input.back());
+		paramFunc = nullptr;
+		isParam = false;
+		return;
+	}
+
+	if (const auto it = paramCommands_.find(input); it != paramCommands_.end()) {
+		paramFunc = it->second;
+		isParam = true;
 		input.clear();
 		return;
 	}
 
-	if (auto it = fixedCommands_.find(input); it != fixedCommands_.end()) {
+	if (const auto it = fixedCommands_.find(input); it != fixedCommands_.end()) {
 		it->second(textBuffer, cursor);
 		input.clear();
+		return;
+	}
+
+	bool flag1 = std::ranges::any_of(paramCommands_, [input](const auto& c) {return c.first.starts_with(input);});
+	bool flag2 = std::ranges::any_of(fixedCommands_, [input](const auto& c) {return c.first.starts_with(input);});
+
+	if (!flag1 && !flag2) {
+		input.clear();
+		return;
 	}
 
 	std::cout << "Cursor: " << cursor.x_ << ' ' << cursor.y_ << '\n';
