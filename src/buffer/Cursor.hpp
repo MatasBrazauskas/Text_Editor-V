@@ -5,7 +5,7 @@
 class Cursor {
 public:
     Cursor() = delete;
-    Cursor(const ITextBuffer& textBuffer);
+    Cursor(const ITextBuffer&);
 
     bool visible_;
     std::size_t x_;

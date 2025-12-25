@@ -4,19 +4,21 @@
 #include "buffer/ITextBuffer.hpp"
 #include "utils/Config.hpp"
 
-class Renderer {
+class Renderer final {
 public:
-    Renderer() = delete;
-    Renderer(ITextBuffer& textBuffer, const Cursor& cursor, const Config& config, Sdl& sdl);
-    ~Renderer() = default;
+	Renderer() = delete;
 
-    void Render() const;
+	Renderer(ITextBuffer&, const Cursor&, const Config&, Sdl&);
 
-    int width;
-    int height;
+	~Renderer() = default;
 
-    ITextBuffer& textBuffer_;
-    const Cursor& cursor_;
-    const Config& config_;
-    Sdl& sdl_;
+	void Render() const;
+
+	int width;
+	int height;
+
+	ITextBuffer&  textBuffer_;
+	const Cursor& cursor_;
+	const Config& config_;
+	Sdl&          sdl_;
 };

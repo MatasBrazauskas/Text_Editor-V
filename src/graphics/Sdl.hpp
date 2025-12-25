@@ -1,24 +1,23 @@
 #pragma once
 
-//#include "graphics/SdlWindow.hpp"
-//#include "graphics/SdlTtf.h"
-
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <string_view>
 
 #include "utils/Config.hpp"
 
-class Sdl {
+class Sdl final {
 public:
-    Sdl() = delete;
-    //Sdl(const char* title, const char* fontsPath, const size_t fontSize);
-    Sdl(const Config& config);
-    ~Sdl();
-    void RenderLine(std::string_view line, const SDL_Color& color, const size_t rowX);
-    //bool WindowOpen();
-//private:
-    SDL_Window *window_;
-    SDL_Renderer *renderer_;
-    TTF_Font* font_;
+	Sdl() = delete;
+
+	Sdl(const Config&);
+
+	~Sdl();
+
+	void RenderLine(std::string_view line, const SDL_Color&, const size_t rowX);
+
+	//private:
+	SDL_Window*   window_;
+	SDL_Renderer* renderer_;
+	TTF_Font*     font_;
 };

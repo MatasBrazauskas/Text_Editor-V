@@ -5,24 +5,27 @@
 #include "commands/Normal.hpp"
 #include <memory>
 
-//Get event and then process it; action -> actual change
-class Editor {
+class Editor final {
 public:
-    Editor();
-    Editor(ITextBuffer& textBuffer, Cursor& cursor);
-    ~Editor() = default;
+	Editor();
 
-    void HandleKeyboardInput();
-    void switchToInsertMode();
-    void switchToNormalMode();
+	Editor(ITextBuffer&, Cursor&);
 
-    ITextBuffer& textBuffer_;
-    Cursor& cursor_;
+	~Editor() = default;
 
-    bool running_;
-    std::string input_;
+	void HandleKeyboardInput();
 
-    std::unique_ptr<NormalMode> normalMode_;
-    std::unique_ptr<InsertMode> insertMode_;
-    IMode* mode_;
+	void switchToInsertMode();
+
+	void switchToNormalMode();
+
+	ITextBuffer& textBuffer_;
+	Cursor&      cursor_;
+
+	bool        running_;
+	std::string input_;
+
+	std::unique_ptr<NormalMode> normalMode_;
+	std::unique_ptr<InsertMode> insertMode_;
+	IMode*                      mode_;
 };

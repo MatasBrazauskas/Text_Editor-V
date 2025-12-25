@@ -10,24 +10,29 @@ using namespace std::string_view_literals;
 
 class NormalMode final : public IMode {
 public:
-    NormalMode();
+	NormalMode();
 
-    [[nodiscard]] std::string_view name() const noexcept override;
+	[[nodiscard]] std::string_view name() const noexcept override;
 
-    void HandleKeyboardInput(std::string& input, ITextBuffer& textBuffer,Cursor& cursor) override;
+	void HandleKeyboardInput(std::string&, ITextBuffer&, Cursor&) override;
 
-    void moveCursorLeft(ITextBuffer&, Cursor&);
-    void moveCursorDown(ITextBuffer&, Cursor&);
-    void moveCursorUp(ITextBuffer&, Cursor&);
-    void moveCursorRight(ITextBuffer&, Cursor&);
+	void moveCursorLeft(ITextBuffer&, Cursor&);
 
-    void moveCursorTopFile(ITextBuffer&, Cursor&);
-    void moveCursorBottomFile(ITextBuffer&, Cursor&);
+	void moveCursorDown(ITextBuffer&, Cursor&);
 
-    void moveRightMost(ITextBuffer&, Cursor&);
-    void moveLeftMost(ITextBuffer&, Cursor&);
+	void moveCursorUp(ITextBuffer&, Cursor&);
 
-    void deleteLine(ITextBuffer&, Cursor&);
+	void moveCursorRight(ITextBuffer&, Cursor&);
 
-    std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&)>> commands_;
+	void moveCursorTopFile(ITextBuffer&, Cursor&);
+
+	void moveCursorBottomFile(ITextBuffer&, Cursor&);
+
+	void moveRightMost(ITextBuffer&, Cursor&);
+
+	void moveLeftMost(ITextBuffer&, Cursor&);
+
+	void deleteLine(ITextBuffer&, Cursor&);
+
+	std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&)> > commands_;
 };

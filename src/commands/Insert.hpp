@@ -7,10 +7,11 @@
 
 using namespace std::string_view_literals;
 
-class InsertMode: public IMode {
+class InsertMode final : public IMode {
 public:
-    InsertMode() = default;
-    [[nodiscard]] std::string_view name() const noexcept override;
+	InsertMode() = default;
 
-    void HandleKeyboardInput(std::string& input, ITextBuffer& textBuffer, Cursor& cursor) override;
+	[[nodiscard]] std::string_view name() const noexcept override;
+
+	void HandleKeyboardInput(std::string& input, ITextBuffer&, Cursor&) override;
 };

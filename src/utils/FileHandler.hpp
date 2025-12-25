@@ -4,13 +4,16 @@
 #include <string>
 #include <vector>
 
-class FileHandler {
+class FileHandler final {
 public :
-    FileHandler() = delete;
-    FileHandler(const char* filesPath);
-    std::vector<std::string> getContent();
+	FileHandler() = delete;
 
-    ~FileHandler() = default;
+	FileHandler(const char*);
+
+	std::vector<std::string> getContent();
+
+	~FileHandler() = default;
+
 private:
-    std::ifstream file_;
+	std::ifstream file_;
 };
