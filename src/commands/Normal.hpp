@@ -34,5 +34,9 @@ public:
 
 	void deleteLine(ITextBuffer&, Cursor&);
 
-	std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&)> > commands_;
+	void findFirstCharRight(ITextBuffer&, Cursor&, char);
+	void findFirstCharLeft(ITextBuffer&, Cursor&, char);
+
+	std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&)> > fixedCommands_;
+	std::unordered_map<std::string, std::function<void(ITextBuffer&, Cursor&, char)>> paramCommands_;
 };

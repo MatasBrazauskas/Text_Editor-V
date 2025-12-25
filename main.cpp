@@ -10,12 +10,16 @@
 
 #include "core/Editor.hpp"
 
+using namespace std::string_literals;
 
 int main() {
 	constexpr auto Fps           = 60.0;
 	constexpr auto ticksPerFrame = 1.0 / Fps;
 	//Config
 	const std::filesystem::path configPath = "config.json";
+
+	const auto seperators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
+
 	Config                      config(configPath);
 
 	//Content
@@ -24,7 +28,7 @@ int main() {
 	const auto  lines = fileHandler.getContent();
 
 	Matrix matrix;
-	matrix.init(lines);
+	matrix.init(lines, seperators);
 
 	Cursor cursor{matrix};
 	cursor.visible_ = true;
