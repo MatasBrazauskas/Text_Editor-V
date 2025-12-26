@@ -19,6 +19,10 @@ void Editor::switchToNormalMode() {
 	mode_ = normalMode_.get();
 }
 
+void Editor::switchToCommandMode() {
+	mode_ = commandMode_.get();
+}
+
 void Editor::HandleKeyboardInput() {
 	SDL_Event event;
 
@@ -41,6 +45,11 @@ void Editor::HandleKeyboardInput() {
 				switchToInsertMode();
 				input_.clear();
 				std::cout << "Switched to insert mode\n";
+				return;
+			} else if (input_ == ":") {
+				switchToCommandMode();
+				input_.clear();
+				std::cout << "Switched to command mode\n";
 				return;
 			}
 		}

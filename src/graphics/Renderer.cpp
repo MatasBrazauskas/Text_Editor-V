@@ -18,11 +18,7 @@ void Renderer::Render() const {
 
 	for (size_t y = 0; y < textBuffer_.size(); ++y) {
 		const auto line = textBuffer_.rowView(y);
-
 		for (size_t x = 0; x < line.size(); ++x) {
-			if (x == cursor_.x_ && y == cursor_.y_)
-				continue;
-
 			char c[2] = {line[x], '\0'};
 
 			SDL_Surface* surface =
@@ -60,7 +56,6 @@ void Renderer::Render() const {
 
 		SDL_RenderFillRect(sdl_.renderer_, &cursorRect);
 
-		/* 4. Re-render cursor character */
 		char ch = ' ';
 		if (cursor_.y_ < textBuffer_.size()) {
 			const auto line = textBuffer_.rowView(cursor_.y_);

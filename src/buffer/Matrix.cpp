@@ -60,3 +60,11 @@ std::optional<size_t> Matrix::firstCharAccuranceLeft(size_t row, size_t col, cha
 
 	return index;
 }
+
+std::optional<std::string_view> Matrix::nextWord(size_t row, size_t col) const {
+	return std::nullopt;
+}
+
+std::optional<std::string_view> Matrix::prevWord(size_t row, size_t col) const {
+	return std::nullopt;
+}

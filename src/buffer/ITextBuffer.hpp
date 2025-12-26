@@ -26,5 +26,10 @@ public :
 
 	[[nodiscard]] virtual std::optional<size_t> firstCharAccuranceLeft(size_t row, size_t col, char c) const = 0;
 
+	[[nodiscard]] virtual std::optional<std::string_view> nextWord(size_t row, size_t col) const = 0;
+
+	[[nodiscard]] virtual std::optional<std::string_view> prevWord(size_t row, size_t col) const = 0;
+
+
 	std::string separators_;
 };

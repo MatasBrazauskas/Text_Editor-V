@@ -29,6 +29,8 @@ add_executable(Text_Editor
         src/commands/IMode.hpp
         src/commands/Insert.hpp
         src/commands/Normal.hpp
+        src/commands/CommandMode.cpp
+        src/commands/CommandMode.hpp
 )
 
 target_link_libraries(Text_Editor PRIVATE

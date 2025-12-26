@@ -23,6 +23,10 @@ public:
 
 	[[nodiscard]] std::optional<size_t> firstCharAccuranceLeft(size_t row, size_t col, char c) const override;
 
+	[[nodiscard]] std::optional<std::string_view> nextWord(size_t row, size_t col) const override;
+
+	[[nodiscard]] std::optional<std::string_view> prevWord(size_t row, size_t col) const override;
+
 private:
 	std::vector<std::string> lines_;
 };
