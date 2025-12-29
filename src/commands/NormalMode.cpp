@@ -9,8 +9,8 @@
 
 NormalMode::NormalMode(): paramFunc{nullptr} {
     paramCommands_ = {
-           {"f", [this](EditorState& state, Document& doc) { findFirstCharRight(state, doc); }},
-           {"F", [this](EditorState& state, Document& doc) { findFirstCharLeft(state, doc); }},
+           {"f", [this](EditorState& state, Document& doc) { return findFirstCharRight(state, doc); }},
+           {"F", [this](EditorState& state, Document& doc) { return findFirstCharLeft(state, doc); }},
     };
 
     fixedCommands_ = {
@@ -112,7 +112,7 @@ void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& documen
 	}
 
 	if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {
-		it->second(editorState, document);
+		paramFunc = it->second;
 		editorState.input_.clear();
 		return;
 	}
