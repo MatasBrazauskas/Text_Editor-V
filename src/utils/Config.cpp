@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <algorithm>
 
-EditorConfig::EditorConfig(const size_t tabSize, const bool              autoSave,
+EditorConfig::EditorConfig(const size_t tabSize, const bool autoSave,
                            const size_t autoSaveIntervalMs, const size_t cursorBlinkMs,
                            std::string  title)
 	: tab_size(tabSize), auto_save(autoSave), auto_save_intervals_ms(autoSaveIntervalMs),

@@ -4,7 +4,7 @@
         "title": "Text Editor",
         "tab_size": 8,
         "auto_save": false,
-        "auto_save_interval_ms": 500,
+        "auto_save_interval_ms": 1000,
         "cursor_blink_ms": 500
     },
     "font":

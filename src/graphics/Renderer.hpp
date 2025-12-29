@@ -1,24 +1,30 @@
 #pragma once
-#include "Sdl.hpp"
-#include "buffer/Cursor.hpp"
-#include "buffer/ITextBuffer.hpp"
+
+#include <SDL.h>
+#include <SDL_ttf.h>
+
 #include "utils/Config.hpp"
+#include "buffer/Files.hpp"
+#include "core/Editor.hpp"
 
 class Renderer final {
 public:
 	Renderer() = delete;
 
-	Renderer(ITextBuffer&, const Cursor&, const Config&, Sdl&);
+	Renderer(const EditorState&, const Files&, const Config&);
 
-	~Renderer() = default;
+	~Renderer();
 
 	void Render() const;
 
-	int width;
-	int height;
+	int width_;
+	int height_;
 
-	ITextBuffer&  textBuffer_;
-	const Cursor& cursor_;
+	SDL_Window*   window_;
+	SDL_Renderer* renderer_;
+	TTF_Font*     font_;
+
+	const EditorState& editorState_;
+	const Files& files_;
 	const Config& config_;
-	Sdl&          sdl_;
 };

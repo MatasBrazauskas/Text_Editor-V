@@ -32,16 +32,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/commands/CommandMode.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/ITextBuffer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/ITextBuffer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Cursor.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Cursor.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/ITextBuffer.hpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/IMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/IMode.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/Insert.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/Insert.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/Normal.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/Normal.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Editor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Editor.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Editor.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Editor.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/graphics/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphics/Renderer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphics/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphics/Renderer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphics/Sdl.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphics/Sdl.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/Config.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/Config.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,15 +67,21 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="38" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet.." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet.." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet.." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet.." root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="FJJZtLkX" />
@@ -99,7 +121,9 @@
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/home/matas/Repos/Text Editor/CMakeLists.txt",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "/home/matas/Repos/Text Editor/main.cpp",
     "org.rust.first.attach.projects": "true",
@@ -120,12 +144,12 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="Text_Editor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/cmake-build-debug/Text_Editor" EXPLICIT_BUILD_TARGET_NAME="all">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="Text_Editor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/cmake-build-debug/Text_Editor" EXPLICIT_BUILD_TARGET_NAME="all">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -151,7 +175,10 @@
       <workItem from="1766732087818" duration="338000" />
       <workItem from="1766732436270" duration="115000" />
       <workItem from="1766732563122" duration="12000" />
-      <workItem from="1766732603063" duration="4178000" />
+      <workItem from="1766732603063" duration="4226000" />
+      <workItem from="1766779895700" duration="8556000" />
+      <workItem from="1766947827561" duration="17069000" />
+      <workItem from="1767014075611" duration="2714000" />
     </task>
     <servers />
   </component>

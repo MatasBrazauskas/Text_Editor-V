@@ -1,35 +1,44 @@
 #pragma once
-#include "buffer/Cursor.hpp"
-#include "buffer/ITextBuffer.hpp"
-#include "commands/CommandMode.hpp"
-#include "commands/Insert.hpp"
-#include "commands/Normal.hpp"
+
 #include <memory>
+
+#include "buffer/Files.hpp"
+#include "commands/NormalMode.hpp"
+#include "commands/InsertMode.hpp"
+#include "commands/CommandMode.hpp"
+
+enum class Modes: uint8_t {Normal, Insert, Command};
+
+
+class EditorState final {
+public:
+	EditorState();
+	~EditorState() = default;
+
+	Modes currentMode_;
+
+	bool running_;
+	std::string input_;
+
+	size_t activeTab_;
+
+	std::string commandLineInput_;
+};
 
 class Editor final {
 public:
-	Editor();
+	Editor() = delete;
 
-	Editor(ITextBuffer&, Cursor&);
+	Editor(Files&, EditorState&);
 
 	~Editor() = default;
 
 	void HandleKeyboardInput();
 
-	void switchToInsertMode();
-
-	void switchToNormalMode();
-
-	void switchToCommandMode();
-
-	ITextBuffer& textBuffer_;
-	Cursor&      cursor_;
-
-	bool        running_;
-	std::string input_;
+	Files& files_;
+	EditorState& editorState_;
 
 	std::unique_ptr<NormalMode> normalMode_;
 	std::unique_ptr<InsertMode> insertMode_;
 	std::unique_ptr<CommandMode> commandMode_;
-	IMode*                      mode_;
 };

@@ -44,7 +44,6 @@ public:
 
 	~EditorConfig() noexcept = default;
 
-	//private:
 	size_t      tab_size;
 	bool        auto_save;
 	size_t      auto_save_intervals_ms;
@@ -60,7 +59,6 @@ public:
 
 	~FontConfig() noexcept = default;
 
-	//private:
 	std::string font_path;
 	size_t      font_size{};
 
@@ -75,7 +73,6 @@ public:
 
 	~ColorsConfig() noexcept = default;
 
-	//private:
 	SDL_Color background_color;
 	SDL_Color foreground_color;
 	SDL_Color cursor_color;
@@ -95,7 +92,6 @@ public:
 
 	~Config() noexcept;
 
-	//private:
 	EditorConfig editor_;
 	FontConfig   font_;
 	ColorsConfig colors_;

@@ -1,12 +1,11 @@
 #include "Matrix.hpp"
-#include <iostream>
 
 #include <algorithm>
 #include <string>
 
 void Matrix::init(std::vector<std::string> lines, std::string separators) {
 	lines_ = std::move(lines);
-	separators_ = separators;
+	separators_ = std::move(separators);
 }
 
 std::string_view Matrix::rowView(const size_t row) const {
@@ -29,7 +28,7 @@ void Matrix::erase(const size_t row) {
 	lines_.erase(lines_.begin() + row);
 }
 
-std::optional<size_t> Matrix::firstCharAccuranceRight(size_t row, size_t col, char c) const {
+std::optional<size_t> Matrix::firstCharOccurrenceRight(const size_t row, const size_t col, const char c) const {
 	const auto rowLine = rowView(row);
 
 	if (col + 1 >= rowLine.length()) {
@@ -45,7 +44,7 @@ std::optional<size_t> Matrix::firstCharAccuranceRight(size_t row, size_t col, ch
 	return index;
 }
 
-std::optional<size_t> Matrix::firstCharAccuranceLeft(size_t row, size_t col, char c) const {
+std::optional<size_t> Matrix::firstCharOccurrenceLeft(size_t row, size_t col, char c) const {
 	const auto rowLine = rowView(row);
 
 	if (col - 1 < 0) {

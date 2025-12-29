@@ -1,7 +1,9 @@
 #pragma once
-#include "ITextBuffer.hpp"
+
 #include <vector>
 #include <string>
+
+#include "buffer/Files.hpp"
 
 class Matrix final : public ITextBuffer {
 public:
@@ -19,9 +21,9 @@ public:
 
 	void erase(size_t row) override;
 
-	[[nodiscard]] std::optional<size_t> firstCharAccuranceRight(size_t row, size_t col, char c) const override;
+	[[nodiscard]] std::optional<size_t> firstCharOccurrenceRight(size_t row, size_t col, char c) const override;
 
-	[[nodiscard]] std::optional<size_t> firstCharAccuranceLeft(size_t row, size_t col, char c) const override;
+	[[nodiscard]] std::optional<size_t> firstCharOccurrenceLeft(size_t row, size_t col, char c) const override;
 
 	[[nodiscard]] std::optional<std::string_view> nextWord(size_t row, size_t col) const override;
 

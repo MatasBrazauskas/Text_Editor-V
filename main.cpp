@@ -1,52 +1,48 @@
 #include "Renderer.hpp"
-#include "src/graphics/Sdl.hpp"
 
 #include "src/utils/Config.hpp"
 #include "src/utils/FileHandler.hpp"
-
 #include "buffer/Matrix.hpp"
-
-#include "buffer/Cursor.hpp"
-
+#include "buffer/Files.hpp"
 #include "core/Editor.hpp"
+
+#include <iostream>
 
 using namespace std::string_literals;
 
+constexpr auto Fps           = 60.0;
+constexpr auto ticksPerFrame = 1.0 / Fps;
+
+const auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
+
+const std::filesystem::path configPath = "config.json";
+
+const auto  filesPath = "text.txt";
+
 int main() {
-	constexpr auto Fps           = 60.0;
-	constexpr auto ticksPerFrame = 1.0 / Fps;
-	//Config
-	const std::filesystem::path configPath = "config.json";
+	Config config(configPath);
 
-	const auto seperators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
-
-	Config                      config(configPath);
-
-	//Content
-	const auto  filesPath = "text.txt";
 	FileHandler fileHandler{filesPath};
 	const auto  lines = fileHandler.getContent();
 
-	Matrix matrix;
-	matrix.init(lines, seperators);
+	auto ptr = std::make_unique<Matrix>();
+	ptr->init(lines, separators);
 
-	Cursor cursor{matrix};
-	cursor.visible_ = true;
+	Files files;
+	files.addFrame(std::move(ptr));
 
-	Editor editor{matrix, cursor};
+	EditorState editorState;
+	Editor editor{files, editorState};
+	Renderer renderer{editorState, files, config};
 
-	//Graphics
-	Sdl      sdl{config};
-	Renderer renderer{matrix, cursor, config, sdl};
 
-	const Uint64 freq        = SDL_GetPerformanceFrequency();
-	Uint64       renderStart = SDL_GetPerformanceCounter();
+	const Uint64 freq = SDL_GetPerformanceFrequency();
+	Uint64 renderStart = SDL_GetPerformanceCounter();
 
-	while (editor.running_) {
+	while (editorState.running_) {
 
 		Uint64 end        = SDL_GetPerformanceCounter();
-		double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(
-			                    freq);
+		double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
 		editor.HandleKeyboardInput();
 
@@ -55,4 +51,6 @@ int main() {
 			renderer.Render();
 		}
 	}
+
+	std::cout << "Real end\n";
 }

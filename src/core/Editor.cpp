@@ -3,57 +3,55 @@
 #include <iostream>
 #include <SDL.h>
 
-Editor::Editor(ITextBuffer& textBuffer, Cursor& cursor) : textBuffer_(textBuffer), cursor_(cursor),
-                                                          running_(true) {
-	normalMode_ = std::make_unique<NormalMode>();
-	insertMode_ = std::make_unique<InsertMode>();
+#include "utils/Config.hpp"
 
-	mode_ = normalMode_.get();
-}
+EditorState::EditorState(): currentMode_{Modes::Normal}, running_{true}, activeTab_{} {}
 
-void Editor::switchToInsertMode() {
-	mode_ = insertMode_.get();
-}
-
-void Editor::switchToNormalMode() {
-	mode_ = normalMode_.get();
-}
-
-void Editor::switchToCommandMode() {
-	mode_ = commandMode_.get();
+Editor::Editor(Files& files, EditorState& editorState) : files_{files}, editorState_ {editorState}{
+	normalMode_  = std::make_unique<NormalMode>();
+	insertMode_  = std::make_unique<InsertMode>();
+	commandMode_ = std::unique_ptr<CommandMode>();
 }
 
 void Editor::HandleKeyboardInput() {
 	SDL_Event event;
 
 	while (SDL_PollEvent(&event)) {
+
 		if (event.type == SDL_QUIT) {
-			running_ = false;
-			std::cout << "Quit programme\n";
+			editorState_.running_ = false;
 			return;
 		}
 		if (event.type == SDL_KEYDOWN) {
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
-				switchToNormalMode();
-				input_.clear();
+				editorState_.currentMode_ = Modes::Normal;
+				editorState_.input_.clear();
 				std::cout << "Switched to normal mode\n";
 				return;
 			}
 		} else if (event.type == SDL_TEXTINPUT) {
-			input_.append(event.text.text);
-			if (input_ == "i") {
-				switchToInsertMode();
-				input_.clear();
+			editorState_.input_.append(event.text.text);
+			if (editorState_.input_ == "i") {
+				editorState_.currentMode_ = Modes::Insert;
+				editorState_.input_.clear();
 				std::cout << "Switched to insert mode\n";
 				return;
-			} else if (input_ == ":") {
-				switchToCommandMode();
-				input_.clear();
+			}
+			if (editorState_.input_ == ":") {
+				editorState_.currentMode_ = Modes::Command;
+				editorState_.input_.clear();
 				std::cout << "Switched to command mode\n";
 				return;
 			}
 		}
 
-		mode_->HandleKeyboardInput(input_, textBuffer_, cursor_);
+		std::cout << "Input state: " << editorState_.input_ << '\n';
+
+		switch (editorState_.currentMode_) {
+			case Modes::Normal: normalMode_->HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
+			case Modes::Insert: insertMode_->HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
+			case Modes::Command: commandMode_->HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
+
+		}
 	}
 }
