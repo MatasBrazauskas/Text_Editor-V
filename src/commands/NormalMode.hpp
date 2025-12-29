@@ -43,4 +43,5 @@ public:
 	std::unordered_map<std::string, ParamFunc> paramCommands_;
 
 	ParamFunc paramFunc;
+	size_t paramCount_;
 };

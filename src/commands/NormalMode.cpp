@@ -5,9 +5,8 @@
 
 #include <algorithm>
 #include <iostream>
-#include <ostream>
 
-NormalMode::NormalMode(): paramFunc{nullptr} {
+NormalMode::NormalMode(): paramFunc{nullptr}, paramCount_{} {
     paramCommands_ = {
            {"f", [this](EditorState& state, Document& doc) { return findFirstCharRight(state, doc); }},
            {"F", [this](EditorState& state, Document& doc) { return findFirstCharLeft(state, doc); }},
@@ -87,7 +86,6 @@ void NormalMode::deleteLine(EditorState&, Document& doc) {
 }
 
 void NormalMode::findFirstCharRight(EditorState& editorState, Document& doc) {
-    // Note: 'symb' needs to be passed in or grabbed from state.input_
     char symb = editorState.input_.back();
     const auto index = doc.textBuffer_->firstCharOccurrenceRight(doc.cursor_.y_, doc.cursor_.x_, symb);
     if (index.has_value()) {
@@ -105,15 +103,17 @@ void NormalMode::findFirstCharLeft(EditorState& editorState, Document& doc) {
 
 void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
 
-	if (paramFunc != nullptr && !editorState.input_.empty()) {
+	if (paramFunc != nullptr && paramCount_ + 1 == editorState.input_.size()) {
 		paramFunc(editorState, document);
+		editorState.input_.clear();
 		paramFunc = nullptr;
+		paramCount_ = 0;
 		return;
 	}
 
 	if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {
 		paramFunc = it->second;
-		editorState.input_.clear();
+		paramCount_ = editorState.input_.size();
 		return;
 	}
 
@@ -127,7 +127,6 @@ void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& documen
 	const bool flag2 = std::ranges::any_of(fixedCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
 
 	if (!flag1 && !flag2) {
-		std::cout << "Unknown command: " << editorState.input_ << '\n';
 		editorState.input_.clear();
 	}
 }
