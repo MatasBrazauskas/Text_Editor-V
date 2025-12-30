@@ -8,8 +8,18 @@ public:
 	Cursor();
 	~Cursor() = default;
 
-	size_t x_;
-	size_t y_;
+	void        incrementX();
+	void        decrementX();
+	void        incrementY();
+	void        decrementY();
+	std::size_t getX() const;
+	std::size_t getY() const;
+	void        setX(std::size_t);
+	void        setY(std::size_t);
+	bool        isVisible() const;
+private:
+	std::size_t x_;
+	std::size_t y_;
 	bool visible_;
 };
 
@@ -31,8 +41,8 @@ public :
 
 	[[nodiscard]] virtual size_t size() const = 0;
 
-	virtual void erase(size_t row) = 0;
-
+	virtual void deleteLine(size_t row) = 0;
+	virtual void deleteCharacter(size_t row, size_t col) = 0;
 
 	[[nodiscard]] virtual std::optional<size_t> firstCharOccurrenceRight(size_t row, size_t col, char c) const = 0;
 
@@ -42,24 +52,25 @@ public :
 
 	[[nodiscard]] virtual std::optional<std::string_view> prevWord(size_t row, size_t col) const = 0;
 
-
+	virtual void insertLine(size_t row) = 0;
 };
 
 class Document final {
 public:
 	Document() = delete;
 
-	explicit Document(std::unique_ptr<ITextBuffer> textBuffer);
+	explicit Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName);
 
 	std::unique_ptr<ITextBuffer> textBuffer_;
 	Cursor cursor_;
+	std::string fileName_;
 };
 
 class Files final {
 public:
 	Files() = default;
 
-	void addFrame(std::unique_ptr<ITextBuffer> textBuffer);
+	void addFrame(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName);
 
 	[[nodiscard]] Document& getDocument(size_t index) const;
 

@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <iostream>
 
-NormalMode::NormalMode(): paramFunc{nullptr}, paramCount_{} {
+NormalMode::NormalMode(): paramFunc_{nullptr}, paramCount_{} {
     paramCommands_ = {
            {"f", [this](EditorState& state, Document& doc) { return findFirstCharRight(state, doc); }},
            {"F", [this](EditorState& state, Document& doc) { return findFirstCharLeft(state, doc); }},
@@ -22,111 +22,137 @@ NormalMode::NormalMode(): paramFunc{nullptr}, paramCount_{} {
            {"$", [this](EditorState& state, Document& doc) { moveRightMost(state, doc); }},
            {"0", [this](EditorState& state, Document& doc) { moveLeftMost(state, doc); }},
            {"dd", [this](EditorState& state, Document& doc) { deleteLine(state, doc); }},
+	   {"x", [this](EditorState& state, Document& doc) { deleteChar(state, doc);}},
+           {"O", [this](EditorState& state, Document& doc) { insertLineAbove(state, doc); }},
+	   {"o", [this](EditorState& state, Document& doc) { insertLineBelow(state, doc); }},
+           {"i", [this](EditorState& state, Document& doc) { switchToInsertLeft(state, doc); }},
+           {"a", [this](EditorState& state, Document& doc) { switchToInsertRight(state, doc); }},
     };
 }
 
 void NormalMode::moveCursorLeft(EditorState&, Document& doc) {
-    if (doc.cursor_.x_ > 0) {
-        doc.cursor_.x_--;
+    if (doc.cursor_.getX() > 0) {
+        doc.cursor_.decrementX();
     }
 }
 
 void NormalMode::moveCursorRight(EditorState&, Document& doc) {
-    if (doc.textBuffer_->rowView(doc.cursor_.y_).length() - 1 > doc.cursor_.x_) {
-        doc.cursor_.x_++;
+    if (doc.textBuffer_->rowView(doc.cursor_.getY()).length() - 1 > doc.cursor_.getX()) {
+        doc.cursor_.incrementX();
     }
 }
 
 void NormalMode::moveCursorUp(EditorState&, Document& doc) {
-    if (doc.cursor_.y_ > 0) {
-        const size_t currRowLength = doc.textBuffer_->rowView(doc.cursor_.y_).length();
-        doc.cursor_.y_--;
-        const size_t nextRowLength = doc.textBuffer_->rowView(doc.cursor_.y_).length();
+    if (doc.cursor_.getY() > 0) {
+        const size_t currRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
+    	doc.cursor_.decrementY();
+        const size_t nextRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
 
-        if (currRowLength - 1 == doc.cursor_.x_ || nextRowLength - 1 <= doc.cursor_.x_) {
-            doc.cursor_.x_ = nextRowLength - 1;
+        if (currRowLength - 1 == doc.cursor_.getX() || nextRowLength - 1 <= doc.cursor_.getX()) {
+            doc.cursor_.setX(nextRowLength - 1);
         }
     }
 }
 
 void NormalMode::moveCursorDown(EditorState&, Document& doc) {
-    if (doc.textBuffer_->size() - 1 > doc.cursor_.y_) {
-        const size_t currRowLength = doc.textBuffer_->rowView(doc.cursor_.y_).length();
-        doc.cursor_.y_++;
-        const size_t nextRowLength = doc.textBuffer_->rowView(doc.cursor_.y_).length();
+    if (doc.textBuffer_->size() - 1 > doc.cursor_.getY()) {
+        const size_t currRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
+    	doc.cursor_.incrementY();
+        const size_t nextRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
 
-        if (currRowLength - 1 == doc.cursor_.x_ || nextRowLength - 1 <= doc.cursor_.x_) {
-            doc.cursor_.x_ = nextRowLength - 1;
+        if (currRowLength - 1 == doc.cursor_.getX() || nextRowLength - 1 <= doc.cursor_.getX()) {
+            doc.cursor_.setX(nextRowLength - 1);
         }
     }
 }
 
 void NormalMode::moveCursorTopFile(EditorState&, Document& doc) {
-    doc.cursor_.y_ = 0;
-    doc.cursor_.x_ = std::min(doc.textBuffer_->rowLength(doc.cursor_.y_) - 1, doc.cursor_.x_);
+    doc.cursor_.setY(0);
+    doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
 }
 
 void NormalMode::moveCursorBottomFile(EditorState&, Document& doc) {
-    doc.cursor_.y_ = doc.textBuffer_->size() - 1;
-    doc.cursor_.x_ = std::min(doc.textBuffer_->rowLength(doc.cursor_.y_) - 1, doc.cursor_.x_);
+    doc.cursor_.setY(doc.textBuffer_->size() - 1);
+    doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
 }
 
 void NormalMode::moveRightMost(EditorState&, Document& doc) {
-    doc.cursor_.x_ = doc.textBuffer_->rowView(doc.cursor_.y_).length() - 1;
+    doc.cursor_.setX(doc.textBuffer_->rowView(doc.cursor_.getY()).length() - 1);
 }
 
 void NormalMode::moveLeftMost(EditorState&, Document& doc) {
-    doc.cursor_.x_ = 0;
+    doc.cursor_.setX(0);
 }
 
 void NormalMode::deleteLine(EditorState&, Document& doc) {
-    doc.textBuffer_->erase(doc.cursor_.y_);
-    doc.cursor_.y_ = std::min(doc.textBuffer_->size() - 1, doc.cursor_.y_);
-    doc.cursor_.x_ = std::min(doc.textBuffer_->rowLength(doc.cursor_.y_) - 1, doc.cursor_.x_);
+    doc.textBuffer_->deleteLine(doc.cursor_.getY());
+    doc.cursor_.setY(std::min(doc.textBuffer_->size() - 1, doc.cursor_.getY()));
+    doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
+}
+
+void NormalMode::deleteChar(EditorState&, Document& doc) {
+	doc.textBuffer_->deleteCharacter(doc.cursor_.getY(), doc.cursor_.getX());
 }
 
 void NormalMode::findFirstCharRight(EditorState& editorState, Document& doc) {
     char symb = editorState.input_.back();
-    const auto index = doc.textBuffer_->firstCharOccurrenceRight(doc.cursor_.y_, doc.cursor_.x_, symb);
+    const auto index = doc.textBuffer_->firstCharOccurrenceRight(doc.cursor_.getY(), doc.cursor_.getX(), symb);
     if (index.has_value()) {
-        doc.cursor_.x_ = index.value();
+        doc.cursor_.setX(index.value());
     }
 }
 
 void NormalMode::findFirstCharLeft(EditorState& editorState, Document& doc) {
     char symb = editorState.input_.back();
-    const auto index = doc.textBuffer_->firstCharOccurrenceLeft(doc.cursor_.y_, doc.cursor_.x_, symb);
+    const auto index = doc.textBuffer_->firstCharOccurrenceLeft(doc.cursor_.getY(), doc.cursor_.getX(), symb);
     if (index.has_value()) {
-        doc.cursor_.x_ = index.value();
+        doc.cursor_.setX(index.value());
     }
+}
+
+void NormalMode::insertLineAbove(EditorState& editorState, Document& doc) {
+	doc.textBuffer_->insertLine(doc.cursor_.getY());
+	doc.cursor_.setX(0);
+	editorState.currentMode_ = Modes::Insert;
+}
+void NormalMode::insertLineBelow(EditorState& editorState, Document& doc) {
+	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1);
+	doc.cursor_.incrementY();
+	doc.cursor_.setX(0);
+	editorState.currentMode_ = Modes::Insert;
+}
+
+void NormalMode::switchToInsertLeft(EditorState& editorState, Document&) {
+	editorState.currentMode_ = Modes::Insert;
+}
+void NormalMode::switchToInsertRight(EditorState& editorState, Document& doc) {
+	editorState.currentMode_ = Modes::Insert;
+	doc.cursor_.incrementX();
 }
 
 void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
 
-	if (paramFunc != nullptr && paramCount_ + 1 == editorState.input_.size()) {
-		paramFunc(editorState, document);
+	if (paramFunc_ != nullptr && paramCount_ + 1 == editorState.input_.size()) {
+		paramFunc_(editorState, document);
 		editorState.input_.clear();
-		paramFunc = nullptr;
 		paramCount_ = 0;
-		return;
-	}
 
-	if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {
-		paramFunc = it->second;
+	} else if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {
+		paramFunc_ = it->second;
 		paramCount_ = editorState.input_.size();
-		return;
-	}
 
-	if (const auto it = fixedCommands_.find(editorState.input_); it != fixedCommands_.end()) {
+	} else if (const auto it = fixedCommands_.find(editorState.input_); it != fixedCommands_.end()) {
 		it->second(editorState, document);
 		editorState.input_.clear();
-		return;
-	}
+		paramFunc_ = nullptr;
 
-	const bool flag1 = std::ranges::any_of(paramCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
-	const bool flag2 = std::ranges::any_of(fixedCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
+	} else {
+		const bool flag1 = std::ranges::any_of(paramCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
+		const bool flag2 = std::ranges::any_of(fixedCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
 
-	if (!flag1 && !flag2) {
-		editorState.input_.clear();
+		if (!flag1 && !flag2) {
+			editorState.input_.clear();
+			paramFunc_ = nullptr;
+		}
 	}
 }

@@ -61,7 +61,7 @@ void Renderer::Render() const {
 	const auto fg       = config_.colors_.foreground_color;
 	const auto cursorBg = config_.colors_.cursor_color;
 	const auto cursorFg = config_.colors_.selection_color;
-	const auto& [textBuffer, cursor] = files_.getDocument(editorState_.activeTab_);
+	const auto& [textBuffer, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
 	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 	SDL_RenderClear(renderer_);
@@ -90,12 +90,12 @@ void Renderer::Render() const {
 		}
 	}
 
-	if (cursor.visible_) {
+	if (cursor.isVisible()) {
 		SDL_SetRenderDrawColor(renderer_,cursorBg.r, cursorBg.g, cursorBg.b, cursorBg.a);
 
 		const SDL_Rect cursorRect{
-				static_cast<int>(cursor.x_ * width_),
-				static_cast<int>(cursor.y_ * height_),
+				static_cast<int>(cursor.getX() * width_),
+				static_cast<int>(cursor.getY() * height_),
 				width_,
 				height_
 		};
@@ -103,10 +103,10 @@ void Renderer::Render() const {
 		SDL_RenderFillRect(renderer_, &cursorRect);
 
 		char ch = ' ';
-		if (cursor.y_ < textBuffer->size()) {
-			const auto line = textBuffer->rowView(cursor.y_);
-			if (cursor.x_ < line.size())
-				ch = line[cursor.x_];
+		if (cursor.getY() < textBuffer->size()) {
+			const auto line = textBuffer->rowView(cursor.getY());
+			if (cursor.getX() < line.size())
+				ch = line[cursor.getX()];
 		}
 
 		char text[2] = {ch, '\0'};
@@ -116,8 +116,8 @@ void Renderer::Render() const {
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 		const SDL_Rect dst{
-				static_cast<int>(cursor.x_ * width_),
-				static_cast<int>(cursor.y_ * height_),
+				static_cast<int>(cursor.getX() * width_),
+				static_cast<int>(cursor.getY() * height_),
 				surface->w,
 				surface->h
 		};

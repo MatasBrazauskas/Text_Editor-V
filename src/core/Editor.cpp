@@ -10,7 +10,7 @@ EditorState::EditorState(): currentMode_{Modes::Normal}, running_{true}, activeT
 Editor::Editor(Files& files, EditorState& editorState) : files_{files}, editorState_ {editorState}{
 	normalMode_  = std::make_unique<NormalMode>();
 	insertMode_  = std::make_unique<InsertMode>();
-	commandMode_ = std::unique_ptr<CommandMode>();
+	commandMode_ = std::make_unique<CommandMode>();
 }
 
 void Editor::HandleKeyboardInput() {
@@ -31,19 +31,9 @@ void Editor::HandleKeyboardInput() {
 			}
 		} else if (event.type == SDL_TEXTINPUT) {
 			editorState_.input_.append(event.text.text);
-			if (editorState_.input_ == "i") {
-				editorState_.currentMode_ = Modes::Insert;
-				editorState_.input_.clear();
-				std::cout << "Switched to insert mode\n";
-				return;
-			}
-			if (editorState_.input_ == ":") {
-				editorState_.currentMode_ = Modes::Command;
-				editorState_.input_.clear();
-				std::cout << "Switched to command mode\n";
-				return;
-			}
 		}
+
+		if (editorState_.input_.empty()) return;
 
 		std::cout << "Input state: " << editorState_.input_ << '\n';
 

@@ -8,8 +8,9 @@ void InsertMode::HandleKeyboardInput(EditorState& editorState, Document& documen
 	auto& cursor = document.cursor_;
 
 	if (!editorState.input_.empty()) {
-		auto& row = textBuffer->rowRef(cursor.y_);
-		row.insert(cursor.x_++, editorState.input_);
+		auto& row = textBuffer->rowRef(cursor.getY());
+		row.insert(cursor.getX(), editorState.input_);
+		cursor.incrementX();
 		editorState.input_.clear();
 	}
 }

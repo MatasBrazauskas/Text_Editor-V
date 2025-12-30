@@ -29,7 +29,7 @@ int main() {
 	ptr->init(lines, separators);
 
 	Files files;
-	files.addFrame(std::move(ptr));
+	files.addFrame(std::move(ptr), filesPath);
 
 	EditorState editorState;
 	Editor editor{files, editorState};

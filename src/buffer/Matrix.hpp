@@ -19,7 +19,9 @@ public:
 
 	[[nodiscard]] size_t size() const override;
 
-	void erase(size_t row) override;
+	void deleteLine(size_t row) override;
+
+	void deleteCharacter(size_t row, size_t col) override;
 
 	[[nodiscard]] std::optional<size_t> firstCharOccurrenceRight(size_t row, size_t col, char c) const override;
 
@@ -28,6 +30,8 @@ public:
 	[[nodiscard]] std::optional<std::string_view> nextWord(size_t row, size_t col) const override;
 
 	[[nodiscard]] std::optional<std::string_view> prevWord(size_t row, size_t col) const override;
+
+	void insertLine(size_t row) override;
 
 private:
 	std::vector<std::string> lines_;

@@ -24,8 +24,12 @@ size_t Matrix::size() const {
 	return lines_.size();
 }
 
-void Matrix::erase(const size_t row) {
+void Matrix::deleteLine(const size_t row) {
 	lines_.erase(lines_.begin() + row);
+}
+
+void Matrix::deleteCharacter(const size_t row, const size_t col) {
+	lines_.at(row).erase(col, 1);
 }
 
 std::optional<size_t> Matrix::firstCharOccurrenceRight(const size_t row, const size_t col, const char c) const {
@@ -66,4 +70,8 @@ std::optional<std::string_view> Matrix::nextWord(size_t row, size_t col) const {
 
 std::optional<std::string_view> Matrix::prevWord(size_t row, size_t col) const {
 	return std::nullopt;
+}
+
+void Matrix::insertLine(const size_t row) {
+	lines_.insert(lines_.begin() + row, "");
 }
