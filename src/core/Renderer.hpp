@@ -15,10 +15,13 @@ public:
 
 	~Renderer();
 
-	void Render() const;
+	void Render();
 
-	int width_;
-	int height_;
+	int charWidth_;
+	int charHeight_;
+
+	int windowWidth_;
+	int windowHeight_;
 
 	SDL_Window*   window_;
 	SDL_Renderer* renderer_;
@@ -27,4 +30,8 @@ public:
 	const EditorState& editorState_;
 	const Files& files_;
 	const Config& config_;
+private:
+	void RenderText() const;
+	void RenderCursor() const;
+	void RenderCommandLine() const;
 };

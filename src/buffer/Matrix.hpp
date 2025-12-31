@@ -7,7 +7,7 @@
 
 class Matrix final : public ITextBuffer {
 public:
-	Matrix() = default;
+	Matrix();
 
 	void init(std::vector<std::string> lines, std::string separators) override;
 

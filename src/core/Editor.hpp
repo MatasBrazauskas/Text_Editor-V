@@ -9,7 +9,6 @@
 
 enum class Modes: uint8_t {Normal, Insert, Command};
 
-
 class EditorState final {
 public:
 	EditorState();
@@ -38,7 +37,7 @@ public:
 	Files& files_;
 	EditorState& editorState_;
 
-	std::unique_ptr<NormalMode> normalMode_;
-	std::unique_ptr<InsertMode> insertMode_;
-	std::unique_ptr<CommandMode> commandMode_;
+	NormalMode normalMode_;
+	InsertMode insertMode_;
+	CommandMode commandMode_;
 };

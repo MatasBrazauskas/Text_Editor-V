@@ -19,8 +19,8 @@ add_executable(Text_Editor
         src/buffer/Matrix.hpp
         src/core/Editor.cpp
         src/core/Editor.hpp
-        src/graphics/Renderer.cpp
-        src/graphics/Renderer.hpp
+        src/core/Renderer.cpp
+        src/core/Renderer.hpp
         src/commands/IMode.hpp
         src/commands/InsertMode.hpp
         src/commands/NormalMode.hpp

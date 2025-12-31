@@ -2,21 +2,24 @@
 #include <vector>
 #include <memory>
 #include <optional>
+#include <unordered_set>
+
+#include "utils/FileHandler.hpp"
 
 class Cursor final {
 public:
 	Cursor();
 	~Cursor() = default;
 
-	void        incrementX();
-	void        decrementX();
-	void        incrementY();
-	void        decrementY();
-	std::size_t getX() const;
-	std::size_t getY() const;
-	void        setX(std::size_t);
-	void        setY(std::size_t);
-	bool        isVisible() const;
+	void incrementX();
+	void decrementX();
+	void incrementY();
+	void decrementY();
+	[[nodiscard]] std::size_t getX() const;
+	[[nodiscard]] std::size_t getY() const;
+	void setX(std::size_t);
+	void setY(std::size_t);
+	[[nodiscard]] bool isVisible() const;
 private:
 	std::size_t x_;
 	std::size_t y_;
@@ -55,6 +58,22 @@ public :
 	virtual void insertLine(size_t row) = 0;
 };
 
+class TextBufferView final {
+public:
+	TextBufferView();
+	~TextBufferView() = default;
+
+	std::size_t windowWidth_;
+	std::size_t windowHeight_;
+	std::size_t cursorX_;
+	std::size_t cursorY_;
+
+	std::unordered_set<std::size_t> dirtyLinesIndexes_;
+
+	void clearDirtyLines();
+	void addDirtyLine(std::size_t index);
+};
+
 class Document final {
 public:
 	Document() = delete;
@@ -62,17 +81,21 @@ public:
 	explicit Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName);
 
 	std::unique_ptr<ITextBuffer> textBuffer_;
+	TextBufferView view_;
 	Cursor cursor_;
 	std::string fileName_;
 };
 
 class Files final {
 public:
-	Files() = default;
+	explicit Files(FileHandler&, int argc, char** argv);
 
 	void addFrame(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName);
 
 	[[nodiscard]] Document& getDocument(size_t index) const;
 
+	void removeDocument(size_t index);
+
+	FileHandler& fileHandler_;
 	std::vector<std::unique_ptr<Document>> files_;
 };

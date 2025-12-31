@@ -7,11 +7,7 @@
 
 EditorState::EditorState(): currentMode_{Modes::Normal}, running_{true}, activeTab_{} {}
 
-Editor::Editor(Files& files, EditorState& editorState) : files_{files}, editorState_ {editorState}{
-	normalMode_  = std::make_unique<NormalMode>();
-	insertMode_  = std::make_unique<InsertMode>();
-	commandMode_ = std::make_unique<CommandMode>();
-}
+Editor::Editor(Files& files, EditorState& editorState): files_{files}, editorState_ {editorState} {}
 
 void Editor::HandleKeyboardInput() {
 	SDL_Event event;
@@ -38,9 +34,9 @@ void Editor::HandleKeyboardInput() {
 		std::cout << "Input state: " << editorState_.input_ << '\n';
 
 		switch (editorState_.currentMode_) {
-			case Modes::Normal: normalMode_->HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
-			case Modes::Insert: insertMode_->HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
-			case Modes::Command: commandMode_->HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
+			case Modes::Normal: normalMode_.HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
+			case Modes::Insert: insertMode_.HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
+			case Modes::Command: commandMode_.HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
 
 		}
 	}

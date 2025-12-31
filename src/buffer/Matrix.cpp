@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <string>
 
+Matrix::Matrix() {
+	lines_ = {""};
+}
+
 void Matrix::init(std::vector<std::string> lines, std::string separators) {
 	lines_ = std::move(lines);
 	separators_ = std::move(separators);

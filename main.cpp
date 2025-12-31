@@ -1,4 +1,4 @@
-#include "Renderer.hpp"
+#include "src/core/Renderer.hpp"
 
 #include "src/utils/Config.hpp"
 #include "src/utils/FileHandler.hpp"
@@ -17,24 +17,15 @@ const auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
 
 const std::filesystem::path configPath = "config.json";
 
-const auto  filesPath = "text.txt";
-
-int main() {
+int main(int argc, char** argv) {
 	Config config(configPath);
 
-	FileHandler fileHandler{filesPath};
-	const auto  lines = fileHandler.getContent();
-
-	auto ptr = std::make_unique<Matrix>();
-	ptr->init(lines, separators);
-
-	Files files;
-	files.addFrame(std::move(ptr), filesPath);
+	FileHandler fileHandler;
+	Files files{fileHandler, argc, argv};
 
 	EditorState editorState;
 	Editor editor{files, editorState};
 	Renderer renderer{editorState, files, config};
-
 
 	const Uint64 freq = SDL_GetPerformanceFrequency();
 	Uint64 renderStart = SDL_GetPerformanceCounter();
@@ -51,6 +42,4 @@ int main() {
 			renderer.Render();
 		}
 	}
-
-	std::cout << "Real end\n";
 }

@@ -1,7 +1,7 @@
 #include "Renderer.hpp"
 
 Renderer::Renderer(const EditorState& editorState, const Files& files, const Config& config)
-	: width_{}, height_{}, editorState_{editorState}, files_{files}, config_{config} {
+	: charWidth_{}, charHeight_{}, windowWidth_{}, windowHeight_{}, editorState_{editorState}, files_{files}, config_{config} {
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
 		throw std::runtime_error(SDL_GetError());
@@ -42,7 +42,7 @@ Renderer::Renderer(const EditorState& editorState, const Files& files, const Con
 	}
 
 	TTF_SetFontHinting(font_, TTF_HINTING_LIGHT);
-	TTF_SizeText(font_, "a", &width_, &height_);
+	TTF_SizeText(font_, "a", &charWidth_, &charHeight_);
 }
 
 Renderer::~Renderer() {
@@ -56,49 +56,54 @@ Renderer::~Renderer() {
 	}
 }
 
-void Renderer::Render() const {
-	const auto bg       = config_.colors_.background_color;
-	const auto fg       = config_.colors_.foreground_color;
-	const auto cursorBg = config_.colors_.cursor_color;
-	const auto cursorFg = config_.colors_.selection_color;
-	const auto& [textBuffer, cursor, _] = files_.getDocument(editorState_.activeTab_);
+void Renderer::RenderText() const {
+	const auto bg = config_.colors_.background_color;
+	const auto fg = config_.colors_.foreground_color;
+
+	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
 	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 	SDL_RenderClear(renderer_);
 
 	for (size_t y = 0; y < textBuffer->size(); ++y) {
-		const auto line = textBuffer->rowView(y);
+		std::string_view line = textBuffer->rowView(y);
 
-		for (size_t x = 0; x < line.size(); ++x) {
-			char c[2] = {line[x], '\0'};
+		if (line.empty()) continue;
 
-			SDL_Surface* surface = TTF_RenderText_Blended(font_, c, fg);
+		SDL_Surface* surface =
+		    TTF_RenderText_Blended(font_, line.data(), fg);
 
-			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+		SDL_Texture* texture =
+		    SDL_CreateTextureFromSurface(renderer_, surface);
 
-			SDL_Rect dst{
-					static_cast<int>(x * width_),
-					static_cast<int>(y * height_),
-					surface->w,
-					surface->h
-			};
+		SDL_Rect dst {
+			0,
+			static_cast<int>((y) * charHeight_),
+			surface->w,
+			surface->h
+		    };
 
-			SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+		SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
-			SDL_FreeSurface(surface);
-			SDL_DestroyTexture(texture);
-		}
+		SDL_FreeSurface(surface);
+		SDL_DestroyTexture(texture);
 	}
+}
+
+void Renderer::RenderCursor() const {
+
+	const auto cursorBg = config_.colors_.cursor_color;
+	const auto cursorFg = config_.colors_.selection_color;
+	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
 	if (cursor.isVisible()) {
 		SDL_SetRenderDrawColor(renderer_,cursorBg.r, cursorBg.g, cursorBg.b, cursorBg.a);
 
 		const SDL_Rect cursorRect{
-				static_cast<int>(cursor.getX() * width_),
-				static_cast<int>(cursor.getY() * height_),
-				width_,
-				height_
-		};
+			static_cast<int>(cursor.getX() * charWidth_),
+			static_cast<int>(cursor.getY() * charHeight_),
+			charWidth_,
+			charHeight_};
 
 		SDL_RenderFillRect(renderer_, &cursorRect);
 
@@ -109,24 +114,36 @@ void Renderer::Render() const {
 				ch = line[cursor.getX()];
 		}
 
-		char text[2] = {ch, '\0'};
+		const char text[2] = {ch, '\0'};
 
 		SDL_Surface* surface = TTF_RenderText_Blended(font_, text, cursorFg);
 
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 		const SDL_Rect dst{
-				static_cast<int>(cursor.getX() * width_),
-				static_cast<int>(cursor.getY() * height_),
-				surface->w,
-				surface->h
-		};
+			static_cast<int>(cursor.getX() * charWidth_),
+			static_cast<int>(cursor.getY() * charHeight_),
+			surface->w,
+			surface->h};
 
 		SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
 		SDL_FreeSurface(surface);
 		SDL_DestroyTexture(texture);
 	}
+}
+
+void Renderer::RenderCommandLine() const {
+
+}
+
+void Renderer::Render() {
+	SDL_GetWindowSize(window_, &windowWidth_, &windowHeight_);
+
+	RenderText();
+	RenderCursor();
+	RenderCommandLine();
 
 	SDL_RenderPresent(renderer_);
 }
+

@@ -6,14 +6,9 @@
 
 class FileHandler final {
 public :
-	FileHandler() = delete;
+	FileHandler() = default;
 
-	FileHandler(const char*);
-
-	std::vector<std::string> getContent();
+	std::vector<std::string> getContent(const char* filesPath);
 
 	~FileHandler() = default;
-
-private:
-	std::ifstream file_;
 };
