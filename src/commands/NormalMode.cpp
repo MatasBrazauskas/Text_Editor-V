@@ -135,6 +135,7 @@ void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& documen
 	if (paramFunc_ != nullptr && paramCount_ + 1 == editorState.input_.size()) {
 		paramFunc_(editorState, document);
 		editorState.input_.clear();
+		paramFunc_ = nullptr;
 		paramCount_ = 0;
 
 	} else if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {

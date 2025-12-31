@@ -65,13 +65,13 @@ public:
 
 	std::size_t windowWidth_;
 	std::size_t windowHeight_;
-	std::size_t cursorX_;
-	std::size_t cursorY_;
+	std::size_t cursorStartY_;
+	std::size_t cursorEndY_;
 
-	std::unordered_set<std::size_t> dirtyLinesIndexes_;
+	//std::unordered_set<std::size_t> dirtyLinesIndexes_;
 
-	void clearDirtyLines();
-	void addDirtyLine(std::size_t index);
+	//void clearDirtyLines();
+	//void addDirtyLine(std::size_t index);
 };
 
 class Document final {
@@ -81,7 +81,7 @@ public:
 	explicit Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName);
 
 	std::unique_ptr<ITextBuffer> textBuffer_;
-	TextBufferView view_;
+	TextBufferView textView_;
 	Cursor cursor_;
 	std::string fileName_;
 };
@@ -97,5 +97,6 @@ public:
 	void removeDocument(size_t index);
 
 	FileHandler& fileHandler_;
+	//Some time change this to just stack value, no need to store smart pointer
 	std::vector<std::unique_ptr<Document>> files_;
 };
