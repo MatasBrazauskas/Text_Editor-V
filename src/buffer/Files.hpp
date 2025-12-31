@@ -63,15 +63,13 @@ public:
 	TextBufferView();
 	~TextBufferView() = default;
 
-	std::size_t windowWidth_;
-	std::size_t windowHeight_;
-	std::size_t cursorStartY_;
-	std::size_t cursorEndY_;
+	std::size_t startY_;
+	std::size_t visibleLines_;
 
-	//std::unordered_set<std::size_t> dirtyLinesIndexes_;
+	std::vector<std::size_t> dirtyLinesIndexes_;
 
-	//void clearDirtyLines();
-	//void addDirtyLine(std::size_t index);
+	void clearDirtyLines();
+	void addDirtyLine(std::size_t index);
 };
 
 class Document final {

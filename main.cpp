@@ -6,12 +6,7 @@
 #include "buffer/Files.hpp"
 #include "core/Editor.hpp"
 
-#include <iostream>
-
 using namespace std::string_literals;
-
-constexpr auto Fps           = 60.0;
-constexpr auto ticksPerFrame = 1.0 / Fps;
 
 const auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
 
@@ -19,6 +14,7 @@ const std::filesystem::path configPath = "config.json";
 
 int main(int argc, char** argv) {
 	Config config(configPath);
+    const auto ticksPerFrame = 1.0 / static_cast<double>(config.editor_.fps);
 
 	FileHandler fileHandler;
 	Files files{fileHandler, argc, argv};

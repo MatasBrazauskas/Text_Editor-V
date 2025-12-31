@@ -30,6 +30,10 @@ size_t Matrix::size() const {
 
 void Matrix::deleteLine(const size_t row) {
 	lines_.erase(lines_.begin() + row);
+
+    if (lines_.empty()) {
+        lines_.emplace_back("");
+    }
 }
 
 void Matrix::deleteCharacter(const size_t row, const size_t col) {

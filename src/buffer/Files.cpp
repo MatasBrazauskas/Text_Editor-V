@@ -3,6 +3,7 @@
 #include "Matrix.hpp"
 
 #include <iostream>
+#include <SDL.h>
 
 Cursor::Cursor(): x_{}, y_{}, visible_{true} {}
 
@@ -42,15 +43,17 @@ bool Cursor::isVisible() const {
 	return visible_;
 }
 
-TextBufferView::TextBufferView(): windowWidth_{}, windowHeight_{}, cursorStartY_{}, cursorEndY_{}  {}
+TextBufferView::TextBufferView():startY_{}, visibleLines_{} {
+	visibleLines_ = 28;
+}
 
-/*void TextBufferView::clearDirtyLines() {
+void TextBufferView::clearDirtyLines() {
 	dirtyLinesIndexes_.clear();
 }
 
 void TextBufferView::addDirtyLine(const std::size_t index) {
-	dirtyLinesIndexes_.insert(index);
-}*/
+	dirtyLinesIndexes_.push_back(index);
+}
 
 Document::Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName): textBuffer_(std::move(textBuffer)), fileName_(std::move(fileName)) {}
 
@@ -59,7 +62,7 @@ void Files::addFrame(std::unique_ptr<ITextBuffer> textBuffer, std::string fileNa
 	files_.push_back(std::move(doc));
 }
 
-Files::Files(FileHandler& fileHandler, int argc, char** argv): fileHandler_{fileHandler}{
+Files::Files(FileHandler& fileHandler, const int argc, char** argv): fileHandler_{fileHandler}{
 	const std::vector<std::string> files(argv + 1, argv+ argc);
 
 	if (files.empty()) {

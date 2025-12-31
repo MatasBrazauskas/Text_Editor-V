@@ -52,6 +52,9 @@ void NormalMode::moveCursorUp(EditorState&, Document& doc) {
             doc.cursor_.setX(nextRowLength - 1);
         }
     }
+    if (doc.textView_.startY_ > doc.cursor_.getY()) {
+        doc.textView_.startY_--;
+    }
 }
 
 void NormalMode::moveCursorDown(EditorState&, Document& doc) {
@@ -64,16 +67,23 @@ void NormalMode::moveCursorDown(EditorState&, Document& doc) {
             doc.cursor_.setX(nextRowLength - 1);
         }
     }
+    if (doc.textView_.startY_ + doc.textView_.visibleLines_ <= doc.cursor_.getY()) {
+        doc.textView_.startY_++;
+    }
 }
 
 void NormalMode::moveCursorTopFile(EditorState&, Document& doc) {
     doc.cursor_.setY(0);
     doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
+
+    doc.textView_.startY_ = 0;
 }
 
 void NormalMode::moveCursorBottomFile(EditorState&, Document& doc) {
     doc.cursor_.setY(doc.textBuffer_->size() - 1);
     doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
+
+    doc.textView_.startY_ = doc.textBuffer_->size() - doc.textView_.visibleLines_;
 }
 
 void NormalMode::moveRightMost(EditorState&, Document& doc) {
@@ -85,9 +95,18 @@ void NormalMode::moveLeftMost(EditorState&, Document& doc) {
 }
 
 void NormalMode::deleteLine(EditorState&, Document& doc) {
+    if (doc.textBuffer_->size() == 1 && doc.textBuffer_->rowLength(0) == 0) {
+        return;
+    }
+
     doc.textBuffer_->deleteLine(doc.cursor_.getY());
     doc.cursor_.setY(std::min(doc.textBuffer_->size() - 1, doc.cursor_.getY()));
     doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
+
+    if (doc.textView_.startY_ + doc.textView_.visibleLines_ >= doc.textBuffer_->size()) {
+        const auto zero{0zu};
+        doc.textView_.startY_ = std::min(zero, doc.textView_.startY_ - 1);
+    }
 }
 
 void NormalMode::deleteChar(EditorState&, Document& doc) {
@@ -114,12 +133,20 @@ void NormalMode::insertLineAbove(EditorState& editorState, Document& doc) {
 	doc.textBuffer_->insertLine(doc.cursor_.getY());
 	doc.cursor_.setX(0);
 	editorState.currentMode_ = Modes::Insert;
+
+    if (doc.textView_.startY_ > doc.cursor_.getY()) {
+        doc.textView_.startY_--;
+    }
 }
 void NormalMode::insertLineBelow(EditorState& editorState, Document& doc) {
 	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1);
 	doc.cursor_.incrementY();
 	doc.cursor_.setX(0);
 	editorState.currentMode_ = Modes::Insert;
+
+    if (doc.textView_.startY_ + doc.textView_.visibleLines_ <= doc.cursor_.getY()) {
+        doc.textView_.startY_++;
+    }
 }
 
 void NormalMode::switchToInsertLeft(EditorState& editorState, Document&) {

@@ -16,8 +16,10 @@ namespace EditorFields {
 constexpr auto title              = "title"sv;
 constexpr auto tabSize            = "tab_size"sv;
 constexpr auto autoSave           = "auto_save"sv;
-constexpr auto autoSaveIntervalMs = "auto_save_interval_ms"sv;
-constexpr auto cursorBlinkMs      = "cursor_blink_ms"sv;
+constexpr auto autoSaveIntervalMs = "auto_save_interval_s"sv;
+constexpr auto cursorBlinkS      = "cursor_blink_ms"sv;
+    constexpr auto wrapText = "wrap_text"sv;
+    constexpr auto fps = "fps"sv;
 }
 
 namespace FontFields {
@@ -38,17 +40,19 @@ class EditorConfig {
 public:
 	static EditorConfig getEditorConfig(const Json&);
 
-	EditorConfig() = default;
+	EditorConfig() = delete;
 
-	EditorConfig(size_t, bool, size_t, size_t, std::string);
+	EditorConfig(std::string title, size_t, bool, size_t, size_t, bool, size_t);
 
 	~EditorConfig() noexcept = default;
 
+	std::string title;
 	size_t      tab_size;
 	bool        auto_save;
 	size_t      auto_save_intervals_ms;
-	size_t      cursor_blink_ms;
-	std::string title;
+	size_t      cursor_blink_s;
+    bool        wrap_text;
+    size_t      fps;
 };
 
 class FontConfig {
@@ -86,7 +90,7 @@ private:
 
 class Config final {
 public:
-	Config(const std::filesystem::path&);
+	explicit Config(const std::filesystem::path&);
 
 	Config() = delete;
 

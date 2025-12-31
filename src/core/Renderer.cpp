@@ -65,20 +65,18 @@ void Renderer::RenderText() const {
 	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 	SDL_RenderClear(renderer_);
 
-	for (size_t y = 0; y < textBuffer->size(); ++y) {
-		std::string_view line = textBuffer->rowView(y);
+	for (std::size_t y{}; y < std::min(view.visibleLines_, textBuffer->size()); ++y) {
+		const std::string_view line = textBuffer->rowView(y + view.startY_);
 
 		if (line.empty()) continue;
 
-		SDL_Surface* surface =
-		    TTF_RenderText_Blended(font_, line.data(), fg);
+		SDL_Surface* surface = TTF_RenderText_Blended(font_, line.data(), fg);
 
-		SDL_Texture* texture =
-		    SDL_CreateTextureFromSurface(renderer_, surface);
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 		SDL_Rect dst {
 			0,
-			static_cast<int>((y) * charHeight_),
+			static_cast<int>(y * charHeight_),
 			surface->w,
 			surface->h
 		    };
@@ -101,7 +99,7 @@ void Renderer::RenderCursor() const {
 
 		const SDL_Rect cursorRect{
 			static_cast<int>(cursor.getX() * charWidth_),
-			static_cast<int>(cursor.getY() * charHeight_),
+			static_cast<int>(cursor.getY() * charHeight_ - view.startY_ * charHeight_),
 			charWidth_,
 			charHeight_};
 
@@ -122,7 +120,7 @@ void Renderer::RenderCursor() const {
 
 		const SDL_Rect dst{
 			static_cast<int>(cursor.getX() * charWidth_),
-			static_cast<int>(cursor.getY() * charHeight_),
+			static_cast<int>(cursor.getY() * charHeight_ - view.startY_ * charHeight_),
 			surface->w,
 			surface->h};
 
