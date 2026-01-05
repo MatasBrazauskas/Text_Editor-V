@@ -66,11 +66,17 @@ void Renderer::RenderText() const {
 	SDL_RenderClear(renderer_);
 
 	for (std::size_t y{}; y < std::min(view.visibleLines_, textBuffer->size()); ++y) {
-		const std::string_view line = textBuffer->rowView(y + view.startY_);
+		std::string_view line = textBuffer->rowView(y + view.startY_);
 
 		if (line.empty()) continue;
 
-		SDL_Surface* surface = TTF_RenderText_Blended(font_, line.data(), fg);
+	    if (config_.editor_.wrap_text) {
+	        line = line.substr(view.startX_, view.visibleColumns_);
+	    } else {
+	        line = line.substr(0, view.visibleColumns_);
+	    }
+
+		SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
 
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
@@ -95,14 +101,17 @@ void Renderer::RenderCursor() const {
 	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
 	if (cursor.isVisible()) {
+	    int cursorOffsetY = cursor.getY() * charHeight_;
+	    int cursorOffsetX = cursor.getX() * charWidth_;
+
+	    if (config_.editor_.wrap_text) {
+            cursorOffsetX -= view.startX_ * charWidth_;
+	        cursorOffsetY -= view.startY_ * charHeight_;
+	    }
+
 		SDL_SetRenderDrawColor(renderer_,cursorBg.r, cursorBg.g, cursorBg.b, cursorBg.a);
 
-		const SDL_Rect cursorRect{
-			static_cast<int>(cursor.getX() * charWidth_),
-			static_cast<int>(cursor.getY() * charHeight_ - view.startY_ * charHeight_),
-			charWidth_,
-			charHeight_};
-
+		const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_, charHeight_};
 		SDL_RenderFillRect(renderer_, &cursorRect);
 
 		char ch = ' ';
@@ -118,11 +127,7 @@ void Renderer::RenderCursor() const {
 
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-		const SDL_Rect dst{
-			static_cast<int>(cursor.getX() * charWidth_),
-			static_cast<int>(cursor.getY() * charHeight_ - view.startY_ * charHeight_),
-			surface->w,
-			surface->h};
+		const SDL_Rect dst{cursorOffsetX, cursorOffsetY, surface->w, surface->h};
 
 		SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 

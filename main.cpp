@@ -8,8 +8,6 @@
 
 using namespace std::string_literals;
 
-const auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
-
 const std::filesystem::path configPath = "config.json";
 
 int main(int argc, char** argv) {
@@ -28,7 +26,7 @@ int main(int argc, char** argv) {
 
 	while (editorState.running_) {
 
-		Uint64 end        = SDL_GetPerformanceCounter();
+		Uint64 end = SDL_GetPerformanceCounter();
 		double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
 		editor.HandleKeyboardInput();

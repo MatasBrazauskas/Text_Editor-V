@@ -2,9 +2,10 @@
 #include <vector>
 #include <memory>
 #include <optional>
-#include <unordered_set>
 
 #include "utils/FileHandler.hpp"
+
+using namespace std::string_literals;
 
 class Cursor final {
 public:
@@ -64,7 +65,10 @@ public:
 	~TextBufferView() = default;
 
 	std::size_t startY_;
+    std::size_t startX_;
+
 	std::size_t visibleLines_;
+    std::size_t visibleColumns_;
 
 	std::vector<std::size_t> dirtyLinesIndexes_;
 
@@ -77,6 +81,8 @@ public:
 	Document() = delete;
 
 	explicit Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName);
+
+    inline static auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
 
 	std::unique_ptr<ITextBuffer> textBuffer_;
 	TextBufferView textView_;

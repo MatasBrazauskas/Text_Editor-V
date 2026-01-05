@@ -27,6 +27,7 @@ public:
 	void moveCursorBottomFile(EditorState&, Document&);
 
 	void moveRightMost(EditorState&, Document&);
+    void moveRightMostChar(EditorState&, Document&);
 	void moveLeftMost(EditorState&, Document&);
 
 	void deleteLine(EditorState&, Document&);
