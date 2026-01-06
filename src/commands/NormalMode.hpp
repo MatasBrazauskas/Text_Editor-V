@@ -5,18 +5,19 @@
 #include <string_view>
 #include <string>
 
-#include "commands/IMode.hpp"
+class EditorState;
+class Document;
 
 using namespace std::string_view_literals;
 
 using FixedFunc = std::function<void(EditorState&, Document&)>;
 using ParamFunc = std::function<void(EditorState&, Document&)>;
 
-class NormalMode final : public IMode {
+class NormalMode final {
 public:
 	NormalMode();
 
-	void HandleKeyboardInput(EditorState&, Document&) override;
+	void HandleKeyboardInput(EditorState&, Document&);
 
 	void moveCursorLeft(EditorState&, Document&);
 	void moveCursorDown(EditorState&, Document&);

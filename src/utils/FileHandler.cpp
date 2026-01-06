@@ -1,6 +1,8 @@
 #include "utils/FileHandler.hpp"
 
-std::vector<std::string> FileHandler::getContent(const char* filesPath) {
+#include <fstream>
+
+std::vector<std::string> FileHandler::getContent(const char* filesPath) const {
 	std::ifstream file_(filesPath, std::ios::in);
 
 	std::vector<std::string> lines;

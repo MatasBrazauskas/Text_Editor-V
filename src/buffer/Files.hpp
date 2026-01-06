@@ -39,24 +39,16 @@ public :
 
 	[[nodiscard]] virtual std::string_view rowView(size_t row) const = 0;
 
-	[[nodiscard]] virtual size_t rowLength(size_t row) const = 0;
+	[[nodiscard]] virtual size_t rowsLength(size_t row) const = 0;
 
-	[[nodiscard]] virtual std::string& rowRef(size_t row) = 0;
-
-	[[nodiscard]] virtual size_t size() const = 0;
+	[[nodiscard]] virtual size_t linesCount() const = 0;
 
 	virtual void deleteLine(size_t row) = 0;
-	virtual void deleteCharacter(size_t row, size_t col) = 0;
-
-	[[nodiscard]] virtual std::optional<size_t> firstCharOccurrenceRight(size_t row, size_t col, char c) const = 0;
-
-	[[nodiscard]] virtual std::optional<size_t> firstCharOccurrenceLeft(size_t row, size_t col, char c) const = 0;
-
-	[[nodiscard]] virtual std::optional<std::string_view> nextWord(size_t row, size_t col) const = 0;
-
-	[[nodiscard]] virtual std::optional<std::string_view> prevWord(size_t row, size_t col) const = 0;
-
 	virtual void insertLine(size_t row) = 0;
+
+	virtual void deleteCharacter(size_t row, size_t col) = 0;
+    virtual void insertCharacter(size_t row, size_t col, char c) = 0;
+
 };
 
 class TextBufferView final {

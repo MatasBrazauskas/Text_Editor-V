@@ -4,7 +4,6 @@
 #include <SDL_ttf.h>
 
 #include "utils/Config.hpp"
-#include "buffer/Files.hpp"
 #include "core/Editor.hpp"
 
 class Renderer final {

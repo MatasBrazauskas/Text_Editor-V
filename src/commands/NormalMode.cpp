@@ -1,10 +1,10 @@
 #include "commands/NormalMode.hpp"
 
-#include "buffer/Files.hpp"
-#include "core/Editor.hpp"
-
 #include <algorithm>
 #include <iostream>
+
+#include "core/Editor.hpp"
+#include "buffer/Files.hpp"
 
 NormalMode::NormalMode(): paramFunc_{nullptr}, paramCount_{} {
     paramCommands_ = {
@@ -67,7 +67,7 @@ void NormalMode::moveCursorUp(EditorState&, Document& doc) {
 }
 
 void NormalMode::moveCursorDown(EditorState&, Document& doc) {
-    if (doc.textBuffer_->size() - 1 > doc.cursor_.getY()) {
+    if (doc.textBuffer_->linesCount() - 1 > doc.cursor_.getY()) {
         const size_t currRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
     	doc.cursor_.incrementY();
         const size_t nextRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
@@ -83,17 +83,17 @@ void NormalMode::moveCursorDown(EditorState&, Document& doc) {
 
 void NormalMode::moveCursorTopFile(EditorState&, Document& doc) {
     doc.cursor_.setY(0);
-    doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
+    doc.cursor_.setX(std::min(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
 
     doc.textView_.startY_ = 0;
     doc.textView_.startX_ = std::min(0zu, doc.cursor_.getX() - doc.textView_.visibleColumns_);
 }
 
 void NormalMode::moveCursorBottomFile(EditorState&, Document& doc) {
-    doc.cursor_.setY(doc.textBuffer_->size() - 1);
-    doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
+    doc.cursor_.setY(doc.textBuffer_->linesCount() - 1);
+    doc.cursor_.setX(std::min(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
 
-    doc.textView_.startY_ = doc.textBuffer_->size() - doc.textView_.visibleLines_;
+    doc.textView_.startY_ = doc.textBuffer_->linesCount() - doc.textView_.visibleLines_;
     doc.textView_.startX_ = std::min(0zu, doc.cursor_.getX() - doc.textView_.visibleColumns_);
 }
 
@@ -118,15 +118,15 @@ void NormalMode::moveLeftMost(EditorState&, Document& doc) {
 }
 
 void NormalMode::deleteLine(EditorState&, Document& doc) {
-    if (doc.textBuffer_->size() == 1 && doc.textBuffer_->rowLength(0) == 0) {
+    if (doc.textBuffer_->linesCount() == 1 && doc.textBuffer_->rowsLength(0) == 0) {
         return;
     }
 
     doc.textBuffer_->deleteLine(doc.cursor_.getY());
-    doc.cursor_.setY(std::min(doc.textBuffer_->size() - 1, doc.cursor_.getY()));
-    doc.cursor_.setX(std::min(doc.textBuffer_->rowLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
+    doc.cursor_.setY(std::min(doc.textBuffer_->linesCount() - 1, doc.cursor_.getY()));
+    doc.cursor_.setX(std::min(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
 
-    if (doc.textView_.startY_ + doc.textView_.visibleLines_ >= doc.textBuffer_->size()) {
+    if (doc.textView_.startY_ + doc.textView_.visibleLines_ >= doc.textBuffer_->linesCount()) {
         doc.textView_.startY_ = std::min(0zu, doc.textView_.startY_ - 1);
     }
 }
@@ -136,19 +136,11 @@ void NormalMode::deleteChar(EditorState&, Document& doc) {
 }
 
 void NormalMode::findFirstCharRight(EditorState& editorState, Document& doc) {
-    char symb = editorState.input_.back();
-    const auto index = doc.textBuffer_->firstCharOccurrenceRight(doc.cursor_.getY(), doc.cursor_.getX(), symb);
-    if (index.has_value()) {
-        doc.cursor_.setX(index.value());
-    }
+    throw std::runtime_error("Not implemented");
 }
 
 void NormalMode::findFirstCharLeft(EditorState& editorState, Document& doc) {
-    char symb = editorState.input_.back();
-    const auto index = doc.textBuffer_->firstCharOccurrenceLeft(doc.cursor_.getY(), doc.cursor_.getX(), symb);
-    if (index.has_value()) {
-        doc.cursor_.setX(index.value());
-    }
+    throw std::runtime_error("Not implemented");
 }
 
 void NormalMode::insertLineAbove(EditorState& editorState, Document& doc) {

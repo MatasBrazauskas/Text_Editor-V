@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
 #include <filesystem>
-#include "../includes/Json.hpp"
 #include <SDL_pixels.h>
+
+#include "../includes/Json.hpp"
 
 using namespace std::string_view_literals;
 

@@ -2,13 +2,14 @@
 
 #include <string_view>
 
-#include "commands/IMode.hpp"
-
 using namespace std::string_view_literals;
 
-class InsertMode final : IMode {
+class EditorState;
+class Document;
+
+class InsertMode final {
 public:
 	InsertMode() = default;
 
-	void HandleKeyboardInput(EditorState&, Document&) override;
+	void HandleKeyboardInput(EditorState&, Document&) const;
 };

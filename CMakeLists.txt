@@ -21,7 +21,6 @@ add_executable(Text_Editor
         src/core/Editor.hpp
         src/core/Renderer.cpp
         src/core/Renderer.hpp
-        src/commands/IMode.hpp
         src/commands/InsertMode.hpp
         src/commands/NormalMode.hpp
         src/commands/CommandMode.cpp

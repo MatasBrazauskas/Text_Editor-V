@@ -65,7 +65,7 @@ void Renderer::RenderText() const {
 	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 	SDL_RenderClear(renderer_);
 
-	for (std::size_t y{}; y < std::min(view.visibleLines_, textBuffer->size()); ++y) {
+	for (std::size_t y{}; y < std::min(view.visibleLines_, textBuffer->linesCount()); ++y) {
 		std::string_view line = textBuffer->rowView(y + view.startY_);
 
 		if (line.empty()) continue;
@@ -115,7 +115,7 @@ void Renderer::RenderCursor() const {
 		SDL_RenderFillRect(renderer_, &cursorRect);
 
 		char ch = ' ';
-		if (cursor.getY() < textBuffer->size()) {
+		if (cursor.getY() < textBuffer->linesCount()) {
 			const auto line = textBuffer->rowView(cursor.getY());
 			if (cursor.getX() < line.size())
 				ch = line[cursor.getX()];

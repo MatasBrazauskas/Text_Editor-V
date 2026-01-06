@@ -1,4 +1,5 @@
 #include "Config.hpp"
+
 #include <fstream>
 #include <stdexcept>
 #include <algorithm>

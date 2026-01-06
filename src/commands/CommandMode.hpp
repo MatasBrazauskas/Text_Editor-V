@@ -1,9 +1,10 @@
 #pragma once
 
-#include "commands/IMode.hpp"
+class EditorState;
+class Document;
 
-class CommandMode final : public IMode {
+class CommandMode final {
 public:
 	CommandMode() = default;
-	void HandleKeyboardInput(EditorState&, Document&) override;
+	void HandleKeyboardInput(EditorState&, Document&) const;
 };

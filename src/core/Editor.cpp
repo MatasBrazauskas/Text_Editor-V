@@ -3,8 +3,6 @@
 #include <iostream>
 #include <SDL.h>
 
-#include "utils/Config.hpp"
-
 EditorState::EditorState(): currentMode_{Modes::Normal}, running_{true}, activeTab_{} {}
 
 Editor::Editor(Files& files, EditorState& editorState): files_{files}, editorState_ {editorState} {}

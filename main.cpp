@@ -1,10 +1,9 @@
-#include "src/core/Renderer.hpp"
-
-#include "src/utils/Config.hpp"
-#include "src/utils/FileHandler.hpp"
+#include "core/Renderer.hpp"
+#include "core/Editor.hpp"
+#include "utils/Config.hpp"
+#include "utils/FileHandler.hpp"
 #include "buffer/Matrix.hpp"
 #include "buffer/Files.hpp"
-#include "core/Editor.hpp"
 
 using namespace std::string_literals;
 
