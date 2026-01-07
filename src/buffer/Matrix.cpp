@@ -12,8 +12,16 @@ void Matrix::init(std::vector<std::string> lines, std::string separators) {
 	separators_ = std::move(separators);
 }
 
-std::string_view Matrix::rowView(const int row) const {
+const std::string_view Matrix::rowsView(const int row) const {
 	return lines_.at(row);
+}
+
+const std::string_view Matrix::rowSubstr(const int row, const int col, const int n) const {
+	return lines_.at(row).substr(col, n);
+}
+
+const std::string_view Matrix::rowSubstr(const int row, const int col) const {
+	return lines_.at(row).substr(col);
 }
 
 int Matrix::rowsLength(const int row) const {

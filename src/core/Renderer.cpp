@@ -66,7 +66,7 @@ void Renderer::RenderText() const {
 	SDL_RenderClear(renderer_);
 
 	for (auto y{0}; y < std::min(view.visibleLines_, textBuffer->linesCount()); ++y) {
-		std::string_view line = textBuffer->rowView(y + view.startY_);
+		auto line = textBuffer->rowsView(y + view.startY_);
 
 		if (line.empty()) continue;
 
@@ -115,7 +115,7 @@ void Renderer::RenderCursor() const {
 
 		char ch = ' ';
 		if (cursor.getY() < textBuffer->linesCount()) {
-			const auto line = textBuffer->rowView(cursor.getY());
+			const auto line = textBuffer->rowsView(cursor.getY());
 			if (cursor.getX() < line.size())
 				ch = line[cursor.getX()];
 		}

@@ -4,53 +4,57 @@
 #include <unordered_map>
 #include <string_view>
 #include <string>
+#include <memory>
 
 class EditorState;
 class Document;
+class ITextBuffer;
+class TextBufferView;
+class Cursor;
+
 
 using namespace std::string_view_literals;
 
-using FixedFunc = std::function<void(EditorState&, Document&)>;
-using ParamFunc = std::function<void(EditorState&, Document&)>;
+#define FUNC_TYPES EditorState&, std::unique_ptr<ITextBuffer>&, Cursor&
+
+using Func = std::function<void(FUNC_TYPES)>;
 
 class NormalMode final {
 public:
-	NormalMode();
-
-	void HandleKeyboardInput(EditorState&, Document&);
+    NormalMode();
+    void HandleKeyboardInput(EditorState&, Document&);
 
 private:
-	void moveCursorLeft(EditorState&, Document&);
-	void moveCursorDown(EditorState&, Document&);
-	void moveCursorUp(EditorState&, Document&);
-	void moveCursorRight(EditorState&, Document&);
+    void moveCursorLeft(FUNC_TYPES);
+    void moveCursorDown(FUNC_TYPES);
+    void moveCursorUp(FUNC_TYPES);
+    void moveCursorRight(FUNC_TYPES);
 
-	void moveCursorTopFile(EditorState&, Document&);
-	void moveCursorBottomFile(EditorState&, Document&);
+    void moveCursorTopFile(FUNC_TYPES);
+    void moveCursorBottomFile(FUNC_TYPES);
 
-	void moveRightMost(EditorState&, Document&);
-    void moveLeftMostChar(EditorState&, Document&);
-	void moveLeftMost(EditorState&, Document&);
+    void moveRightMost(FUNC_TYPES);
+    void moveLeftMostChar(FUNC_TYPES);
+    void moveLeftMost(FUNC_TYPES);
 
-	void deleteLine(EditorState&, Document&);
-	void deleteChar(EditorState&, Document&);
-    void deleteWord(EditorState&, Document&);
-    void deleteAllWord(EditorState&, Document&);
+    void deleteLine(FUNC_TYPES);
+    void deleteChar(FUNC_TYPES);
+    void deleteWord(FUNC_TYPES);
+    void deleteAllWord(FUNC_TYPES);
 
-	void findFirstCharRight(EditorState&, Document&);
-	void findFirstCharLeft(EditorState&, Document&);
+    void findFirstCharRight(FUNC_TYPES);
+    void findFirstCharLeft(FUNC_TYPES);
 
-	void insertLineAbove(EditorState&, Document&);
-	void insertLineBelow(EditorState&, Document&);
+    void insertLineAbove(FUNC_TYPES);
+    void insertLineBelow(FUNC_TYPES);
 
-	void switchToInsertLeft(EditorState&, Document&);
-	void switchToInsertRight(EditorState&, Document&);
+    void switchToInsertLeft(FUNC_TYPES);
+    void switchToInsertRight(FUNC_TYPES);
 
-    void updateView(EditorState&, Document&);
+    void updateView(TextBufferView&, const Cursor&);
 
-	std::unordered_map<std::string, FixedFunc> fixedCommands_;
-	std::unordered_map<std::string, ParamFunc> paramCommands_;
-
-	ParamFunc paramFunc_;
-	size_t paramCount_;
+    std::unordered_map<std::string, Func> fixedCommands_;
+    std::unordered_map<std::string, Func> paramCommands_;
+    Func paramFunc_;
+    size_t paramCount_;
 };

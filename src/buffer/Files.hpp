@@ -37,7 +37,10 @@ public :
 
 	virtual void init(std::vector<std::string> matrix, std::string separators) = 0;
 
-	[[nodiscard]] virtual std::string_view rowView(int row) const = 0;
+	[[nodiscard]] virtual const std::string_view rowsView(int row) const = 0;
+
+    [[nodiscard]] virtual const std::string_view rowSubstr(int row, int col) const = 0;
+    [[nodiscard]] virtual const std::string_view rowSubstr(int row, int col, int n) const = 0;
 
 	[[nodiscard]] virtual int rowsLength(int row) const = 0;
 

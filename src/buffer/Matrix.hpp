@@ -11,7 +11,9 @@ public:
 
 	void init(std::vector<std::string> lines, std::string separators) override;
 
-	[[nodiscard]] std::string_view rowView(int row) const override;
+	[[nodiscard]] const std::string_view rowsView(int row) const override;
+    [[nodiscard]] const std::string_view rowSubstr(int row, int col) const override;
+    [[nodiscard]] const std::string_view rowSubstr(int row, int col, int n) const override;
 
 	[[nodiscard]] int rowsLength(int row) const override;
 
