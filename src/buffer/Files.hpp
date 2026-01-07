@@ -16,14 +16,14 @@ public:
 	void decrementX();
 	void incrementY();
 	void decrementY();
-	[[nodiscard]] std::size_t getX() const;
-	[[nodiscard]] std::size_t getY() const;
-	void setX(std::size_t);
-	void setY(std::size_t);
+	[[nodiscard]] int getX() const;
+	[[nodiscard]] int getY() const;
+	void setX(int);
+	void setY(int);
 	[[nodiscard]] bool isVisible() const;
 private:
-	std::size_t x_;
-	std::size_t y_;
+	int x_;
+	int y_;
 	bool visible_;
 };
 
@@ -37,17 +37,20 @@ public :
 
 	virtual void init(std::vector<std::string> matrix, std::string separators) = 0;
 
-	[[nodiscard]] virtual std::string_view rowView(size_t row) const = 0;
+	[[nodiscard]] virtual std::string_view rowView(int row) const = 0;
 
-	[[nodiscard]] virtual size_t rowsLength(size_t row) const = 0;
+	[[nodiscard]] virtual int rowsLength(int row) const = 0;
 
-	[[nodiscard]] virtual size_t linesCount() const = 0;
+	[[nodiscard]] virtual int linesCount() const = 0;
 
-	virtual void deleteLine(size_t row) = 0;
-	virtual void insertLine(size_t row) = 0;
+	virtual void deleteLine(int row) = 0;
+	virtual void insertLine(int row) = 0;
 
-	virtual void deleteCharacter(size_t row, size_t col) = 0;
-    virtual void insertCharacter(size_t row, size_t col, char c) = 0;
+	virtual void deleteCharacter(int row, int col) = 0;
+    virtual void insertCharacter(int row, int col, char c) = 0;
+
+    virtual void deleteRange(int row, int startCol, int len) = 0;
+    virtual void insertRange(int row, int startCol, std::string_view range) = 0;
 
 };
 
@@ -56,16 +59,16 @@ public:
 	TextBufferView();
 	~TextBufferView() = default;
 
-	std::size_t startY_;
-    std::size_t startX_;
+	int startY_;
+    int startX_;
 
-	std::size_t visibleLines_;
-    std::size_t visibleColumns_;
+	int visibleLines_;
+    int visibleColumns_;
 
-	std::vector<std::size_t> dirtyLinesIndexes_;
+	std::vector<int> dirtyLinesIndexes_;
 
 	void clearDirtyLines();
-	void addDirtyLine(std::size_t index);
+	void addDirtyLine(int index);
 };
 
 class Document final {

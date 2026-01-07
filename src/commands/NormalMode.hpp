@@ -19,6 +19,7 @@ public:
 
 	void HandleKeyboardInput(EditorState&, Document&);
 
+private:
 	void moveCursorLeft(EditorState&, Document&);
 	void moveCursorDown(EditorState&, Document&);
 	void moveCursorUp(EditorState&, Document&);
@@ -28,11 +29,13 @@ public:
 	void moveCursorBottomFile(EditorState&, Document&);
 
 	void moveRightMost(EditorState&, Document&);
-    void moveRightMostChar(EditorState&, Document&);
+    void moveLeftMostChar(EditorState&, Document&);
 	void moveLeftMost(EditorState&, Document&);
 
 	void deleteLine(EditorState&, Document&);
 	void deleteChar(EditorState&, Document&);
+    void deleteWord(EditorState&, Document&);
+    void deleteAllWord(EditorState&, Document&);
 
 	void findFirstCharRight(EditorState&, Document&);
 	void findFirstCharLeft(EditorState&, Document&);
@@ -42,6 +45,8 @@ public:
 
 	void switchToInsertLeft(EditorState&, Document&);
 	void switchToInsertRight(EditorState&, Document&);
+
+    void updateView(EditorState&, Document&);
 
 	std::unordered_map<std::string, FixedFunc> fixedCommands_;
 	std::unordered_map<std::string, ParamFunc> paramCommands_;

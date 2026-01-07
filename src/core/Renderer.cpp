@@ -65,7 +65,7 @@ void Renderer::RenderText() const {
 	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 	SDL_RenderClear(renderer_);
 
-	for (std::size_t y{}; y < std::min(view.visibleLines_, textBuffer->linesCount()); ++y) {
+	for (auto y{0}; y < std::min(view.visibleLines_, textBuffer->linesCount()); ++y) {
 		std::string_view line = textBuffer->rowView(y + view.startY_);
 
 		if (line.empty()) continue;
@@ -77,12 +77,11 @@ void Renderer::RenderText() const {
 	    }
 
 		SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
-
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 		SDL_Rect dst {
 			0,
-			static_cast<int>(y * charHeight_),
+			y * charHeight_,
 			surface->w,
 			surface->h
 		    };

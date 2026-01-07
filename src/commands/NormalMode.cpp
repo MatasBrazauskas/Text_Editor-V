@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <ranges>
 
 #include "core/Editor.hpp"
 #include "buffer/Files.hpp"
@@ -21,8 +22,10 @@ NormalMode::NormalMode(): paramFunc_{nullptr}, paramCount_{} {
             {"G", [this](EditorState& state, Document& doc) { moveCursorBottomFile(state, doc); }},
             {"$", [this](EditorState& state, Document& doc) { moveRightMost(state, doc); }},
             {"0", [this](EditorState& state, Document& doc) { moveLeftMost(state, doc); }},
-            {"^", [this](EditorState& state, Document& doc) { moveRightMostChar(state, doc); }},
+            {"^", [this](EditorState& state, Document& doc) { moveLeftMostChar(state, doc); }},
             {"dd", [this](EditorState& state, Document& doc) { deleteLine(state, doc); }},
+            {"dw", [this](EditorState& state, Document& doc) { deleteWord(state, doc); }},
+            {"daw", [this](EditorState& state, Document& doc) { deleteAllWord(state, doc); }},
             {"x", [this](EditorState& state, Document& doc) { deleteChar(state, doc);}},
             {"O", [this](EditorState& state, Document& doc) { insertLineAbove(state, doc); }},
             {"o", [this](EditorState& state, Document& doc) { insertLineBelow(state, doc); }},
@@ -34,132 +37,133 @@ NormalMode::NormalMode(): paramFunc_{nullptr}, paramCount_{} {
 void NormalMode::moveCursorLeft(EditorState&, Document& doc) {
     if (doc.cursor_.getX() > 0) {
         doc.cursor_.decrementX();
-
-        if (doc.textView_.startX_ > doc.cursor_.getX()) {
-            doc.textView_.startX_--;
-        }
     }
 }
 
 void NormalMode::moveCursorRight(EditorState&, Document& doc) {
-    if (doc.textBuffer_->rowView(doc.cursor_.getY()).length() - 1 > doc.cursor_.getX()) {
+    if (doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1 > doc.cursor_.getX()) {
         doc.cursor_.incrementX();
-
-        if (doc.textView_.startX_ + doc.textView_.visibleColumns_ <= doc.cursor_.getX()) {
-            doc.textView_.startX_++;
-        }
     }
 }
 
 void NormalMode::moveCursorUp(EditorState&, Document& doc) {
     if (doc.cursor_.getY() > 0) {
-        const size_t currRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
+        const auto currRowLength = doc.textBuffer_->rowsLength(doc.cursor_.getY());
+
     	doc.cursor_.decrementY();
-        const size_t nextRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
+
+        const auto nextRowLength = doc.textBuffer_->rowsLength(doc.cursor_.getY());
 
         if (currRowLength - 1 == doc.cursor_.getX() || nextRowLength - 1 <= doc.cursor_.getX()) {
             doc.cursor_.setX(nextRowLength - 1);
         }
-    }
-    if (doc.textView_.startY_ > doc.cursor_.getY()) {
-        doc.textView_.startY_--;
     }
 }
 
 void NormalMode::moveCursorDown(EditorState&, Document& doc) {
     if (doc.textBuffer_->linesCount() - 1 > doc.cursor_.getY()) {
         const size_t currRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
+
     	doc.cursor_.incrementY();
+
         const size_t nextRowLength = doc.textBuffer_->rowView(doc.cursor_.getY()).length();
 
         if (currRowLength - 1 == doc.cursor_.getX() || nextRowLength - 1 <= doc.cursor_.getX()) {
             doc.cursor_.setX(nextRowLength - 1);
         }
     }
-    if (doc.textView_.startY_ + doc.textView_.visibleLines_ <= doc.cursor_.getY()) {
-        doc.textView_.startY_++;
-    }
 }
 
 void NormalMode::moveCursorTopFile(EditorState&, Document& doc) {
     doc.cursor_.setY(0);
     doc.cursor_.setX(std::min(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
-
-    doc.textView_.startY_ = 0;
-    doc.textView_.startX_ = std::min(0zu, doc.cursor_.getX() - doc.textView_.visibleColumns_);
 }
 
 void NormalMode::moveCursorBottomFile(EditorState&, Document& doc) {
     doc.cursor_.setY(doc.textBuffer_->linesCount() - 1);
     doc.cursor_.setX(std::min(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
-
-    doc.textView_.startY_ = doc.textBuffer_->linesCount() - doc.textView_.visibleLines_;
-    doc.textView_.startX_ = std::min(0zu, doc.cursor_.getX() - doc.textView_.visibleColumns_);
 }
 
 void NormalMode::moveRightMost(EditorState&, Document& doc) {
-    doc.cursor_.setX(doc.textBuffer_->rowView(doc.cursor_.getY()).length() - 1);
-    doc.textView_.startX_ = doc.cursor_.getX() - doc.textView_.visibleColumns_ + 1;
+    doc.cursor_.setX(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1);
 }
 
-void NormalMode::moveRightMostChar(EditorState&, Document& doc) {
+void NormalMode::moveLeftMostChar(EditorState&, Document& doc) {
     const auto line = doc.textBuffer_->rowView(doc.cursor_.getY());
     const size_t index = line.find_first_not_of(doc.separators);
 
     if (index != std::string::npos) {
         doc.cursor_.setX(index);
-        doc.textView_.startX_ = std::min(0zu, doc.cursor_.getX() - doc.textView_.visibleColumns_);
     }
 }
 
 void NormalMode::moveLeftMost(EditorState&, Document& doc) {
     doc.cursor_.setX(0);
-    doc.textView_.startX_ = 0;
 }
 
 void NormalMode::deleteLine(EditorState&, Document& doc) {
+    //fix this
     if (doc.textBuffer_->linesCount() == 1 && doc.textBuffer_->rowsLength(0) == 0) {
         return;
     }
 
     doc.textBuffer_->deleteLine(doc.cursor_.getY());
+
     doc.cursor_.setY(std::min(doc.textBuffer_->linesCount() - 1, doc.cursor_.getY()));
     doc.cursor_.setX(std::min(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1, doc.cursor_.getX()));
-
-    if (doc.textView_.startY_ + doc.textView_.visibleLines_ >= doc.textBuffer_->linesCount()) {
-        doc.textView_.startY_ = std::min(0zu, doc.textView_.startY_ - 1);
-    }
 }
 
 void NormalMode::deleteChar(EditorState&, Document& doc) {
 	doc.textBuffer_->deleteCharacter(doc.cursor_.getY(), doc.cursor_.getX());
 }
 
-void NormalMode::findFirstCharRight(EditorState& editorState, Document& doc) {
-    throw std::runtime_error("Not implemented");
+void NormalMode::deleteWord(EditorState&, Document& doc) {
+    const auto index = doc.textBuffer_->rowView(doc.cursor_.getY()).substr(doc.cursor_.getX()).find_first_of(doc.separators);
+    doc.textBuffer_->deleteRange(doc.cursor_.getY(), doc.cursor_.getX(), doc.cursor_.getX() + index);
 }
 
-void NormalMode::findFirstCharLeft(EditorState& editorState, Document& doc) {
-    throw std::runtime_error("Not implemented");
+void NormalMode::deleteAllWord(EditorState&, Document& doc) {
+    const auto firstPart = doc.textBuffer_->rowView(doc.cursor_.getY()).substr(0, doc.cursor_.getX());
+    const size_t lastSep = firstPart.find_last_of(doc.textBuffer_->separators_);
+    const size_t prevIndex = lastSep == std::string_view::npos ? 0 : lastSep + 1;
+
+    const auto secondPart= doc.textBuffer_->rowView(doc.cursor_.getY()).substr(doc.cursor_.getX());
+    const auto relativeNext = secondPart.find_first_of(doc.textBuffer_->separators_);
+    const size_t nextIndex = relativeNext == std::string_view::npos ? prevIndex: doc.cursor_.getX() + relativeNext;
+
+    doc.textBuffer_->deleteRange(doc.cursor_.getY(), prevIndex, nextIndex - prevIndex);
 }
 
 void NormalMode::insertLineAbove(EditorState& editorState, Document& doc) {
 	doc.textBuffer_->insertLine(doc.cursor_.getY());
 	doc.cursor_.setX(0);
 	editorState.currentMode_ = Modes::Insert;
-
-    if (doc.textView_.startY_ > doc.cursor_.getY()) {
-        doc.textView_.startY_--;
-    }
 }
+
 void NormalMode::insertLineBelow(EditorState& editorState, Document& doc) {
 	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1);
 	doc.cursor_.incrementY();
 	doc.cursor_.setX(0);
-	editorState.currentMode_ = Modes::Insert;
 
-    if (doc.textView_.startY_ + doc.textView_.visibleLines_ <= doc.cursor_.getY()) {
-        doc.textView_.startY_++;
+	editorState.currentMode_ = Modes::Insert;
+}
+
+void NormalMode::findFirstCharRight(EditorState& editorState, Document& doc) {
+    const auto reversedView = doc.textBuffer_->rowView(doc.cursor_.getY()).substr(0, doc.cursor_.getX()) | std::views::reverse;
+    const auto index = std::ranges::find(reversedView, editorState.input_.back());
+
+    if (index != reversedView.end()) {
+        const auto offset = doc.cursor_.getX() - std::distance(reversedView.begin(), index) - 1;
+        doc.cursor_.setX(offset);
+    }
+}
+
+void NormalMode::findFirstCharLeft(EditorState& editorState, Document& doc) {
+    const auto subView = doc.textBuffer_->rowView(doc.cursor_.getY()).substr(doc.cursor_.getX() + 1);
+    const auto index = std::ranges::find(subView, editorState.input_.back());
+
+    if (index != subView.end()) {
+        doc.cursor_.setX(std::distance(doc.textBuffer_->rowView(doc.cursor_.getY()).begin(), index));
     }
 }
 
@@ -168,7 +172,21 @@ void NormalMode::switchToInsertLeft(EditorState& editorState, Document&) {
 }
 void NormalMode::switchToInsertRight(EditorState& editorState, Document& doc) {
 	editorState.currentMode_ = Modes::Insert;
-	doc.cursor_.incrementX();
+	this->moveCursorRight(editorState, doc);
+}
+
+void NormalMode::updateView(EditorState&, Document& doc) {
+    if (doc.cursor_.getX() < doc.textView_.startX_) {
+        doc.textView_.startX_ = doc.cursor_.getX();
+    } else if (doc.cursor_.getX() >= doc.textView_.startX_ + doc.textView_.visibleColumns_) {
+        doc.textView_.startX_ = doc.cursor_.getX() - doc.textView_.visibleColumns_ + 1;
+    }
+
+    if (doc.cursor_.getY() < doc.textView_.startY_) {
+        doc.textView_.startY_ = doc.cursor_.getY();
+    } else if (doc.cursor_.getY() >= doc.textView_.startY_ + doc.textView_.visibleLines_) {
+        doc.textView_.startY_ = doc.cursor_.getY() - doc.textView_.visibleLines_ + 1;
+    }
 }
 
 void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
@@ -178,6 +196,7 @@ void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& documen
 		editorState.input_.clear();
 		paramFunc_ = nullptr;
 		paramCount_ = 0;
+	    this->updateView(editorState, document);
 
 	} else if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {
 		paramFunc_ = it->second;
@@ -187,6 +206,7 @@ void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& documen
 		it->second(editorState, document);
 		editorState.input_.clear();
 		paramFunc_ = nullptr;
+	    this->updateView(editorState, document);
 
 	} else {
 		const bool flag1 = std::ranges::any_of(paramCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});

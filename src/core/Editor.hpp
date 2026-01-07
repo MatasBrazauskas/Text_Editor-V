@@ -9,19 +9,23 @@
 
 enum class Modes: uint8_t {Normal, Insert, Command};
 
+// for unified input clearance - SPACES, BACKSPACE detection, resize.
+class HandleInput final {
+
+};
+
 class EditorState final {
 public:
 	EditorState();
 	~EditorState() = default;
 
-	Modes currentMode_;
 
-	bool running_;
 	std::string input_;
+    std::string commandLineInput_;
 
-	size_t activeTab_;
-
-	std::string commandLineInput_;
+	int activeTab_;
+    Modes currentMode_;
+    bool running_;
 };
 
 class Editor final {

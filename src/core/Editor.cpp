@@ -3,7 +3,7 @@
 #include <iostream>
 #include <SDL.h>
 
-EditorState::EditorState(): currentMode_{Modes::Normal}, running_{true}, activeTab_{} {}
+EditorState::EditorState(): activeTab_{}, currentMode_{Modes::Normal}, running_{true} {}
 
 Editor::Editor(Files& files, EditorState& editorState): files_{files}, editorState_ {editorState} {}
 

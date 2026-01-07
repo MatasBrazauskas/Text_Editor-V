@@ -2,7 +2,6 @@
 
 #include "Matrix.hpp"
 
-#include <iostream>
 #include <SDL.h>
 
 Cursor::Cursor(): x_{}, y_{}, visible_{true} {}
@@ -23,19 +22,19 @@ void Cursor::decrementY() {
 	y_--;
 }
 
-std::size_t Cursor::getX() const {
+int Cursor::getX() const {
 	return x_;
 }
 
-std::size_t Cursor::getY() const {
+int Cursor::getY() const {
 	return y_;
 }
 
-void Cursor::setX(const std::size_t x) {
+void Cursor::setX(const int x) {
 	x_ = x;
 }
 
-void Cursor::setY(const std::size_t y) {
+void Cursor::setY(const int y) {
 	y_ = y;
 }
 
@@ -52,7 +51,7 @@ void TextBufferView::clearDirtyLines() {
 	dirtyLinesIndexes_.clear();
 }
 
-void TextBufferView::addDirtyLine(const std::size_t index) {
+void TextBufferView::addDirtyLine(const int index) {
 	dirtyLinesIndexes_.push_back(index);
 }
 
