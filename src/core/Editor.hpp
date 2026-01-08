@@ -12,11 +12,6 @@ enum class Modes: uint8_t {Normal, Insert, Command};
 
 enum class SpecialKeys: uint8_t {Backspace = 129, Enter = 130};
 
-// for unified input clearance - SPACES, BACKSPACE detection, resize.
-class HandleInput final {
-
-};
-
 class EditorState final {
 public:
 	EditorState();

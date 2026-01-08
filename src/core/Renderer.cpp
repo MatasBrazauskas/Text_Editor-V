@@ -145,7 +145,36 @@ void Renderer::RenderCursor() const {
 }
 
 void Renderer::RenderCommandLine() const {
+    const auto topLRect = SDL_Rect{0, 800 - charHeight_ - charHeight_, windowWidth_, charHeight_};
+    SDL_SetRenderDrawColor(renderer_, config_.colors_.cursor_color.r, config_.colors_.cursor_color.g, config_.colors_.cursor_color.b, config_.colors_.cursor_color.a);
+    SDL_RenderFillRect(renderer_, &topLRect);
 
+    std::string line{};
+
+    switch (editorState_.currentMode_) {
+        case Modes::Normal: line = "Normal"; break;
+        case Modes::Insert: line = "Insert"; break;
+        case Modes::Command: line = "Command"; break;
+    }
+
+    SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), config_.colors_.selection_color);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+
+    SDL_Rect dst {0,800 - charHeight_ - charHeight_,surface->w,surface->h};
+    SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+
+
+    if (editorState_.currentMode_ == Modes::Command) {
+        surface = TTF_RenderText_Blended(font_, editorState_.input_.c_str(), config_.colors_.cursor_color);
+        texture = SDL_CreateTextureFromSurface(renderer_, surface);
+
+        SDL_Rect dst {0, 800 - charHeight_, surface->w,surface->h};
+
+        SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+    }
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
 void Renderer::Render() {

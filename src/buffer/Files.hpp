@@ -55,6 +55,9 @@ public :
     virtual void deleteRange(int row, int startCol, int len) = 0;
     virtual void insertRange(int row, int startCol, std::string_view range) = 0;
 
+private:
+    size_t rowsCount_;
+    size_t charsCount_;
 };
 
 class TextBufferView final {

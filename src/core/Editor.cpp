@@ -24,6 +24,11 @@ std::string Editor::EncodeInput(const SDL_Event& event) {
                 std::cout << "Bybys zino\n";
         }
     } else if (event.type == SDL_TEXTINPUT) {
+        if (event.text.text[0] == ':') {
+            editorState_.currentMode_ = Modes::Command;
+            editorState_.input_.clear();
+            return ":";
+        }
         return event.text.text;
     }
     return {};
