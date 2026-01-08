@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <SDL_events.h>
 
 #include "buffer/Files.hpp"
 #include "commands/NormalMode.hpp"
@@ -8,6 +9,8 @@
 #include "commands/CommandMode.hpp"
 
 enum class Modes: uint8_t {Normal, Insert, Command};
+
+enum class SpecialKeys: uint8_t {Backspace = 129, Enter = 130};
 
 // for unified input clearance - SPACES, BACKSPACE detection, resize.
 class HandleInput final {
@@ -31,17 +34,17 @@ public:
 class Editor final {
 public:
 	Editor() = delete;
-
 	Editor(Files&, EditorState&);
-
 	~Editor() = default;
 
 	void HandleKeyboardInput();
-
+private:
 	Files& files_;
 	EditorState& editorState_;
 
 	NormalMode normalMode_;
 	InsertMode insertMode_;
 	CommandMode commandMode_;
+
+    std::string EncodeInput(const SDL_Event&);
 };

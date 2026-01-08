@@ -52,7 +52,7 @@ void NormalMode::moveCursorUp(FUNC_TYPES) {
         cursor.decrementY();
         const auto nextRowLength = text->rowsLength(cursor.getY());
 
-        if (currRowLength - 1 == cursor.getX() || nextRowLength - 1 <= cursor.getX()) {
+        if (currRowLength - 1 == cursor.getX() || nextRowLength - 1 < cursor.getX()) {
             cursor.setX(nextRowLength - 1);
         }
     }
@@ -167,7 +167,8 @@ void NormalMode::switchToInsertLeft(FUNC_TYPES) {
 
 void NormalMode::switchToInsertRight(FUNC_TYPES) {
     state.currentMode_ = Modes::Insert;
-    this->moveCursorRight(text, cursor, state);
+    if (cursor.getX() <= text->rowsLength(cursor.getY()) - 1)
+    cursor.incrementX();
 }
 
 void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {

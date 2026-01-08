@@ -68,13 +68,19 @@ void Renderer::RenderText() const {
 	for (auto y{0}; y < std::min(view.visibleLines_, textBuffer->linesCount()); ++y) {
 		auto line = textBuffer->rowsView(y + view.startY_);
 
-		if (line.empty()) continue;
+		if (line.empty() || line.size() <= view.startX_) continue;
 
 	    if (config_.editor_.wrap_text) {
-	        line = line.substr(view.startX_, view.visibleColumns_);
+	        if (view.startX_ + view.visibleColumns_ >= line.size()) {
+	            line = line.substr(view.startX_);
+	        } else {
+	            line = line.substr(view.startX_, view.visibleColumns_);
+	        }
 	    } else {
 	        line = line.substr(0, view.visibleColumns_);
 	    }
+
+		if (line.empty()) continue;
 
 		SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
@@ -99,39 +105,42 @@ void Renderer::RenderCursor() const {
 	const auto cursorFg = config_.colors_.selection_color;
 	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
+    SDL_SetRenderDrawColor(renderer_,cursorBg.r, cursorBg.g, cursorBg.b, cursorBg.a);
+
+    int cursorOffsetY = cursor.getY() * charHeight_;
+    int cursorOffsetX = cursor.getX() * charWidth_;
+
+    if (config_.editor_.wrap_text) {
+        cursorOffsetX -= view.startX_ * charWidth_;
+        cursorOffsetY -= view.startY_ * charHeight_;
+    }
+
 	if (cursor.isVisible()) {
-	    int cursorOffsetY = cursor.getY() * charHeight_;
-	    int cursorOffsetX = cursor.getX() * charWidth_;
+	    if (editorState_.currentMode_ == Modes::Insert) {
+	        const auto rect = SDL_Rect{cursorOffsetX, cursorOffsetY, 1, charHeight_};
+	        SDL_RenderFillRect(renderer_, &rect);
+	    }else {
+	        const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_, charHeight_};
+	        SDL_RenderFillRect(renderer_, &cursorRect);
 
-	    if (config_.editor_.wrap_text) {
-            cursorOffsetX -= view.startX_ * charWidth_;
-	        cursorOffsetY -= view.startY_ * charHeight_;
+	        char ch = ' ';
+	        if (cursor.getY() < textBuffer->linesCount()) {
+	            const auto line = textBuffer->rowsView(cursor.getY());
+	            if (cursor.getX() < line.size())
+	                ch = line[cursor.getX()];
+	        }
+
+	        const char text[2] = {ch, '\0'};
+
+	        SDL_Surface* surface = TTF_RenderText_Blended(font_, text, cursorFg);
+	        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+
+	        const SDL_Rect dst{cursorOffsetX, cursorOffsetY, surface->w, surface->h};
+	        SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+
+	        SDL_FreeSurface(surface);
+	        SDL_DestroyTexture(texture);
 	    }
-
-		SDL_SetRenderDrawColor(renderer_,cursorBg.r, cursorBg.g, cursorBg.b, cursorBg.a);
-
-		const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_, charHeight_};
-		SDL_RenderFillRect(renderer_, &cursorRect);
-
-		char ch = ' ';
-		if (cursor.getY() < textBuffer->linesCount()) {
-			const auto line = textBuffer->rowsView(cursor.getY());
-			if (cursor.getX() < line.size())
-				ch = line[cursor.getX()];
-		}
-
-		const char text[2] = {ch, '\0'};
-
-		SDL_Surface* surface = TTF_RenderText_Blended(font_, text, cursorFg);
-
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
-
-		const SDL_Rect dst{cursorOffsetX, cursorOffsetY, surface->w, surface->h};
-
-		SDL_RenderCopy(renderer_, texture, nullptr, &dst);
-
-		SDL_FreeSurface(surface);
-		SDL_DestroyTexture(texture);
 	}
 }
 
