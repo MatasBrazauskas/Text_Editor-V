@@ -33,12 +33,9 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Files.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,6 +170,7 @@
       <workItem from="1767735984272" duration="6766000" />
       <workItem from="1767777090775" duration="3442000" />
       <workItem from="1767794929367" duration="2449000" />
+      <workItem from="1767892785621" duration="1589000" />
     </task>
     <servers />
   </component>

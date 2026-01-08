@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <unordered_map>
 #include <string_view>
 #include <string>
@@ -15,14 +14,13 @@ class Cursor;
 
 using namespace std::string_view_literals;
 
-#define FUNC_TYPES EditorState&, std::unique_ptr<ITextBuffer>&, Cursor&
-
-using Func = std::function<void(FUNC_TYPES)>;
+#define FUNC_TYPES std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state
 
 class NormalMode final {
 public:
     NormalMode();
     void HandleKeyboardInput(EditorState&, Document&);
+    using Func = void (NormalMode::*)(FUNC_TYPES);
 
 private:
     void moveCursorLeft(FUNC_TYPES);
