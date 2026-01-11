@@ -27,6 +27,7 @@ private:
 	bool visible_;
 };
 
+//add iterator because RB tree will need to have stack tho
 class ITextBuffer {
 public :
 	ITextBuffer() = default;

@@ -59,5 +59,5 @@ void Matrix::deleteRange(const int row, const int startCol, const int len) {
 
 void Matrix::insertRange(const int row, const int startCol, const std::string_view range) {
     auto& line = lines_.at(row);
-    line.insert(startCol, range);
+    line.insert(startCol, std::string(range));
 }
