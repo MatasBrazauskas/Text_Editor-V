@@ -42,9 +42,13 @@ bool Cursor::isVisible() const {
 	return visible_;
 }
 
+void Cursor::setVisible(const bool visible) {
+	visible_ = visible;
+}
+
 TextBufferView::TextBufferView():startY_{}, startX_{}, visibleLines_{}, visibleColumns_{} {
 	visibleLines_ = 28;
-    visibleColumns_ = 80;
+    visibleColumns_ = 85;
 }
 
 void TextBufferView::clearDirtyLines() {

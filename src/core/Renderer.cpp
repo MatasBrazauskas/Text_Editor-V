@@ -2,47 +2,47 @@
 
 Renderer::Renderer(const EditorState& editorState, const Files& files, const Config& config)
 	: charWidth_{}, charHeight_{}, windowWidth_{}, windowHeight_{}, editorState_{editorState}, files_{files}, config_{config} {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
+        throw std::runtime_error(SDL_GetError());
+    }
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
-		throw std::runtime_error(SDL_GetError());
-	}
+    window_ = SDL_CreateWindow(
+            config.editor_.title.c_str(),
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            1000, 800,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE //| SDL_WINDOW_BORDERLESS
+            );
 
-	window_ = SDL_CreateWindow(
-			config.editor_.title.c_str(),
-			SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED,
-			1000, 800,
-			SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE //| SDL_WINDOW_BORDERLESS
-			);
+    if (!window_) {
+        SDL_Quit();
+        throw std::runtime_error(SDL_GetError());
+    }
 
-	if (!window_) {
-		SDL_Quit();
-		throw std::runtime_error(SDL_GetError());
-	}
+    renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-	renderer_ = SDL_CreateRenderer(window_, -1,
-				       SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer_) {
+        SDL_Quit();
+        throw std::runtime_error(SDL_GetError());
+    }
 
-	if (!renderer_) {
-		SDL_Quit();
-		throw std::runtime_error(SDL_GetError());
-	}
+    SDL_StartTextInput();
 
-	SDL_StartTextInput();
+    if (TTF_Init() == -1) {
+        throw std::runtime_error("Failed to initialize TTF.");
+    }
 
-	if (TTF_Init() == -1) {
-		throw std::runtime_error("Failed to initialize TTF.");
-	}
+    font_ = TTF_OpenFont(config.font_.font_path.c_str(),
+                 static_cast<int>(config.font_.font_size));
 
-	font_ = TTF_OpenFont(config.font_.font_path.c_str(),
-			     static_cast<int>(config.font_.font_size));
+    if (!font_) {
+        throw std::runtime_error("Failed to open font.");
+    }
 
-	if (!font_) {
-		throw std::runtime_error("Failed to open font.");
-	}
+    TTF_SetFontHinting(font_, TTF_HINTING_MONO);
+    TTF_SetFontKerning(font_, 0);
 
-	TTF_SetFontHinting(font_, TTF_HINTING_LIGHT);
-	TTF_SizeText(font_, "a", &charWidth_, &charHeight_);
+    TTF_SizeText(font_, "A", &charWidth_, &charHeight_);
 }
 
 Renderer::~Renderer() {
@@ -57,8 +57,8 @@ Renderer::~Renderer() {
 }
 
 void Renderer::RenderText() const {
-	const auto bg = config_.colors_.background_color;
-	const auto fg = config_.colors_.foreground_color;
+	const auto& bg = config_.colors_.background_color;
+	const auto& fg = config_.colors_.foreground_color;
 
 	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
@@ -85,14 +85,12 @@ void Renderer::RenderText() const {
 		SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-		SDL_Rect dst {
-			0,
-			y * charHeight_,
-			surface->w,
-			surface->h
-		    };
+	    const int length = line.length() * charWidth_;
 
-		SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+		SDL_Rect src{0, 0, length, surface->h};
+	    SDL_Rect dst{0, y * charHeight_, length, surface->h};
+
+		SDL_RenderCopy(renderer_, texture, &src, &dst);
 
 		SDL_FreeSurface(surface);
 		SDL_DestroyTexture(texture);
@@ -101,11 +99,11 @@ void Renderer::RenderText() const {
 
 void Renderer::RenderCursor() const {
 
-	const auto cursorBg = config_.colors_.cursor_color;
-	const auto cursorFg = config_.colors_.selection_color;
+	const auto [cr, cg, cb, ca] = config_.colors_.cursor_color;
+	const auto& cursorFg = config_.colors_.selection_color;
 	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
-    SDL_SetRenderDrawColor(renderer_,cursorBg.r, cursorBg.g, cursorBg.b, cursorBg.a);
+    SDL_SetRenderDrawColor(renderer_, cr, cg, cb, ca);
 
     int cursorOffsetY = cursor.getY() * charHeight_;
     int cursorOffsetX = cursor.getX() * charWidth_;
@@ -168,9 +166,9 @@ void Renderer::RenderCommandLine() const {
         surface = TTF_RenderText_Blended(font_, editorState_.input_.c_str(), config_.colors_.cursor_color);
         texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-        SDL_Rect dst {0, 800 - charHeight_, surface->w,surface->h};
+        SDL_Rect dst2 {0, 800 - charHeight_, surface->w,surface->h};
 
-        SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+        SDL_RenderCopy(renderer_, texture, nullptr, &dst2);
     }
 
     SDL_FreeSurface(surface);

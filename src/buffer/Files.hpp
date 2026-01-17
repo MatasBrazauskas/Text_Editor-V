@@ -21,6 +21,7 @@ public:
 	void setX(int);
 	void setY(int);
 	[[nodiscard]] bool isVisible() const;
+    void setVisible(bool);
 private:
 	int x_;
 	int y_;
