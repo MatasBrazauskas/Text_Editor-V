@@ -10,7 +10,7 @@ class Renderer final {
 public:
 	Renderer() = delete;
 
-	Renderer(const EditorState&, const Files&, const Config&);
+	Renderer(const EditorState&, Files&, const Config&);
 
 	~Renderer();
 
@@ -27,7 +27,7 @@ public:
 	TTF_Font*     font_;
 
 	const EditorState& editorState_;
-	const Files& files_;
+	Files& files_;
 	const Config& config_;
 private:
 	void RenderText() const;

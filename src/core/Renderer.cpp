@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 
-Renderer::Renderer(const EditorState& editorState, const Files& files, const Config& config)
+Renderer::Renderer(const EditorState& editorState, Files& files, const Config& config)
 	: charWidth_{}, charHeight_{}, windowWidth_{}, windowHeight_{}, editorState_{editorState}, files_{files}, config_{config} {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         throw std::runtime_error(SDL_GetError());
@@ -101,7 +101,7 @@ void Renderer::RenderCursor() const {
 
 	const auto [cr, cg, cb, ca] = config_.colors_.cursor_color;
 	const auto& cursorFg = config_.colors_.selection_color;
-	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
+	auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
 
     SDL_SetRenderDrawColor(renderer_, cr, cg, cb, ca);
 
@@ -164,11 +164,14 @@ void Renderer::RenderCommandLine() const {
 
     if (editorState_.currentMode_ == Modes::Command) {
         surface = TTF_RenderText_Blended(font_, editorState_.input_.c_str(), config_.colors_.cursor_color);
-        texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-        SDL_Rect dst2 {0, 800 - charHeight_, surface->w,surface->h};
+        if (surface) {
+            texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-        SDL_RenderCopy(renderer_, texture, nullptr, &dst2);
+            SDL_Rect dst2 {0, 800 - charHeight_, surface->w,surface->h};
+
+            SDL_RenderCopy(renderer_, texture, nullptr, &dst2);
+        }
     }
 
     SDL_FreeSurface(surface);

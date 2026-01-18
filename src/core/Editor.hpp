@@ -17,7 +17,6 @@ public:
 	EditorState();
 	~EditorState() = default;
 
-
 	std::string input_;
     std::string commandLineInput_;
 
@@ -29,12 +28,13 @@ public:
 class Editor final {
 public:
 	Editor() = delete;
-	Editor(Files&, EditorState&);
+	Editor(Files&, FileHandler&, EditorState&);
 	~Editor() = default;
 
 	void HandleKeyboardInput();
 private:
 	Files& files_;
+    FileHandler& fileHandler_;
 	EditorState& editorState_;
 
 	NormalMode normalMode_;

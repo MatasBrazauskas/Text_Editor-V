@@ -5,7 +5,7 @@
 
 EditorState::EditorState(): activeTab_{}, currentMode_{Modes::Normal}, running_{true} {}
 
-Editor::Editor(Files& files, EditorState& editorState): files_{files}, editorState_ {editorState} {}
+Editor::Editor(Files& files, FileHandler& fileHandler, EditorState& editorState): files_{files}, fileHandler_{fileHandler}, editorState_ {editorState} {}
 
 std::string Editor::EncodeInput(const SDL_Event& event) {
     if (event.type == SDL_QUIT) {
@@ -49,7 +49,7 @@ void Editor::HandleKeyboardInput() {
 		switch (editorState_.currentMode_) {
 			case Modes::Normal: normalMode_.HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
 			case Modes::Insert: insertMode_.HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
-			case Modes::Command: commandMode_.HandleKeyboardInput(editorState_, files_.getDocument(editorState_.activeTab_)); break;
+			case Modes::Command: commandMode_.HandleKeyboardInput(editorState_, fileHandler_, files_); break;
 
 		}
 	}

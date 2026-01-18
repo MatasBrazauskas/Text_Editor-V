@@ -11,7 +11,7 @@ CommandStructure CommandMode::parseCommand(std::string input) {
     }
 
     input.pop_back();
-    input.erase(0,1 );
+    input.erase(0,1);
 
     std::stringstream ss{input};
     CommandStructure com;
@@ -32,25 +32,42 @@ CommandStructure CommandMode::parseCommand(std::string input) {
 
 CommandMode::CommandMode() {
     commands_ = {
-        {"q", &CommandMode::closeProgramme}
+        {"q", &CommandMode::closeProgramme},
+        {"w", &CommandMode::writeToFile}
     };
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& state, Document& doc) {
-	std::cout << "Command mode running...\n";
-
-    if (state.input_.back() == static_cast<char>(SpecialKeys::Enter)) {
+void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandler, Files& files) {
+    if (state.input_.empty()) return;
+    if (state.input_.back() == static_cast<char>(SpecialKeys::Backspace)) {
+        state.input_.erase(state.input_.end() - 2, state.input_.end());
+    }
+    else if (state.input_.back() == static_cast<char>(SpecialKeys::Enter)) {
         const auto& com = parseCommand(state.input_);
-
-        std::cout << "Command: " << com.command_ << '\n';
 
         if (const auto it = commands_.find(com.command_); it != commands_.end()) {
             const auto& func = it->second;
-            (this->*func)(state, doc, com);
+            (this->*func)(state, fileHandler, files, com);
+            state.input_.clear();
+        } else {
+            state.input_ = "Unknown command";
         }
     }
 }
 
-void CommandMode::closeProgramme(EditorState& state, Document&, const CommandStructure&) {
-    state.running_ = false;
+void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, Files& files, const CommandStructure& com) {
+    std::cout << "Writing to file...\n";
+    if (com.args_.empty()) {
+        fileHandler.writeToFile(files.getDocument(state.activeTab_));
+    } else {
+
+    }
+}
+
+void CommandMode::closeProgramme(EditorState& state, FileHandler&, Files&, const CommandStructure& com) {
+    if (!com.args_.empty()) {
+        state.input_ = "Trailing characters";
+    } else {
+        state.running_ = false;
+    }
 }

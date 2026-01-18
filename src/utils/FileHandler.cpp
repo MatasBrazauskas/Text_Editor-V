@@ -2,7 +2,9 @@
 
 #include <fstream>
 
-std::vector<std::string> FileHandler::getContent(const char* filesPath) const {
+#include "core/Editor.hpp"
+
+std::vector<std::string> FileHandler::getContent(std::filesystem::path filesPath) const {
 	std::ifstream file_(filesPath, std::ios::in);
 
 	std::vector<std::string> lines;
@@ -12,4 +14,31 @@ std::vector<std::string> FileHandler::getContent(const char* filesPath) const {
 	}
 
 	return lines;
+}
+
+void FileHandler::writeToFile(const Document& doc) const {
+    auto tempFilesPath = doc.filesPath_;
+    tempFilesPath += ".tmp";
+
+    {
+        std::ofstream tempFile_(tempFilesPath, std::ios::binary | std::ios::trunc);
+        if (!tempFile_.is_open()) {
+            throw std::runtime_error("Failed to open file for writing");
+        }
+
+        for (int i = 0; i < doc.textBuffer_->linesCount(); i++) {
+            tempFile_.write(doc.textBuffer_->rowsView(i).data(), doc.textBuffer_->rowsLength(i));
+            tempFile_.put('\n');
+        }
+
+        tempFile_.flush();
+    }
+
+    std::error_code errorCode;
+    std::filesystem::rename(tempFilesPath, doc.filesPath_, errorCode);
+
+    if (errorCode) {
+        std::filesystem::remove(tempFilesPath);
+        throw std::runtime_error("Failed to rename file");
+    }
 }

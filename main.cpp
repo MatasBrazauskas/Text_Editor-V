@@ -9,7 +9,7 @@ using namespace std::string_literals;
 
 const std::filesystem::path configPath = "config.json";
 
-int main(int argc, char** argv) {
+int main(const int argc, char** argv) {
 	Config config(configPath);
     const auto ticksPerFrame = 1.0 / static_cast<double>(config.editor_.fps);
 
@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 	Files files{fileHandler, argc, argv};
 
 	EditorState editorState;
-	Editor editor{files, editorState};
+	Editor editor{files, fileHandler, editorState};
 	Renderer renderer{editorState, files, config};
 
 	const Uint64 freq = SDL_GetPerformanceFrequency();
@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
 
 	while (editorState.running_) {
 
-		Uint64 end = SDL_GetPerformanceCounter();
-		double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
+		const Uint64 end = SDL_GetPerformanceCounter();
+		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
 		editor.HandleKeyboardInput();
 

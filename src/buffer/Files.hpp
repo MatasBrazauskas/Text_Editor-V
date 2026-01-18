@@ -1,7 +1,7 @@
 #pragma once
+#include <filesystem>
 #include <vector>
 #include <memory>
-#include <optional>
 
 #include "utils/FileHandler.hpp"
 
@@ -28,35 +28,41 @@ private:
 	bool visible_;
 };
 
-//add iterator because RB tree will need to have stack tho
+/*class ITextIterator {
+public:
+    virtual ~ITextIterator() = default;
+
+    virtual bool equals(const ITextIterator&) const = 0;
+    virtual void next() = 0;
+    virtual std::string_view value() const = 0;
+};*/
+
 class ITextBuffer {
 public :
-	ITextBuffer() = default;
+    ITextBuffer() = default;
+    virtual ~ITextBuffer() = default;
 
-	virtual ~ITextBuffer() = default;
+    std::string separators_;
 
-	std::string separators_;
+    virtual void init(std::vector<std::string> matrix, std::string separators) = 0;
 
-	virtual void init(std::vector<std::string> matrix, std::string separators) = 0;
-
-	[[nodiscard]] virtual const std::string_view rowsView(int row) const = 0;
+    [[nodiscard]] virtual const std::string_view rowsView(int row) const = 0;
 
     [[nodiscard]] virtual const std::string_view rowSubstr(int row, int col) const = 0;
     [[nodiscard]] virtual const std::string_view rowSubstr(int row, int col, int n) const = 0;
 
-	[[nodiscard]] virtual int rowsLength(int row) const = 0;
+    [[nodiscard]] virtual int rowsLength(int row) const = 0;
 
-	[[nodiscard]] virtual int linesCount() const = 0;
+    [[nodiscard]] virtual int linesCount() const = 0;
 
-	virtual void deleteLine(int row) = 0;
-	virtual void insertLine(int row) = 0;
+    virtual void deleteLine(int row) = 0;
+    virtual void insertLine(int row) = 0;
 
-	virtual void deleteCharacter(int row, int col) = 0;
+    virtual void deleteCharacter(int row, int col) = 0;
     virtual void insertCharacter(int row, int col, char c) = 0;
 
     virtual void deleteRange(int row, int startCol, int len) = 0;
     virtual void insertRange(int row, int startCol, std::string_view range) = 0;
-
 private:
     size_t rowsCount_;
     size_t charsCount_;
@@ -90,20 +96,19 @@ public:
 	std::unique_ptr<ITextBuffer> textBuffer_;
 	TextBufferView textView_;
 	Cursor cursor_;
-	std::string fileName_;
+	std::filesystem::path filesPath_;
 };
 
 class Files final {
 public:
-	explicit Files(FileHandler&, int argc, char** argv);
+	explicit Files(const FileHandler&, int argc, char** argv);
+    ~Files() = default;
 
 	void addFrame(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName);
 
-	[[nodiscard]] Document& getDocument(size_t index) const;
+	[[nodiscard]] Document& getDocument(size_t index);
 
 	void removeDocument(size_t index);
 
-	FileHandler& fileHandler_;
-	//Some time change this to just stack value, no need to store smart pointer
-	std::vector<std::unique_ptr<Document>> files_;
+	std::vector<Document> files_;
 };

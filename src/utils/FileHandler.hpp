@@ -1,13 +1,18 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <vector>
+
+class Document;
 
 class FileHandler final {
 public :
 	FileHandler() = default;
+    ~FileHandler() = default;
 
-	std::vector<std::string> getContent(const char* filesPath) const;
+	std::vector<std::string> getContent(std::filesystem::path) const;
 
-	~FileHandler() = default;
+    void writeToFile(const Document&) const;
+
 };

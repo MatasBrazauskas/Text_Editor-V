@@ -27,8 +27,6 @@ public:
 
     void deleteRange(int row, int startCol, int len) override;
     void insertRange(int row, int startCol, std::string_view range) override;
-
-
 private:
 	std::vector<std::string> lines_;
 };
