@@ -1,10 +1,7 @@
 #include "commands/InsertMode.hpp"
 
-#include <iostream>
-
 #include "core/Editor.hpp"
 
-//Dont forget to update that shit ok (errors and checks)
 InsertMode::InsertMode() {
     const auto b = std::string(1, static_cast<char>(SpecialKeys::Enter));
     const auto c = std::string(1, static_cast<char>(SpecialKeys::Backspace));

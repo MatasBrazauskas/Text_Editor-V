@@ -14,6 +14,18 @@ class Cursor;
 
 using namespace std::string_view_literals;
 
+enum CommandState{ WaitCount = 1, WaitOperation = 2, WaitMotion = 4 };
+
+class Command {
+public:
+    Command();
+    ~Command() = default;
+    int state;
+    int count;
+    std::string operation;
+    std::string motion;
+};
+
 #define FUNC_TYPES std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state
 
 class NormalMode final {
@@ -55,4 +67,12 @@ private:
     std::unordered_map<std::string, Func> paramCommands_;
     Func paramFunc_;
     size_t paramCount_;
+
+    bool parseCount(Command&, std::string_view input);
+    bool parseOperation(Command&, std::string_view input);
+    bool parseMotion(Command&, std::string_view input);
+
+    std::unordered_map<std::string_view, Func> operations_;
+    std::unordered_map<std::string_view, Func> motions_;
+    Command command_;
 };

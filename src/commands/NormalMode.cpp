@@ -7,8 +7,112 @@
 #include "core/Editor.hpp"
 #include "buffer/Files.hpp"
 
+Command::Command(): state{WaitCount || WaitOperation || WaitMotion}, count{1} {}
+
+bool NormalMode::parseCount(Command& com, const std::string_view input) {
+    if (std::isdigit(input.back())) {
+        if (input.back() == '0') {
+            return false;
+        }
+        com.count = com.count * 10 + input.back() - '0';
+
+    }
+
+    return false;
+}
+
+bool NormalMode::parseOperation(Command& com, std::string_view input) {
+    if (com.operation.empty()) {
+        if (const auto it = operations_.find(input.substr(input.length() - 1)); it != operations_.end()) {
+            com.operation = std::string(input.substr(input.length() - 1));
+            return true;
+        }
+
+        return false;
+    } else {
+
+    }
+    return false;
+}
+
+bool NormalMode::parseMotion(Command& com, std::string_view input) {
+
+}
+
+
+
+void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
+
+    if ((command_.state | WaitCount) != 0) {
+
+    }
+    if ((command_.state | WaitOperation) != 0) {
+
+    }
+    if ((command_.state | WaitMotion) != 0) {
+
+    }
+
+    /*auto& [text, view, cursor, _] = document;
+
+    if (paramFunc_ != nullptr && paramCount_ + 1 == editorState.input_.size()) {
+        auto func = paramFunc_;
+        (this->*func)(document.textBuffer_, document.cursor_, editorState);
+        editorState.input_.clear();
+        paramFunc_ = nullptr;
+        paramCount_ = 0;
+        this->updateView(view, cursor);
+
+    } else if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {
+        paramFunc_ = it->second;
+        paramCount_ = editorState.input_.size();
+
+    } else if (const auto it = fixedCommands_.find(editorState.input_); it != fixedCommands_.end()) {
+        auto func = it->second;
+        (this->*func)(document.textBuffer_, document.cursor_, editorState);
+        editorState.input_.clear();
+        paramFunc_ = nullptr;
+        this->updateView(view, cursor);
+
+    } else {
+        const bool flag1 = std::ranges::any_of(paramCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
+        const bool flag2 = std::ranges::any_of(fixedCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
+
+        if (!flag1 && !flag2) {
+            editorState.input_.clear();
+            paramFunc_ = nullptr;
+        }
+    }*/
+}
+
+void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
+    if (cursor.getX() < view.startX_) {
+        view.startX_ = cursor.getX();
+    } else if (cursor.getX() >= view.startX_ + view.visibleColumns_) {
+        view.startX_ = cursor.getX() - view.visibleColumns_ + 1;
+    }
+
+    if (cursor.getY() < view.startY_) {
+        view.startY_ = cursor.getY();
+    } else if (cursor.getY() >= view.startY_ + view.visibleLines_) {
+        view.startY_ = cursor.getY() - view.visibleLines_ + 1;
+    }
+}
+
 NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
-    paramCommands_ = {
+    operations_ = {
+        {"x", &NormalMode::deleteChar},
+    };
+
+    motions_ = {
+        {"h",   &NormalMode::moveCursorLeft},
+        {"j",   &NormalMode::moveCursorDown},
+        {"k",   &NormalMode::moveCursorUp},
+        {"l",   &NormalMode::moveCursorRight},
+        {"0", &NormalMode::moveLeftMost}
+    };
+
+    /*paramCommands_ = {
         {"f", &NormalMode::findFirstCharRight},
         {"F", &NormalMode::findFirstCharLeft}
     };
@@ -31,7 +135,7 @@ NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
         {"o",   &NormalMode::insertLineBelow},
         {"i",   &NormalMode::switchToInsertLeft},
         {"a",   &NormalMode::switchToInsertRight}
-    };
+    };*/
 }
 
 void NormalMode::moveCursorLeft(FUNC_TYPES) {
@@ -169,51 +273,4 @@ void NormalMode::switchToInsertRight(FUNC_TYPES) {
     state.currentMode_ = Modes::Insert;
     if (cursor.getX() <= text->rowsLength(cursor.getY()) - 1)
     cursor.incrementX();
-}
-
-void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
-    if (cursor.getX() < view.startX_) {
-        view.startX_ = cursor.getX();
-    } else if (cursor.getX() >= view.startX_ + view.visibleColumns_) {
-        view.startX_ = cursor.getX() - view.visibleColumns_ + 1;
-    }
-
-    if (cursor.getY() < view.startY_) {
-        view.startY_ = cursor.getY();
-    } else if (cursor.getY() >= view.startY_ + view.visibleLines_) {
-        view.startY_ = cursor.getY() - view.visibleLines_ + 1;
-    }
-}
-
-void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
-    auto& [text, view, cursor, _] = document;
-
-	if (paramFunc_ != nullptr && paramCount_ + 1 == editorState.input_.size()) {
-		auto func = paramFunc_;
-	    (this->*func)(document.textBuffer_, document.cursor_, editorState);
-		editorState.input_.clear();
-		paramFunc_ = nullptr;
-		paramCount_ = 0;
-	    this->updateView(view, cursor);
-
-	} else if (const auto it = paramCommands_.find(editorState.input_); it != paramCommands_.end()) {
-		paramFunc_ = it->second;
-		paramCount_ = editorState.input_.size();
-
-	} else if (const auto it = fixedCommands_.find(editorState.input_); it != fixedCommands_.end()) {
-		auto func = it->second;
-	    (this->*func)(document.textBuffer_, document.cursor_, editorState);
-		editorState.input_.clear();
-		paramFunc_ = nullptr;
-	    this->updateView(view, cursor);
-
-	} else {
-		const bool flag1 = std::ranges::any_of(paramCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
-		const bool flag2 = std::ranges::any_of(fixedCommands_, [&](const auto& c) {return c.first.starts_with(editorState.input_);});
-
-		if (!flag1 && !flag2) {
-			editorState.input_.clear();
-			paramFunc_ = nullptr;
-		}
-	}
 }
