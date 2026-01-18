@@ -36,7 +36,7 @@ bool NormalMode::parseOperation(Command& com, std::string_view input) {
 }
 
 bool NormalMode::parseMotion(Command& com, std::string_view input) {
-
+    return false;
 }
 
 
