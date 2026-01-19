@@ -4,22 +4,26 @@
 
 #include <SDL.h>
 
-Cursor::Cursor(): x_{}, y_{}, visible_{true} {}
+Cursor::Cursor() : x_{}, y_{}, visible_{true} {}
 
 void Cursor::incrementX() {
 	x_++;
+	visible_ = true;
 }
 
 void Cursor::decrementX() {
 	x_--;
+	visible_ = true;
 }
 
 void Cursor::incrementY() {
 	y_++;
+	visible_ = true;
 }
 
 void Cursor::decrementY() {
 	y_--;
+	visible_ = true;
 }
 
 int Cursor::getX() const {
@@ -31,11 +35,13 @@ int Cursor::getY() const {
 }
 
 void Cursor::setX(const int x) {
-	x_ = x;
+	x_	 = x;
+	visible_ = true;
 }
 
 void Cursor::setY(const int y) {
-	y_ = y;
+	y_	 = y;
+	visible_ = true;
 }
 
 bool Cursor::isVisible() const {
@@ -46,9 +52,9 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-TextBufferView::TextBufferView():startY_{}, startX_{}, visibleLines_{}, visibleColumns_{} {
-	visibleLines_ = 28;
-    visibleColumns_ = 85;
+TextBufferView::TextBufferView() : startY_{}, startX_{}, visibleLines_{}, visibleColumns_{} {
+	visibleLines_	= 28;
+	visibleColumns_ = 85;
 }
 
 void TextBufferView::clearDirtyLines() {
@@ -59,7 +65,8 @@ void TextBufferView::addDirtyLine(const int index) {
 	dirtyLinesIndexes_.push_back(index);
 }
 
-Document::Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName): textBuffer_(std::move(textBuffer)), filesPath_(std::move(fileName)) {}
+Document::Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName)
+    : textBuffer_(std::move(textBuffer)), filesPath_(std::move(fileName)) {}
 
 void Files::addFrame(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName) {
 	auto doc = Document(std::move(textBuffer), std::move(fileName));
@@ -67,15 +74,15 @@ void Files::addFrame(std::unique_ptr<ITextBuffer> textBuffer, std::string fileNa
 }
 
 Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
-	const std::vector<std::string> files(argv + 1, argv+ argc);
+	const std::vector<std::string> files(argv + 1, argv + argc);
 
 	if (files.empty()) {
 		auto ptr = std::make_unique<Matrix>();
 		addFrame(std::move(ptr), "New Document.txt");
 	} else {
-		for (const auto& file: files) {
+		for (const auto& file : files) {
 			const auto lines = fileHandler.getContent(file.c_str());
-			auto ptr = std::make_unique<Matrix>();
+			auto	   ptr	 = std::make_unique<Matrix>();
 			ptr->init(lines, file);
 			addFrame(std::move(ptr), file);
 		}

@@ -1,0 +1,19 @@
+compilation_database_dir: build
+output_directory: diagrams
+diagrams:
+  my_holder_diagram:
+    type: class
+    # 1. Choose which files to look at
+    glob:
+      - src/holders/*.cpp
+    # 2. Define the specific classes to include
+    include:
+      namespaces:
+        - myproject::holders
+      classes:
+        - myproject::holders::DataHolder
+    # 3. Define how they relate to others
+    relationships:
+      - inheritance
+      - aggregation
+      - association

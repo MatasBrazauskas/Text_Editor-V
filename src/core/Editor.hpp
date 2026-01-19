@@ -32,7 +32,7 @@ public:
 	~Editor() = default;
 
 	void HandleKeyboardInput();
-private:
+//private:
 	Files& files_;
     FileHandler& fileHandler_;
 	EditorState& editorState_;
