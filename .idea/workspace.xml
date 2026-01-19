@@ -34,6 +34,8 @@
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/Editor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Editor.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +170,8 @@
       <workItem from="1768598305813" duration="3853000" />
       <workItem from="1768689244750" duration="1949000" />
       <workItem from="1768716664524" duration="8750000" />
-      <workItem from="1768751885937" duration="6159000" />
+      <workItem from="1768751885937" duration="8024000" />
+      <workItem from="1768838256715" duration="5453000" />
     </task>
     <servers />
   </component>

@@ -7,14 +7,14 @@
 #include <iostream>
 #include <ranges>
 
-Command::Command() : state{WaitCount || WaitOperation || WaitMotion}, count{1} {}
+Command::Command() : state{WaitCount1 || WaitOperation || WaitMotion}, count{1}, commandReady{} {}
 
-bool NormalMode::parseCount(Command& com, const std::string_view input) {
+bool NormalMode::parseCount(int& count, const std::string_view input) {
 	if (std::isdigit(input.back())) {
-		if (input.back() == '0') {
-			return false;
+		if (count != 0 || input.back() != '0') {
+			count = count * 10 + input.back() - '0';
+			return true;
 		}
-		com.count = com.count * 10 + input.back() - '0';
 	}
 
 	return false;
@@ -24,12 +24,9 @@ bool NormalMode::parseOperation(Command& com, const std::string_view input) {
 	if (com.operation.empty()) {
 		if (const auto it = operations_.find(input.substr(input.length() - 1));
 		    it != operations_.end()) {
-			com.operation = std::string(input.substr(input.length() - 1));
+			com.operation = std::string(1, input.back());
 			return true;
 		}
-
-		return false;
-	} else {
 	}
 	return false;
 }
@@ -41,18 +38,13 @@ bool NormalMode::parseMotion(Command& com, const std::string_view input) {
 			com.motion = std::string(input.substr(input.length() - 1));
 			return true;
 		}
-	} else {
 	}
 	return false;
 }
 
 void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
 
-	if ((command_.state | WaitCount) != 0) {
-	}
-	if ((command_.state | WaitOperation) != 0) {
-	}
-	if ((command_.state | WaitMotion) != 0) {
+	if (command_.state == WaitCount1 || WaitOperation || WaitMotion) {
 	}
 
 	/*auto& [text, view, cursor, _] = document;
@@ -102,6 +94,7 @@ void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
 
 NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
 	operations_ = {
+	    {"d", &NormalMode::deleteChar},
 	    {"x", &NormalMode::deleteChar},
 	};
 

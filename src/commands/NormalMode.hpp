@@ -4,6 +4,7 @@
 #include <string_view>
 #include <string>
 #include <memory>
+#include <format>
 
 class EditorState;
 class Document;
@@ -14,7 +15,7 @@ class Cursor;
 
 using namespace std::string_view_literals;
 
-enum CommandState{ WaitCount = 1, WaitOperation = 2, WaitMotion = 4 };
+enum CommandState{ WaitCount1 = 1, WaitCount2 = 2, WaitOperation = 4, WaitMotion = 8, };
 
 class Command {
 public:
@@ -24,6 +25,11 @@ public:
     int count;
     std::string operation;
     std::string motion;
+    bool commandReady;
+
+    std::string to_string(const Command& c) const {
+        return std::format("({}, {}, {})", c.count, c.operation, c.motion);
+    }
 };
 
 #define FUNC_TYPES std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state
@@ -68,7 +74,7 @@ private:
     Func paramFunc_;
     size_t paramCount_;
 
-    bool parseCount(Command&, std::string_view input);
+    bool parseCount(int& count, std::string_view input);
     bool parseOperation(Command&, std::string_view input);
     bool parseMotion(Command&, std::string_view input);
 
