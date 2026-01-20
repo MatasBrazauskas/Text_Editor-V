@@ -7,7 +7,9 @@
         "auto_save_interval_s": 30,
         "cursor_blink_ms": 1000,
         "wrap_text": true,
-        "fps": 60
+        "fps": 60,
+        "vertical_ruler": true,
+        "vertical_ruler_count": 20
     },
     "font":
     {
@@ -19,6 +21,7 @@
         "background_color": "1a1b26",
         "foreground_color": "c0caf5",
         "cursor_color": "ffffff",
-        "selection_color": "000000"
+        "selection_color": "000000",
+        "vertical_ruler_color": "ffffff"
     }
 }

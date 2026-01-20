@@ -38,11 +38,5 @@ int main(const int argc, char** argv) {
 			renderStart = end;
 			renderer.Render();
 		}
-
-		if (temp * 1250 >= config.editor_.cursor_blink_s) {
-			editor.files_.files_.at(0).cursor_.setVisible(
-			    !editor.files_.files_.at(0).cursor_.isVisible());
-			buttonTime = end;
-		}
 	}
 }

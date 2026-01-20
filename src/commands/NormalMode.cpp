@@ -44,38 +44,45 @@ bool NormalMode::parseMotion(Command& com, const std::string_view input) {
 
 void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
 
-	if (command_.state == WaitCount1 || WaitOperation || WaitMotion) {
-	}
+	/*if (command_.state == WaitCount1 || WaitOperation || WaitMotion) {
+	}*/
 
-	/*auto& [text, view, cursor, _] = document;
+	auto& [text, view, cursor, _] = document;
 
 	if (paramFunc_ != nullptr && paramCount_ + 1 == editorState.input_.size()) {
-	    auto func = paramFunc_;
-	    (this->*func)(document.textBuffer_, document.cursor_, editorState);
-	    editorState.input_.clear();
-	    paramFunc_ = nullptr;
-	    paramCount_ = 0;
-	    this->updateView(view, cursor);
+		auto func = paramFunc_;
+		(this->*func)(document.textBuffer_, document.cursor_, editorState);
+		editorState.input_.clear();
+		paramFunc_  = nullptr;
+		paramCount_ = 0;
+		this->updateView(view, cursor);
 
-	} else if (const auto it = paramCommands_.find(editorState.input_); it !=
-	paramCommands_.end()) { paramFunc_ = it->second; paramCount_ = editorState.input_.size();
+	} else if (const auto it = paramCommands_.find(editorState.input_);
+		   it != paramCommands_.end()) {
+		paramFunc_  = it->second;
+		paramCount_ = editorState.input_.size();
 
-	} else if (const auto it = fixedCommands_.find(editorState.input_); it !=
-	fixedCommands_.end()) { auto func = it->second; (this->*func)(document.textBuffer_,
-	document.cursor_, editorState); editorState.input_.clear(); paramFunc_ = nullptr;
-	    this->updateView(view, cursor);
-
-	} else {
-	    const bool flag1 = std::ranges::any_of(paramCommands_, [&](const auto& c) {return
-	c.first.starts_with(editorState.input_);}); const bool flag2 =
-	std::ranges::any_of(fixedCommands_, [&](const auto& c) {return
-	c.first.starts_with(editorState.input_);});
-
-	    if (!flag1 && !flag2) {
+	} else if (const auto it = fixedCommands_.find(editorState.input_);
+		   it != fixedCommands_.end()) {
+		auto func = it->second;
+		(this->*func)(document.textBuffer_, document.cursor_, editorState);
 		editorState.input_.clear();
 		paramFunc_ = nullptr;
-	    }
-	}*/
+		this->updateView(view, cursor);
+
+	} else {
+		const bool flag1 = std::ranges::any_of(paramCommands_, [&](const auto& c) {
+			return c.first.starts_with(editorState.input_);
+		});
+		const bool flag2 = std::ranges::any_of(fixedCommands_, [&](const auto& c) {
+			return c.first.starts_with(editorState.input_);
+		});
+
+		if (!flag1 && !flag2) {
+			editorState.input_.clear();
+			paramFunc_ = nullptr;
+		}
+	}
 }
 
 void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
@@ -93,7 +100,7 @@ void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
 }
 
 NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
-	operations_ = {
+	/*operations_ = {
 	    {"d", &NormalMode::deleteChar},
 	    {"x", &NormalMode::deleteChar},
 	};
@@ -102,32 +109,21 @@ NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
 		    {"j", &NormalMode::moveCursorDown},
 		    {"k", &NormalMode::moveCursorUp},
 		    {"l", &NormalMode::moveCursorRight},
-		    {"0", &NormalMode::moveLeftMost}};
+		    {"0", &NormalMode::moveLeftMost}};*/
 
-	/*paramCommands_ = {
-	    {"f", &NormalMode::findFirstCharRight},
-	    {"F", &NormalMode::findFirstCharLeft}
-	};
+	paramCommands_ = {{"f", &NormalMode::findFirstCharRight},
+			  {"F", &NormalMode::findFirstCharLeft}};
 
 	fixedCommands_ = {
-	    {"h",   &NormalMode::moveCursorLeft},
-	    {"j",   &NormalMode::moveCursorDown},
-	    {"k",   &NormalMode::moveCursorUp},
-	    {"l",   &NormalMode::moveCursorRight},
-	    {"gg",  &NormalMode::moveCursorTopFile},
-	    {"G",   &NormalMode::moveCursorBottomFile},
-	    {"$",   &NormalMode::moveRightMost},
-	    {"0",   &NormalMode::moveLeftMost},
-	    {"^",   &NormalMode::moveLeftMostChar},
-	    {"dd",  &NormalMode::deleteLine},
-	    {"dw",  &NormalMode::deleteWord},
-	    {"daw", &NormalMode::deleteAllWord},
-	    {"x",   &NormalMode::deleteChar},
-	    {"O",   &NormalMode::insertLineAbove},
-	    {"o",   &NormalMode::insertLineBelow},
-	    {"i",   &NormalMode::switchToInsertLeft},
-	    {"a",   &NormalMode::switchToInsertRight}
-	};*/
+	    {"h", &NormalMode::moveCursorLeft},	    {"j", &NormalMode::moveCursorDown},
+	    {"k", &NormalMode::moveCursorUp},	    {"l", &NormalMode::moveCursorRight},
+	    {"gg", &NormalMode::moveCursorTopFile}, {"G", &NormalMode::moveCursorBottomFile},
+	    {"$", &NormalMode::moveRightMost},	    {"0", &NormalMode::moveLeftMost},
+	    {"^", &NormalMode::moveLeftMostChar},   {"dd", &NormalMode::deleteLine},
+	    {"dw", &NormalMode::deleteWord},	    {"daw", &NormalMode::deleteAllWord},
+	    {"x", &NormalMode::deleteChar},	    {"O", &NormalMode::insertLineAbove},
+	    {"o", &NormalMode::insertLineBelow},    {"i", &NormalMode::switchToInsertLeft},
+	    {"a", &NormalMode::switchToInsertRight}};
 }
 
 void NormalMode::moveCursorLeft(FUNC_TYPES) {
