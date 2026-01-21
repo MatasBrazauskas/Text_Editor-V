@@ -22,15 +22,11 @@ int main(const int argc, char** argv) {
 
 	const Uint64 freq	 = SDL_GetPerformanceFrequency();
 	Uint64	     renderStart = SDL_GetPerformanceCounter();
-	Uint64	     buttonTime	 = renderStart;
 
 	while (editorState.running_) {
 
 		const Uint64 end = SDL_GetPerformanceCounter();
-		const double renderTime =
-		    static_cast<double>(end - renderStart) / static_cast<double>(freq);
-		const double temp =
-		    static_cast<double>(end - buttonTime) / static_cast<double>(freq);
+		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
 		editor.HandleKeyboardInput();
 
