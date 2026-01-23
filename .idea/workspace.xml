@@ -33,8 +33,6 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +173,7 @@
       <workItem from="1768940652643" duration="496000" />
       <workItem from="1768942476707" duration="1579000" />
       <workItem from="1769016597561" duration="14000" />
-      <workItem from="1769173850518" duration="920000" />
+      <workItem from="1769173850518" duration="2015000" />
     </task>
     <servers />
   </component>
