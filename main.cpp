@@ -26,7 +26,8 @@ int main(const int argc, char** argv) {
 	while (editorState.running_) {
 
 		const Uint64 end = SDL_GetPerformanceCounter();
-		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
+		const double renderTime =
+		    static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
 		editor.HandleKeyboardInput();
 
