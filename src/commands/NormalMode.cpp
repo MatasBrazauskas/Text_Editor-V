@@ -42,19 +42,22 @@ bool NormalMode::parseMotion(Command& com, const std::string_view input) {
 	return false;
 }
 
-void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& document) {
+void NormalMode::HandleKeyboardInput(EditorState& editorState, std::reference_wrapper<Document> document) {
 
 	/*if (command_.state == WaitCount1 || WaitOperation || WaitMotion) {
 	}*/
 
-	auto& [text, view, cursor, _] = document;
+	auto& [text, view, cursor, _] = document.get();
 
 	if (paramFunc_ != nullptr && paramCount_ + 1 == editorState.input_.size()) {
-		auto func = paramFunc_;
-		(this->*func)(document.textBuffer_, document.cursor_, editorState);
+		const auto func = paramFunc_;
+		(this->*func)(text, cursor, editorState);
+
 		editorState.input_.clear();
+
 		paramFunc_  = nullptr;
 		paramCount_ = 0;
+
 		this->updateView(view, cursor);
 
 	} else if (const auto it = paramCommands_.find(editorState.input_);
@@ -65,7 +68,7 @@ void NormalMode::HandleKeyboardInput(EditorState& editorState, Document& documen
 	} else if (const auto it = fixedCommands_.find(editorState.input_);
 		   it != fixedCommands_.end()) {
 		auto func = it->second;
-		(this->*func)(document.textBuffer_, document.cursor_, editorState);
+		(this->*func)(text,cursor, editorState);
 		editorState.input_.clear();
 		paramFunc_ = nullptr;
 		this->updateView(view, cursor);

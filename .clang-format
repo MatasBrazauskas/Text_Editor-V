@@ -19,8 +19,8 @@ SpacesInParentheses: false
 
 AlignAfterOpenBracket: Align
 AlignOperands: true
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
 
 Cpp11BracedListStyle: true
 BraceWrapping:

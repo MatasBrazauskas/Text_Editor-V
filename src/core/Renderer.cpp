@@ -32,8 +32,7 @@ Renderer::Renderer(const EditorState& editorState, Files& files, const Config& c
         throw std::runtime_error("Failed to initialize TTF.");
     }
 
-    font_ = TTF_OpenFont(config.font_.font_path.c_str(),
-                 static_cast<int>(config.font_.font_size));
+    font_ = TTF_OpenFont(config.font_.font_path.c_str(),config.font_.font_size);
 
     if (!font_) {
         throw std::runtime_error("Failed to open font.");
@@ -57,16 +56,17 @@ Renderer::~Renderer() {
 }
 
 void Renderer::RenderText() const {
-	const auto& bg = config_.colors_.background_color;
+	const auto& [br, bg, bb, ba] = config_.colors_.background_color;
 	const auto& fg = config_.colors_.foreground_color;
 
-	const auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
+	const auto& [text, view, cursor, _] = files_.getDocument(editorState_.activeTab_)->get();
 
-	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
+	SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
 	SDL_RenderClear(renderer_);
 
-	for (auto y{0}; y < std::min(view.visibleLines_, textBuffer->linesCount()); ++y) {
-		auto line = textBuffer->rowsView(y + view.startY_);
+    const size_t countLimit = std::min(view.visibleLines_, text->linesCount());
+    for (const auto it = text->forwardIterator(view.startY_); !(it->end(view.startY_ + countLimit)); it->next()) {
+        auto line = it.get()->getLine();
 
 		if (line.empty() || line.size() <= view.startX_) continue;
 
@@ -88,7 +88,7 @@ void Renderer::RenderText() const {
 	    const int length = line.length() * charWidth_;
 
 		SDL_Rect src{0, 0, length, surface->h};
-	    SDL_Rect dst{0, y * charHeight_, length, surface->h};
+	    SDL_Rect dst{0, (it.get()->index_ - view.startY_) * charHeight_, length, surface->h};
 
 		SDL_RenderCopy(renderer_, texture, &src, &dst);
 
@@ -101,7 +101,7 @@ void Renderer::RenderCursor() const {
 
 	const auto [cr, cg, cb, ca] = config_.colors_.cursor_color;
 	const auto& cursorFg = config_.colors_.selection_color;
-	auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_);
+	auto& [textBuffer, view, cursor, _] = files_.getDocument(editorState_.activeTab_)->get();
 
     SDL_SetRenderDrawColor(renderer_, cr, cg, cb, ca);
 
@@ -158,7 +158,7 @@ void Renderer::RenderCommandLine() const {
     SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), config_.colors_.selection_color);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-    SDL_Rect dst {0,800 - charHeight_ - charHeight_,surface->w,surface->h};
+    const SDL_Rect dst {0,800 - charHeight_ - charHeight_,surface->w,surface->h};
     SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
 
@@ -168,7 +168,7 @@ void Renderer::RenderCommandLine() const {
         if (surface) {
             texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-            SDL_Rect dst2 {0, 800 - charHeight_, surface->w,surface->h};
+            const SDL_Rect dst2 {0, 800 - charHeight_, surface->w,surface->h};
 
             SDL_RenderCopy(renderer_, texture, nullptr, &dst2);
         }

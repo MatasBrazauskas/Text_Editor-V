@@ -3,13 +3,32 @@
 #include <algorithm>
 #include <string>
 
-Matrix::Matrix() {
-	lines_ = {""};
+MatrixIterator::MatrixIterator(std::vector<std::string>& ds_t, const int index_t, const bool flag_t): ITextBufferIterator(index_t, flag_t), lines_{ds_t} {}
+
+void MatrixIterator::next() {
+    if (this->forwarded_) {
+        this->index_++;
+    } else {
+        this->index_--;
+    }
+    this->currLine_ = lines_.at(this->index_);
 }
 
-void Matrix::init(std::vector<std::string> lines, std::string separators) {
+std::string_view MatrixIterator::getLine() {
+    return currLine_;
+}
+
+const bool MatrixIterator::end(const size_t endIndex_t) const {
+    if (this->forwarded_) {
+        return this->index_ >= endIndex_t;
+    }
+    return this->index_ < endIndex_t;
+}
+
+Matrix::Matrix(): lines_{""} {}
+
+void Matrix::init(std::vector<std::string> lines) {
 	lines_ = std::move(lines);
-	separators_ = std::move(separators);
 }
 
 const std::string_view Matrix::rowsView(const int row) const {
@@ -60,4 +79,11 @@ void Matrix::deleteRange(const int row, const int startCol, const int len) {
 void Matrix::insertRange(const int row, const int startCol, const std::string_view range) {
     auto& line = lines_.at(row);
     line.insert(startCol, std::string(range));
+}
+std::unique_ptr<ITextBufferIterator> Matrix::forwardIterator(const size_t startCount_t) {
+    return std::make_unique<MatrixIterator>(this->lines_, startCount_t, true);
+}
+
+std::unique_ptr<ITextBufferIterator> Matrix::backwardIterator(const size_t startCount_t) {
+    return std::make_unique<MatrixIterator>(this->lines_, startCount_t, false);
 }

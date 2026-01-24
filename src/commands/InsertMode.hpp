@@ -11,7 +11,7 @@ public:
 	InsertMode();
     ~InsertMode() = default;
 
-	void HandleKeyboardInput(EditorState&, Document&) const;
+	void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>) const;
     using Func = void (InsertMode::*)(EditorState&, Document&) const;
 
 private:

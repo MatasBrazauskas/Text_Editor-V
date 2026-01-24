@@ -53,11 +53,11 @@ void Editor::HandleKeyboardInput() {
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
 			normalMode_.HandleKeyboardInput(
-			    editorState_, files_.getDocument(editorState_.activeTab_));
+			    editorState_, files_.getDocument(editorState_.activeTab_).value());
 			break;
 		case Modes::Insert:
 			insertMode_.HandleKeyboardInput(
-			    editorState_, files_.getDocument(editorState_.activeTab_));
+			    editorState_, files_.getDocument(editorState_.activeTab_).value());
 			break;
 		case Modes::Command:
 			commandMode_.HandleKeyboardInput(editorState_, fileHandler_, files_);

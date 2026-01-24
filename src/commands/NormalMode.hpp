@@ -37,7 +37,7 @@ public:
 class NormalMode final {
 public:
     NormalMode();
-    void HandleKeyboardInput(EditorState&, Document&);
+    void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>);
     using Func = void (NormalMode::*)(FUNC_TYPES);
 
 private:

@@ -58,7 +58,7 @@ void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandl
 void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, Files& files, const CommandStructure& com) {
     std::cout << "Writing to file...\n";
     if (com.args_.empty()) {
-        fileHandler.writeToFile(files.getDocument(state.activeTab_));
+        fileHandler.writeToFile(files.getDocument(state.activeTab_).value());
     } else {
 
     }

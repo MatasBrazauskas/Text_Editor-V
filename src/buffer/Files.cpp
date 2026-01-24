@@ -1,7 +1,6 @@
 #include "Files.hpp"
 
 #include "Matrix.hpp"
-
 #include <SDL.h>
 
 Cursor::Cursor() : x_{}, y_{}, visible_{true} {}
@@ -65,34 +64,39 @@ void TextBufferView::addDirtyLine(const int index) {
 	dirtyLinesIndexes_.push_back(index);
 }
 
-Document::Document(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName)
-    : textBuffer_(std::move(textBuffer)), filesPath_(std::move(fileName)) {}
+Document::Document(std::unique_ptr<ITextBuffer> textBuffer_t, std::filesystem::path fileName_t)
+    : textBuffer_(std::move(textBuffer_t)), filesPath_(std::move(fileName_t)) {}
 
-void Files::addFrame(std::unique_ptr<ITextBuffer> textBuffer, std::string fileName) {
-	auto doc = Document(std::move(textBuffer), std::move(fileName));
-	files_.push_back(std::move(doc));
+void Files::addDocument(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
+	files_.emplace_back(std::move(textBuffer), std::move(filePath_t));
 }
 
 Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
-	const std::vector<std::string> files(argv + 1, argv + argc);
-
-	if (files.empty()) {
+	if (const std::vector<std::string_view> files(argv + 1, argv + argc); files.empty()) {
 		auto ptr = std::make_unique<Matrix>();
-		addFrame(std::move(ptr), "New Document.txt");
+
+		addDocument(std::move(ptr), "New Document.txt");
 	} else {
 		for (const auto& file : files) {
-			const auto lines = fileHandler.getContent(file.c_str());
-			auto	   ptr	 = std::make_unique<Matrix>();
-			ptr->init(lines, file);
-			addFrame(std::move(ptr), file);
+			const auto lines = fileHandler.getContent(file.data());
+
+			auto ptr = std::make_unique<Matrix>();
+			ptr->init(lines);
+
+			addDocument(std::move(ptr), file);
 		}
 	}
 }
 
-Document& Files::getDocument(const size_t index) {
-	return files_.at(index);
+std::optional<std::reference_wrapper<Document>> Files::getDocument(const size_t index_t) {
+    if (index_t < files_.size()) {
+        return files_.at(index_t);
+    }
+    return std::nullopt;
 }
 
-void Files::removeDocument(const size_t index) {
-	files_.erase(files_.begin() + static_cast<int>(index));
+void Files::removeDocument(const size_t index_t) {
+    if (index_t < files_.size()) {
+        files_.erase(files_.begin() + index_t);
+    }
 }

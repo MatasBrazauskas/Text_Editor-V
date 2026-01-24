@@ -40,15 +40,17 @@ void InsertMode::handleBackspace(EditorState&, Document& doc) const {
     }
 }
 
-void InsertMode::HandleKeyboardInput(EditorState& editorState, Document& doc) const {
+void InsertMode::HandleKeyboardInput(EditorState& editorState, std::reference_wrapper<Document> doc) const {
     if (editorState.input_.empty()) return;
 
+    auto& [text, _, cursor, idk] = doc.get();
+
     if (const auto it = commands_.find(editorState.input_); it != commands_.end()) {
-        auto func = it->second;
+        const auto func = it->second;
         (this->*func)(editorState, doc);
     } else {
-        doc.textBuffer_->insertCharacter(doc.cursor_.getY(), doc.cursor_.getX(), editorState.input_.at(0));
-        doc.cursor_.incrementX();
+        text->insertCharacter(cursor.getY(), cursor.getX(), editorState.input_.at(0));
+        cursor.incrementX();
     }
 
     editorState.input_.clear();

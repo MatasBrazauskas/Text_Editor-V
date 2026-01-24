@@ -6,7 +6,7 @@
         "auto_save": false,
         "auto_save_interval_s": 30,
         "cursor_blink_ms": 1000,
-        "wrap_text": true,
+        "wrap_text": false,
         "fps": 60,
         "vertical_ruler": true,
         "vertical_ruler_count": 20
