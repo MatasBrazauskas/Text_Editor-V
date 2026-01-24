@@ -42,7 +42,8 @@ bool NormalMode::parseMotion(Command& com, const std::string_view input) {
 	return false;
 }
 
-void NormalMode::HandleKeyboardInput(EditorState& editorState, std::reference_wrapper<Document> document) {
+void NormalMode::HandleKeyboardInput(EditorState& editorState,
+				     std::reference_wrapper<Document> document) {
 
 	/*if (command_.state == WaitCount1 || WaitOperation || WaitMotion) {
 	}*/
@@ -55,20 +56,20 @@ void NormalMode::HandleKeyboardInput(EditorState& editorState, std::reference_wr
 
 		editorState.input_.clear();
 
-		paramFunc_  = nullptr;
+		paramFunc_ = nullptr;
 		paramCount_ = 0;
 
 		this->updateView(view, cursor);
 
 	} else if (const auto it = paramCommands_.find(editorState.input_);
 		   it != paramCommands_.end()) {
-		paramFunc_  = it->second;
+		paramFunc_ = it->second;
 		paramCount_ = editorState.input_.size();
 
 	} else if (const auto it = fixedCommands_.find(editorState.input_);
 		   it != fixedCommands_.end()) {
 		auto func = it->second;
-		(this->*func)(text,cursor, editorState);
+		(this->*func)(text, cursor, editorState);
 		editorState.input_.clear();
 		paramFunc_ = nullptr;
 		this->updateView(view, cursor);
@@ -213,15 +214,15 @@ void NormalMode::deleteWord(FUNC_TYPES) {
 }
 
 void NormalMode::deleteAllWord(FUNC_TYPES) {
-	const auto   firstPart = text->rowSubstr(cursor.getY(), 0, cursor.getX());
-	const size_t lastSep   = firstPart.find_last_of(" \t");
+	const auto firstPart = text->rowSubstr(cursor.getY(), 0, cursor.getX());
+	const size_t lastSep = firstPart.find_last_of(" \t");
 	const size_t prevIndex = lastSep == std::string_view::npos ? 0 : lastSep + 1;
 
-	const auto   secondPart	  = text->rowSubstr(cursor.getY(), cursor.getX());
-	const auto   relativeNext = secondPart.find_first_of(" \t");
-	const size_t nextIndex	  = relativeNext == std::string_view::npos
-					? text->rowsLength(cursor.getY())
-					: cursor.getX() + relativeNext;
+	const auto secondPart = text->rowSubstr(cursor.getY(), cursor.getX());
+	const auto relativeNext = secondPart.find_first_of(" \t");
+	const size_t nextIndex = relativeNext == std::string_view::npos
+				     ? text->rowsLength(cursor.getY())
+				     : cursor.getX() + relativeNext;
 
 	text->deleteRange(cursor.getY(), prevIndex, nextIndex - prevIndex);
 }
@@ -252,7 +253,7 @@ void NormalMode::findFirstCharRight(FUNC_TYPES) {
 
 void NormalMode::findFirstCharLeft(FUNC_TYPES) {
 	const auto subView = text->rowSubstr(cursor.getY(), cursor.getX() + 1);
-	const auto it	   = std::ranges::find(subView, state.input_.back());
+	const auto it = std::ranges::find(subView, state.input_.back());
 
 	if (it != subView.end()) {
 		cursor.setX(cursor.getX() + 1 + std::distance(subView.begin(), it));

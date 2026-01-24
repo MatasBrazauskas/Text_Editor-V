@@ -1,15 +1,15 @@
 #pragma once
+#include "utils/FileHandler.hpp"
+
 #include <filesystem>
-#include <vector>
 #include <memory>
 #include <optional>
-
-#include "utils/FileHandler.hpp"
+#include <vector>
 
 using namespace std::string_literals;
 
 class Cursor final {
-public:
+      public:
 	Cursor();
 	~Cursor() noexcept = default;
 
@@ -25,71 +25,74 @@ public:
 	void setY(int);
 
 	[[nodiscard]] bool isVisible() const;
-    void setVisible(bool);
-private:
+	void setVisible(bool);
+
+      private:
 	int x_;
 	int y_;
 	bool visible_;
 };
 
 class ITextBufferIterator {
-public:
-    ITextBufferIterator(const int index_t, const bool flag_t): index_(index_t), forwarded_(flag_t) {}
-    virtual ~ITextBufferIterator() noexcept = default;
+      public:
+	ITextBufferIterator(const int index_t, const bool flag_t)
+	    : index_(index_t), forwarded_(flag_t) {}
+	virtual ~ITextBufferIterator() noexcept = default;
 
-    virtual void next() = 0;
-    virtual std::string_view getLine() = 0;
-    virtual const bool end(size_t) const = 0;
+	virtual void next() = 0;
+	virtual std::string_view getLine() = 0;
+	virtual const bool end(size_t) const = 0;
 
-    int index_;
-protected:
-    std::string_view currLine_;
-    bool forwarded_;
+	int index_;
+
+      protected:
+	std::string_view currLine_;
+	bool forwarded_;
 };
 
 class ITextBuffer {
-public :
-    ITextBuffer() = default;
-    virtual ~ITextBuffer() noexcept = default;
+      public:
+	ITextBuffer() = default;
+	virtual ~ITextBuffer() noexcept = default;
 
-    virtual void init(std::vector<std::string> matrix) = 0;
+	virtual void init(std::vector<std::string> matrix) = 0;
 
-    [[nodiscard]] virtual const std::string_view rowsView(int row) const = 0;
+	[[nodiscard]] virtual const std::string_view rowsView(int row) const = 0;
 
-    [[nodiscard]] virtual const std::string_view rowSubstr(int row, int col) const = 0;
-    [[nodiscard]] virtual const std::string_view rowSubstr(int row, int col, int n) const = 0;
+	[[nodiscard]] virtual const std::string_view rowSubstr(int row, int col) const = 0;
+	[[nodiscard]] virtual const std::string_view rowSubstr(int row, int col, int n) const = 0;
 
-    [[nodiscard]] virtual int rowsLength(int row) const = 0;
+	[[nodiscard]] virtual int rowsLength(int row) const = 0;
 
-    [[nodiscard]] virtual int linesCount() const = 0;
+	[[nodiscard]] virtual int linesCount() const = 0;
 
-    virtual void deleteLine(int row) = 0;
-    virtual void insertLine(int row) = 0;
+	virtual void deleteLine(int row) = 0;
+	virtual void insertLine(int row) = 0;
 
-    virtual void deleteCharacter(int row, int col) = 0;
-    virtual void insertCharacter(int row, int col, char c) = 0;
+	virtual void deleteCharacter(int row, int col) = 0;
+	virtual void insertCharacter(int row, int col, char c) = 0;
 
-    virtual void deleteRange(int row, int startCol, int len) = 0;
-    virtual void insertRange(int row, int startCol, std::string_view range) = 0;
+	virtual void deleteRange(int row, int startCol, int len) = 0;
+	virtual void insertRange(int row, int startCol, std::string_view range) = 0;
 
-    virtual std::unique_ptr<ITextBufferIterator> forwardIterator(size_t) = 0;
-    virtual std::unique_ptr<ITextBufferIterator> backwardIterator(size_t) = 0;
+	virtual std::unique_ptr<ITextBufferIterator> forwardIterator(size_t) = 0;
+	virtual std::unique_ptr<ITextBufferIterator> backwardIterator(size_t) = 0;
 
-protected:
-    size_t rowsCount_;
-    size_t charsCount_;
+      protected:
+	size_t rowsCount_;
+	size_t charsCount_;
 };
 
 class TextBufferView final {
-public:
+      public:
 	TextBufferView();
 	~TextBufferView() noexcept = default;
 
 	int startY_;
-    int startX_;
+	int startX_;
 
 	int visibleLines_;
-    int visibleColumns_;
+	int visibleColumns_;
 
 	std::vector<int> dirtyLinesIndexes_;
 
@@ -98,18 +101,18 @@ public:
 };
 
 class Document final {
-public:
+      public:
 	Document() = delete;
 	explicit Document(std::unique_ptr<ITextBuffer>, std::filesystem::path);
-    ~Document() noexcept = default;
+	~Document() noexcept = default;
 
-    Document(Document&&) noexcept = default;
-    Document& operator=(Document&&) noexcept = default;
+	Document(Document&&) noexcept = default;
+	Document& operator=(Document&&) noexcept = default;
 
-    Document(const Document&) = delete;
-    Document& operator=(const Document&) = delete;
+	Document(const Document&) = delete;
+	Document& operator=(const Document&) = delete;
 
-    inline static auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
+	inline static auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
 
 	std::unique_ptr<ITextBuffer> textBuffer_;
 	TextBufferView textView_;
@@ -118,16 +121,17 @@ public:
 };
 
 class Files final {
-public:
-    Files() = delete;
+      public:
+	Files() = delete;
 	explicit Files(const FileHandler&, int argc, char** argv);
-    ~Files() noexcept = default;
+	~Files() noexcept = default;
 
 	void addDocument(std::unique_ptr<ITextBuffer>, std::filesystem::path);
 
 	[[nodiscard]] std::optional<std::reference_wrapper<Document>> getDocument(size_t index_t);
 
 	void removeDocument(size_t index_t);
-private:
+
+      private:
 	std::vector<Document> files_;
 };

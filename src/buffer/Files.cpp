@@ -1,6 +1,7 @@
 #include "Files.hpp"
 
 #include "Matrix.hpp"
+
 #include <SDL.h>
 
 Cursor::Cursor() : x_{}, y_{}, visible_{true} {}
@@ -34,12 +35,12 @@ int Cursor::getY() const {
 }
 
 void Cursor::setX(const int x) {
-	x_	 = x;
+	x_ = x;
 	visible_ = true;
 }
 
 void Cursor::setY(const int y) {
-	y_	 = y;
+	y_ = y;
 	visible_ = true;
 }
 
@@ -52,7 +53,7 @@ void Cursor::setVisible(const bool visible) {
 }
 
 TextBufferView::TextBufferView() : startY_{}, startX_{}, visibleLines_{}, visibleColumns_{} {
-	visibleLines_	= 28;
+	visibleLines_ = 28;
 	visibleColumns_ = 85;
 }
 
@@ -89,14 +90,14 @@ Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
 }
 
 std::optional<std::reference_wrapper<Document>> Files::getDocument(const size_t index_t) {
-    if (index_t < files_.size()) {
-        return files_.at(index_t);
-    }
-    return std::nullopt;
+	if (index_t < files_.size()) {
+		return files_.at(index_t);
+	}
+	return std::nullopt;
 }
 
 void Files::removeDocument(const size_t index_t) {
-    if (index_t < files_.size()) {
-        files_.erase(files_.begin() + index_t);
-    }
+	if (index_t < files_.size()) {
+		files_.erase(files_.begin() + index_t);
+	}
 }

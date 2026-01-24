@@ -1,22 +1,22 @@
 #pragma once
 
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 class EditorState;
 class Document;
 
 class InsertMode final {
-public:
+      public:
 	InsertMode();
-    ~InsertMode() = default;
+	~InsertMode() = default;
 
 	void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>) const;
-    using Func = void (InsertMode::*)(EditorState&, Document&) const;
+	using Func = void (InsertMode::*)(EditorState&, Document&) const;
 
-private:
-    void handleEnter(EditorState&, Document&) const;
-    void handleBackspace(EditorState&, Document&) const;
+      private:
+	void handleEnter(EditorState&, Document&) const;
+	void handleBackspace(EditorState&, Document&) const;
 
-    std::unordered_map<std::string, Func> commands_;
+	std::unordered_map<std::string, Func> commands_;
 };
