@@ -7,46 +7,7 @@
 #include <iostream>
 #include <ranges>
 
-Command::Command() : state{WaitCount1 || WaitOperation || WaitMotion}, count{1}, commandReady{} {}
-
-bool NormalMode::parseCount(int& count, const std::string_view input) {
-	if (std::isdigit(input.back())) {
-		if (count != 0 || input.back() != '0') {
-			count = count * 10 + input.back() - '0';
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool NormalMode::parseOperation(Command& com, const std::string_view input) {
-	if (com.operation.empty()) {
-		if (const auto it = operations_.find(input.substr(input.length() - 1));
-		    it != operations_.end()) {
-			com.operation = std::string(1, input.back());
-			return true;
-		}
-	}
-	return false;
-}
-
-bool NormalMode::parseMotion(Command& com, const std::string_view input) {
-	if (com.motion.empty()) {
-		if (const auto it = motions_.find(input.substr(input.length() - 1));
-		    it != motions_.end()) {
-			com.motion = std::string(input.substr(input.length() - 1));
-			return true;
-		}
-	}
-	return false;
-}
-
-void NormalMode::HandleKeyboardInput(EditorState& editorState,
-				     std::reference_wrapper<Document> document) {
-
-	/*if (command_.state == WaitCount1 || WaitOperation || WaitMotion) {
-	}*/
+void NormalMode::HandleKeyboardInput(EditorState& editorState, std::reference_wrapper<Document> document) {
 
 	auto& [text, view, cursor, _] = document.get();
 
@@ -104,17 +65,6 @@ void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
 }
 
 NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
-	/*operations_ = {
-	    {"d", &NormalMode::deleteChar},
-	    {"x", &NormalMode::deleteChar},
-	};
-
-	motions_ = {{"h", &NormalMode::moveCursorLeft},
-		    {"j", &NormalMode::moveCursorDown},
-		    {"k", &NormalMode::moveCursorUp},
-		    {"l", &NormalMode::moveCursorRight},
-		    {"0", &NormalMode::moveLeftMost}};*/
-
 	paramCommands_ = {{"f", &NormalMode::findFirstCharRight},
 			  {"F", &NormalMode::findFirstCharLeft}};
 
@@ -156,7 +106,11 @@ void NormalMode::moveCursorUp(FUNC_TYPES) {
 
 void NormalMode::moveCursorDown(FUNC_TYPES) {
 	if (text->linesCount() - 1 > cursor.getY()) {
+
 		const size_t currRowLength = text->rowsLength(cursor.getY());
+
+	    //if (currRowLength > state.)
+
 		cursor.incrementY();
 		const size_t nextRowLength = text->rowsLength(cursor.getY());
 

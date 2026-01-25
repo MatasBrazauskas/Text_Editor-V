@@ -55,13 +55,12 @@ Renderer::~Renderer() {
 }
 
 void Renderer::RenderText() const {
-	const auto& [br, bg, bb, ba] = config_.colors_.background_color;
-	const auto& fg = config_.colors_.foreground_color;
+    const auto& [br, bg, bb, ba] = config_.colors_.background_color;
+
+    SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
+    SDL_RenderClear(renderer_);
 
 	const auto& [text, view, cursor, _] = files_.getDocument(editorState_.activeTab_)->get();
-
-	SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
-	SDL_RenderClear(renderer_);
 
 	const size_t countLimit = std::min(view.visibleLines_, text->linesCount());
 	for (const auto it = text->forwardIterator(view.startY_);
@@ -71,33 +70,46 @@ void Renderer::RenderText() const {
 		if (line.empty() || line.size() <= view.startX_)
 			continue;
 
-		if (config_.editor_.wrap_text) {
+		if (config_.editor_.wrap_text == false) {
 			if (view.startX_ + view.visibleColumns_ >= line.size()) {
 				line = line.substr(view.startX_);
 			} else {
 				line = line.substr(view.startX_, view.visibleColumns_);
 			}
 		} else {
-			line = line.substr(0, view.visibleColumns_);
+		    int startIndex = 0;
+
+		    while (startIndex * view.visibleColumns_ < line.size()) {
+		        const auto subStrLine = line.substr(startIndex * view.visibleColumns_,view.visibleColumns_);
+                RenderLine(subStrLine, startIndex + it.get()->index_ - view.startY_);
+			    startIndex++;
+			}
+
+		    continue;
 		}
 
 		if (line.empty())
 			continue;
 
-		SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
-
-		const int length = line.length() * charWidth_;
-
-		SDL_Rect src{0, 0, length, surface->h};
-		SDL_Rect dst{0, (it.get()->index_ - view.startY_) * charHeight_, length,
-			     surface->h};
-
-		SDL_RenderCopy(renderer_, texture, &src, &dst);
-
-		SDL_FreeSurface(surface);
-		SDL_DestroyTexture(texture);
+	    this->RenderLine(line, it.get()->index_ - view.startY_);
 	}
+}
+
+void Renderer::RenderLine(const std::string_view line, const int lineOffset) const {
+    const auto& fg = config_.colors_.foreground_color;
+
+    SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+
+    const int length = line.length() * charWidth_;
+
+    const SDL_Rect src{0, 0, length, surface->h};
+    const SDL_Rect dst{0, lineOffset * charHeight_, length, surface->h};
+
+    SDL_RenderCopy(renderer_, texture, &src, &dst);
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
 void Renderer::RenderCursor() const {
@@ -111,7 +123,7 @@ void Renderer::RenderCursor() const {
 	int cursorOffsetY = cursor.getY() * charHeight_;
 	int cursorOffsetX = cursor.getX() * charWidth_;
 
-	if (config_.editor_.wrap_text) {
+	if (!config_.editor_.wrap_text) {
 		cursorOffsetX -= view.startX_ * charWidth_;
 		cursorOffsetY -= view.startY_ * charHeight_;
 	}

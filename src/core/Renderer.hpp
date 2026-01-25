@@ -31,6 +31,7 @@ public:
 	const Config& config_;
 private:
 	void RenderText() const;
+    void RenderLine(std::string_view, int) const;
 	void RenderCursor() const;
 	void RenderCommandLine() const;
 };
