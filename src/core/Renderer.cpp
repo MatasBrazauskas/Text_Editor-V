@@ -64,7 +64,8 @@ void Renderer::RenderText() const {
 	SDL_RenderClear(renderer_);
 
 	const size_t countLimit = std::min(view.visibleLines_, text->linesCount());
-	for (const auto it = text->forwardIterator(view.startY_); !it->end(view.startY_ + countLimit); it->next()) {
+	for (const auto it = text->forwardIterator(view.startY_);
+	     !it->end(view.startY_ + countLimit); it->next()) {
 		auto line = it.get()->getLine();
 
 		if (line.empty() || line.size() <= view.startX_)
@@ -121,7 +122,8 @@ void Renderer::RenderCursor() const {
 
 			SDL_RenderFillRect(renderer_, &rect);
 		} else {
-			const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_, charHeight_};
+			const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_,
+						  charHeight_};
 			SDL_RenderFillRect(renderer_, &cursorRect);
 
 			char ch = ' ';
