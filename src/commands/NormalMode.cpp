@@ -4,10 +4,11 @@
 #include "core/Editor.hpp"
 
 #include <algorithm>
-#include <iostream>
+// #include <iostream>
 #include <ranges>
 
-void NormalMode::HandleKeyboardInput(EditorState& editorState, std::reference_wrapper<Document> document) {
+void NormalMode::HandleKeyboardInput(EditorState& editorState,
+				     std::reference_wrapper<Document> document) {
 
 	auto& [text, view, cursor, _] = document.get();
 
@@ -109,7 +110,7 @@ void NormalMode::moveCursorDown(FUNC_TYPES) {
 
 		const size_t currRowLength = text->rowsLength(cursor.getY());
 
-	    //if (currRowLength > state.)
+		// if (currRowLength > state.)
 
 		cursor.incrementY();
 		const size_t nextRowLength = text->rowsLength(cursor.getY());

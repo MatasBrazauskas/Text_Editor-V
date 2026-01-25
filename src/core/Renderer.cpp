@@ -55,10 +55,10 @@ Renderer::~Renderer() {
 }
 
 void Renderer::RenderText() const {
-    const auto& [br, bg, bb, ba] = config_.colors_.background_color;
+	const auto& [br, bg, bb, ba] = config_.colors_.background_color;
 
-    SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
-    SDL_RenderClear(renderer_);
+	SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
+	SDL_RenderClear(renderer_);
 
 	const auto& [text, view, cursor, _] = files_.getDocument(editorState_.activeTab_)->get();
 
@@ -77,39 +77,41 @@ void Renderer::RenderText() const {
 				line = line.substr(view.startX_, view.visibleColumns_);
 			}
 		} else {
-		    int startIndex = 0;
+			int startIndex = 0;
 
-		    while (startIndex * view.visibleColumns_ < line.size()) {
-		        const auto subStrLine = line.substr(startIndex * view.visibleColumns_,view.visibleColumns_);
-                RenderLine(subStrLine, startIndex + it.get()->index_ - view.startY_);
-			    startIndex++;
+			while (startIndex * view.visibleColumns_ < line.size()) {
+				const auto subStrLine = line.substr(
+				    startIndex * view.visibleColumns_, view.visibleColumns_);
+				RenderLine(subStrLine,
+					   startIndex + it.get()->index_ - view.startY_);
+				startIndex++;
 			}
 
-		    continue;
+			continue;
 		}
 
 		if (line.empty())
 			continue;
 
-	    this->RenderLine(line, it.get()->index_ - view.startY_);
+		this->RenderLine(line, it.get()->index_ - view.startY_);
 	}
 }
 
 void Renderer::RenderLine(const std::string_view line, const int lineOffset) const {
-    const auto& fg = config_.colors_.foreground_color;
+	const auto& fg = config_.colors_.foreground_color;
 
-    SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+	SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), fg);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-    const int length = line.length() * charWidth_;
+	const int length = line.length() * charWidth_;
 
-    const SDL_Rect src{0, 0, length, surface->h};
-    const SDL_Rect dst{0, lineOffset * charHeight_, length, surface->h};
+	const SDL_Rect src{0, 0, length, surface->h};
+	const SDL_Rect dst{0, lineOffset * charHeight_, length, surface->h};
 
-    SDL_RenderCopy(renderer_, texture, &src, &dst);
+	SDL_RenderCopy(renderer_, texture, &src, &dst);
 
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
+	SDL_DestroyTexture(texture);
 }
 
 void Renderer::RenderCursor() const {
