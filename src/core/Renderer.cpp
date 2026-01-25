@@ -1,7 +1,5 @@
 #include "Renderer.hpp"
 
-
-
 Renderer::Renderer(const EditorState& editorState, Files& files, const Config& config)
     : charWidth_{}, charHeight_{}, windowWidth_{}, windowHeight_{}, editorState_{editorState},
       files_{files}, config_{config} {
@@ -66,8 +64,7 @@ void Renderer::RenderText() const {
 	SDL_RenderClear(renderer_);
 
 	const size_t countLimit = std::min(view.visibleLines_, text->linesCount());
-	for (const auto it = text->forwardIterator(view.startY_);
-	     !(it->end(view.startY_ + countLimit)); it->next()) {
+	for (const auto it = text->forwardIterator(view.startY_); !it->end(view.startY_ + countLimit); it->next()) {
 		auto line = it.get()->getLine();
 
 		if (line.empty() || line.size() <= view.startX_)
@@ -121,10 +118,10 @@ void Renderer::RenderCursor() const {
 	if (cursor.isVisible()) {
 		if (editorState_.currentMode_ == Modes::Insert) {
 			const auto rect = SDL_Rect{cursorOffsetX, cursorOffsetY, 1, charHeight_};
+
 			SDL_RenderFillRect(renderer_, &rect);
 		} else {
-			const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_,
-						  charHeight_};
+			const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_, charHeight_};
 			SDL_RenderFillRect(renderer_, &cursorRect);
 
 			char ch = ' ';

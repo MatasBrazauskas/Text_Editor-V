@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <string>
 
-MatrixIterator::MatrixIterator(std::vector<std::string>& ds_t, const int index_t, const bool flag_t)
-    : ITextBufferIterator(index_t, flag_t), lines_{ds_t} {}
+MatrixIterator::MatrixIterator(std::vector<std::string>& ds_t, const int index_t, const bool flag_t): ITextBufferIterator(index_t, flag_t), lines_{ds_t} {
+    this->currLine_ = ds_t.at(index_t);
+}
 
 void MatrixIterator::next() {
 	if (this->forwarded_) {
@@ -12,6 +13,10 @@ void MatrixIterator::next() {
 	} else {
 		this->index_--;
 	}
+
+    if (lines_.size() <= this->index_ || 0 > this->index_) {
+        return;
+    }
 	this->currLine_ = lines_.at(this->index_);
 }
 

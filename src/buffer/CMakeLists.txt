@@ -1,0 +1,1 @@
+target_sources(Text_Editor PRIVATE Files.cpp Files.hpp Matrix.cpp Matrix.hpp)
