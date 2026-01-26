@@ -62,13 +62,12 @@ void Renderer::RenderText() const {
 
 	const auto& [text, view, cursor, _] = files_.getDocument(editorState_.activeTab_)->get();
 
-	const size_t countLimit = std::min(view.visibleLines_, text->linesCount());
-	for (const auto it = text->forwardIterator(view.startY_);
-	     !it->end(view.startY_ + countLimit); it->next()) {
+    int offsetIndex = 0;
+	size_t countLimit = std::min(view.visibleLines_, text->linesCount());
+	for (const auto it = text->forwardIterator(view.startY_); !it->end(view.startY_ + countLimit); it->next()) {
 		auto line = it.get()->getLine();
 
-		if (line.empty() || line.size() <= view.startX_)
-			continue;
+		if (line.empty() || line.size() <= view.startX_) continue;
 
 		if (config_.editor_.wrap_text == false) {
 			if (view.startX_ + view.visibleColumns_ >= line.size()) {
@@ -80,12 +79,13 @@ void Renderer::RenderText() const {
 			int startIndex = 0;
 
 			while (startIndex * view.visibleColumns_ < line.size()) {
-				const auto subStrLine = line.substr(
-				    startIndex * view.visibleColumns_, view.visibleColumns_);
-				RenderLine(subStrLine,
-					   startIndex + it.get()->index_ - view.startY_);
+				const auto subStrLine = line.substr(startIndex * view.visibleColumns_, view.visibleColumns_);
+			    RenderLine(subStrLine, startIndex + offsetIndex + it.get()->index_ - view.startY_);
 				startIndex++;
 			}
+
+		    offsetIndex+=startIndex - 1;
+		    countLimit = std::min(view.visibleLines_ - offsetIndex, text->linesCount());
 
 			continue;
 		}
@@ -93,7 +93,7 @@ void Renderer::RenderText() const {
 		if (line.empty())
 			continue;
 
-		this->RenderLine(line, it.get()->index_ - view.startY_);
+		this->RenderLine(line, it.get()->index_ - view.startY_ + offsetIndex);
 	}
 }
 
