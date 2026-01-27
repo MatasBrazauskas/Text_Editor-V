@@ -1,24 +1,23 @@
 #include "Renderer.hpp"
 
 Renderer::Renderer(const EditorState& editorState, Files& files, const Config& config)
-    : charWidth_{}, charHeight_{}, windowWidth_{}, windowHeight_{}, editorState_{editorState},
-      files_{files}, config_{config} {
+    : charWidth_{}, charHeight_{}, windowWidth_{}, windowHeight_{}, editorState_{editorState}, files_{files},
+      config_{config} {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
 		throw std::runtime_error(SDL_GetError());
 	}
 
-	window_ = SDL_CreateWindow(config.editor_.title.c_str(), SDL_WINDOWPOS_CENTERED,
-				   SDL_WINDOWPOS_CENTERED, 1000, 800,
-				   SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE //| SDL_WINDOW_BORDERLESS
-	);
+	window_ =
+	    SDL_CreateWindow(config.editor_.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800,
+			     SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE //| SDL_WINDOW_BORDERLESS
+	    );
 
 	if (!window_) {
 		SDL_Quit();
 		throw std::runtime_error(SDL_GetError());
 	}
 
-	renderer_ =
-	    SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	if (!renderer_) {
 		SDL_Quit();
@@ -62,12 +61,13 @@ void Renderer::RenderText() const {
 
 	const auto& [text, view, cursor, _] = files_.getDocument(editorState_.activeTab_)->get();
 
-    int offsetIndex = 0;
+	int offsetIndex = 0;
 	size_t countLimit = std::min(view.visibleLines_, text->linesCount());
 	for (const auto it = text->forwardIterator(view.startY_); !it->end(view.startY_ + countLimit); it->next()) {
 		auto line = it.get()->getLine();
 
-		if (line.empty() || line.size() <= view.startX_) continue;
+		if (line.empty() || line.size() <= view.startX_)
+			continue;
 
 		if (config_.editor_.wrap_text == false) {
 			if (view.startX_ + view.visibleColumns_ >= line.size()) {
@@ -79,13 +79,14 @@ void Renderer::RenderText() const {
 			int startIndex = 0;
 
 			while (startIndex * view.visibleColumns_ < line.size()) {
-				const auto subStrLine = line.substr(startIndex * view.visibleColumns_, view.visibleColumns_);
-			    RenderLine(subStrLine, startIndex + offsetIndex + it.get()->index_ - view.startY_);
+				const auto subStrLine =
+				    line.substr(startIndex * view.visibleColumns_, view.visibleColumns_);
+				RenderLine(subStrLine, startIndex + offsetIndex + it.get()->index_ - view.startY_);
 				startIndex++;
 			}
 
-		    offsetIndex+=startIndex - 1;
-		    countLimit = std::min(view.visibleLines_ - offsetIndex, text->linesCount());
+			offsetIndex += startIndex - 1;
+			countLimit = std::min(view.visibleLines_ - offsetIndex, text->linesCount());
 
 			continue;
 		}
@@ -136,8 +137,7 @@ void Renderer::RenderCursor() const {
 
 			SDL_RenderFillRect(renderer_, &rect);
 		} else {
-			const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_,
-						  charHeight_};
+			const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charWidth_, charHeight_};
 			SDL_RenderFillRect(renderer_, &cursorRect);
 
 			char ch = ' ';
@@ -162,11 +162,9 @@ void Renderer::RenderCursor() const {
 }
 
 void Renderer::RenderCommandLine() const {
-	const auto topLRect =
-	    SDL_Rect{0, 800 - charHeight_ - charHeight_, windowWidth_, charHeight_};
-	SDL_SetRenderDrawColor(renderer_, config_.colors_.cursor_color.r,
-			       config_.colors_.cursor_color.g, config_.colors_.cursor_color.b,
-			       config_.colors_.cursor_color.a);
+	const auto topLRect = SDL_Rect{0, 800 - charHeight_ - charHeight_, windowWidth_, charHeight_};
+	SDL_SetRenderDrawColor(renderer_, config_.colors_.cursor_color.r, config_.colors_.cursor_color.g,
+			       config_.colors_.cursor_color.b, config_.colors_.cursor_color.a);
 	SDL_RenderFillRect(renderer_, &topLRect);
 
 	std::string line{};
@@ -183,16 +181,14 @@ void Renderer::RenderCommandLine() const {
 		break;
 	}
 
-	SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(),
-						      config_.colors_.selection_color);
+	SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), config_.colors_.selection_color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 	const SDL_Rect dst{0, 800 - charHeight_ - charHeight_, surface->w, surface->h};
 	SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
 	if (editorState_.currentMode_ == Modes::Command) {
-		surface = TTF_RenderText_Blended(font_, editorState_.input_.c_str(),
-						 config_.colors_.cursor_color);
+		surface = TTF_RenderText_Blended(font_, editorState_.input_.c_str(), config_.colors_.cursor_color);
 
 		if (surface) {
 			texture = SDL_CreateTextureFromSurface(renderer_, surface);
