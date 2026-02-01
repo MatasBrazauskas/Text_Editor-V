@@ -3,8 +3,8 @@
 #include "core/Editor.hpp"
 #include "utils/Config.hpp"
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 class Renderer final {
       public:

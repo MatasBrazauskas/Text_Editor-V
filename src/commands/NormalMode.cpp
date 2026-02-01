@@ -6,188 +6,192 @@
 #include <algorithm>
 #include <iostream>
 #include <ranges>
+#include <SDL_clipboard.h>
 
-static bool parseCount1(NormalModeCommand& com, const char inputChar) {
-	if (std::isdigit(inputChar) == false)
-		return false;
+static bool parseCount(const int count, const char inputChar) {
+	if (!std::isdigit(inputChar)) return false;
 
-	if (inputChar == '0' && com.count1 == 0) {
-		return false;
-	}
+	if (inputChar == '0' && count == 0) return false;
 
-	com.count1 *= 10;
-	com.count1 += inputChar - '0';
 	return true;
 }
 
-bool parseCount2(NormalModeCommand& com, const char inputChar) {
-	if (std::isdigit(inputChar) == false)
-		return false;
-
-	if (inputChar == '0' && com.count2 == 0) {
-		return false;
-	}
-
-	com.count2 *= 10;
-	com.count2 += inputChar - '0';
-	return true;
+static bool parseOperation(const std::unordered_map<char, Func2>& map, const char inputChar) {
+	return map.contains(inputChar);
 }
 
-bool NormalMode::parseOperation(NormalModeCommand& com, const char inputChar) {
-    const auto it = this->operations.find(std::string{inputChar});
-	if (it != this->operations.end()) {
-		com.operation = std::string{inputChar};
-		return true;
-	}
-	return false;
+static bool parseMotion(const std::unordered_map<char, Func>& map, const char inputChar) {
+    return map.contains(inputChar);
 }
 
-bool NormalMode::parseMotion(NormalModeCommand& com, const char inputChar) {
-    const auto it = this->motions.find(std::string{inputChar});
-	if (it != this->motions.end()) {
-		com.motion = std::string{inputChar};
-		return true;
-	}
-	return false;
+static bool parseTextObject(const std::unordered_map<char, Func>& map, const char inputChar) {
+    return map.contains(inputChar);
 }
 
-bool NormalMode::parseTextObject(NormalModeCommand& com, const char inputChar) {
-	const auto it = this->textObjects.find(std::string{inputChar});
-	if (it != this->textObjects.end()) {
-		com.textObject = std::string{inputChar};
-		return true;
-	}
-	return false;
-}
+NormalModeCommand::NormalModeCommand(): count1{0}, operation{' '}, count2{0}, motion{' '}, textObject{' '}, targetChar{' '}, ignoreCount{}, stage{ParsingStages::Count1OperationMotionTextObject} {}
 
-NormalModeCommand::NormalModeCommand() : count1{0}, count2{0}, stage{ParsingStages::Count1OperationMotionTextObject} {}
+NormalModeCommand::NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar, bool ignoreCount, ParsingStages stage)
+    : count1{count1}, operation{operation}, count2{count2}, motion{motion}, textObject{textObject}, targetChar{targetChar}, ignoreCount{ignoreCount}, stage{stage} {}
 
-void NormalMode::HandleKeyboardInput(EditorState& state, std::reference_wrapper<Document> doc) {
-	auto& [text, view, cursor, _] = doc.get();
-    std::cout << std::boolalpha;
+void NormalMode::parseCommand(std::string& input, const char inputChar) {
+    auto addCount = [inputChar](int& count) {
+        count *= 10;
+        count += inputChar - '0';
+    };
+    const auto addOperation = [inputChar](NormalModeCommand& com) {
+        com.operation = inputChar;
+        com.stage = ParsingStages::Count2MotionTextObject;
+    };
+    const auto addMotion = [inputChar](NormalModeCommand& com) {
+        com.motion = inputChar;
+        com.stage = ParsingStages::Finish;
+    };
+    const auto addTextObject = [inputChar](NormalModeCommand& com) {
+        com.textObject = inputChar;
+        com.stage = ParsingStages::WaitingForTargetChar;
+    };
+    const auto addTargetChar = [inputChar](NormalModeCommand& com) {
+        com.targetChar = inputChar;
+        com.stage = ParsingStages::Finish;
+    };
+    const auto clearInputs = [&input, this] {
+        input.clear();
+        command = NormalModeCommand();
+    };
 
-	if (this->command.stage == ParsingStages::Count1OperationMotionTextObject) {
-		bool first = parseCount1(this->command, state.input_.back());
+    const bool count1 = parseCount(this->command.count1, inputChar);
+    const bool operation = parseOperation(this->operations,inputChar);
+    const bool count2= parseCount(this->command.count2, inputChar);
+    const bool motion = parseMotion(this->motions, inputChar);
+    const bool textObject = parseTextObject(this->textObjects, inputChar);
 
-		if (first) {
-			// dont do anythink
-			std::cout << "Digit\n";
-		} else {
-			bool second = parseOperation(this->command, state.input_.back());
-
-			if (second) {
-				this->command.stage = ParsingStages::Count2MotionTextObject;
-			} else {
-				bool third = parseMotion(this->command, state.input_.back());
-				if (third == true) {
-					this->command.stage = ParsingStages::Finish;
-				} else {
-					bool fourth = parseTextObject(this->command, state.input_.back());
-					if (fourth) {
-						this->command.stage = ParsingStages::TextObject;
-					}
-				}
-			}
-		}
-	} else if (this->command.stage == ParsingStages::Count2MotionTextObject) {
-		bool first = parseCount2(this->command, state.input_.back());
-
-		if (first) {
-
-		} else {
-			bool second = parseMotion(this->command, state.input_.back());
-			if (second) {
-				this->command.stage = ParsingStages::Finish;
-			} else {
-				bool third = parseTextObject(this->command, state.input_.back());
-				if (third) {
-					this->command.stage = ParsingStages::TextObject;
-				}
-			}
-		}
-
-	} else if (this->command.stage == ParsingStages::TextObject) {
-		this->command.textObject.push_back(state.input_.back());
-		this->command.stage = ParsingStages::Finish;
-	} else {
-	    this->command = NormalModeCommand();
-	    state.input_.clear();
-	}
-    if (this->command.stage == ParsingStages::Finish) {
-        std::cout << "Command finished\n";
-        executeNormalModeCommand(text, cursor, state);
-
-        this->updateView(view, cursor);
-
-        this->command = NormalModeCommand();
-        state.input_.clear();
-    }
-
-	std::cout << "Parse mode: " << (int)this->command.stage << ". Count1: " << this->command.count1
-		  << ", operation: " << this->command.operation << ", count2: " << this->command.count2
-		  << ", motion: " << this->command.motion << ", text object: " << this->command.textObject << '\n';
-}
-
-void NormalMode::executeNormalModeCommand(std::unique_ptr<ITextBuffer>&text, Cursor &cursor, EditorState &state) {
-
-    const auto operation = operations.find(command.operation);
-    const auto motion = motions.find(command.motion);
-    const auto textObject = motions.find(command.textObject);
-
-    const auto startRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
-
-    for (auto i{0zu}; i < std::max(1, command.count1) * std::max(1, command.count2); ++i) {
-        std::cout << "Called: " << i << '\n';
-        if (motion != motions.end()) {
-            (this->*motion->second)(text, cursor, state);
-        } else if (textObject != textObjects.end()) {
-            (this->*textObject->second)(text, cursor, state);
+    if (this->command.stage == ParsingStages::Count1OperationMotionTextObject) {
+        if (count1) {
+            addCount(this->command.count1);
         }
+        else if (operation) {
+            addOperation(this->command);
+        }
+        else if (motion) {
+            addMotion(this->command);
+        }
+        else if (textObject) {
+            addTextObject(this->command);
+        } else {
+            clearInputs();
+        }
+    } else if (this->command.stage == ParsingStages::Count2MotionTextObject) {
+        if (count2) {
+            addCount(this->command.count2);
+        } else if (motion) {
+            addMotion(this->command);
+        }else if (textObject) {
+            addTextObject(this->command);
+        } else {
+            clearInputs();
+        }
+    } else if (this->command.stage == ParsingStages::WaitingForTargetChar) {
+        addTargetChar(this->command);
     }
-
-    const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
-
-    (this->*operation->second)(text, cursor, state, startRange, endRange);
-
-    cursor.setY(startRange.y);
-    cursor.setX(startRange.x);
 }
 
-NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
+void NormalMode::HandleKeyboardInput(EditorState& state, const std::reference_wrapper<Document> doc) {
+	auto& [text, view, cursor, _] = doc.get();
+	std::cout << std::boolalpha;
+
+    parseCommand(state.input_, state.input_.back());
+
+    std::cout << "Parse mode: " << (int)this->command.stage << ". Count1: " << this->command.count1
+          << ", operation: " << this->command.operation << ", count2: " << this->command.count2
+          << ", motion: " << this->command.motion << ", text object: " << this->command.textObject
+            << ", target char: " << this->command.targetChar << '\n';
+
+    /*if (this->command.stage == ParsingStages::Finish) {
+        executeNormalModeCommand(text, cursor, state);
+        updateView(view, cursor);
+
+        command = NormalModeCommand();
+        state.input_.clear();
+    }*/
+}
+
+void NormalMode::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state) {
+
+	const auto operation = operations.find(command.operation);
+	const auto motion = motions.find(command.motion);
+	const auto textObject = textObjects.find(command.textObject);
+
+	const auto startRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
+
+	for (auto i{0zu}; i < std::max(1, command.count1) * std::max(1, command.count2); ++i) {
+		std::cout << "Called: " << i << '\n';
+		if (motion != motions.end()) {
+			(this->*motion->second)(text, cursor, state);
+		} else if (textObject != textObjects.end()) {
+			(this->*textObject->second)(text, cursor, state);
+		}
+	}
+
+	const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
+
+    if (operation != operations.end()) {
+        (this->*operation->second)(text, cursor, state, startRange, endRange);
+
+        cursor.setY(startRange.y);
+        cursor.setX(startRange.x);
+    }
+}
+
+NormalMode::NormalMode() {
 
 	operations = {
-	    {"d", &NormalMode::deleteChar},
+	    {'d', &NormalMode::operationDeleteChar},
+	    {'y', &NormalMode::operationCopyText}
 	};
 
 	motions = {
-	    {"h", &NormalMode::moveCursorLeft},
-	    {"j", &NormalMode::moveCursorDown},
-	    {"k", &NormalMode::moveCursorUp},
-	    {"l", &NormalMode::moveCursorRight},
+	    {'h', &NormalMode::motionMoveCursorLeft},
+	    {'j', &NormalMode::motionMoveCursorDown},
+	    {'k', &NormalMode::motionMoveCursorUp},
+	    {'l', &NormalMode::motionMoveCursorRight},
+	    {'G', &NormalMode::motionMoveCursorBottomFile},
+	    {'$', &NormalMode::motionMoveRightMost},
+	    {'0', &NormalMode::motionMoveLeftMost},
+	    {'^', &NormalMode::motionMoveLeftMostChar},
+        {'x', &NormalMode::motionDeleteChar},
 	};
 
 	textObjects = {
-	    {"f", &NormalMode::findFirstCharRight},
-	    {"F", &NormalMode::findFirstCharLeft},
+	    {'f', &NormalMode::findFirstCharRight},
+	    {'F', &NormalMode::findFirstCharLeft},
 	};
 
-	/*paramCommands_ = {{"f", &NormalMode::findFirstCharRight},
-		  {"F", &NormalMode::findFirstCharLeft}};
-
-	fixedCommands_ = {
-	    {"h", &NormalMode::moveCursorLeft},	    {"j", &NormalMode::moveCursorDown},
-	    {"k", &NormalMode::moveCursorUp},	    {"l", &NormalMode::moveCursorRight},
-	    {"gg", &NormalMode::moveCursorTopFile}, {"G", &NormalMode::moveCursorBottomFile},
-	    {"$", &NormalMode::moveRightMost},	    {"0", &NormalMode::moveLeftMost},
-	    {"^", &NormalMode::moveLeftMostChar},   {"dd", &NormalMode::deleteLine},
-	    {"dw", &NormalMode::deleteWord},	    {"daw", &NormalMode::deleteAllWord},
-	    {"x", &NormalMode::deleteChar},	    {"O", &NormalMode::insertLineAbove},
+	/*fixedCommands_ = {
+	    {"O", &NormalMode::insertLineAbove},
 	    {"o", &NormalMode::insertLineBelow},    {"i", &NormalMode::switchToInsertLeft},
 	    {"a", &NormalMode::switchToInsertRight}
 	};*/
 }
 
-void NormalMode::currentLine(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state) {}
+void NormalMode::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
+    if (start.y == end.y) {
+        text->deleteRange(start.y, start.x, end.x - start.x + 1);
+    } else {
+        // text->deleteCharacter(cursor.getY(), cursor.getX());
+    }
+}
+
+void NormalMode::operationCopyText(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
+    if (start.y == end.y) {
+        const auto subString = text->rowsView(start.y);
+        std::cout << "Copies test: " << subString << '\n';
+        if (SDL_SetClipboardText(std::string(subString.data()).c_str()) != 0) {
+            throw std::runtime_error(SDL_GetError());
+        }
+    } else {
+        // text->deleteCharacter(cursor.getY(), cursor.getX());
+    }
+}
 
 void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
 	if (cursor.getX() < view.startX_) {
@@ -203,35 +207,19 @@ void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) {
 	}
 }
 
-/*NormalMode::NormalMode() : paramFunc_{nullptr}, paramCount_{0} {
-	paramCommands_ = {{"f", &NormalMode::findFirstCharRight},
-			  {"F", &NormalMode::findFirstCharLeft}};
-
-	fixedCommands_ = {
-	    {"h", &NormalMode::moveCursorLeft},	    {"j", &NormalMode::moveCursorDown},
-	    {"k", &NormalMode::moveCursorUp},	    {"l", &NormalMode::moveCursorRight},
-	    {"gg", &NormalMode::moveCursorTopFile}, {"G", &NormalMode::moveCursorBottomFile},
-	    {"$", &NormalMode::moveRightMost},	    {"0", &NormalMode::moveLeftMost},
-	    {"^", &NormalMode::moveLeftMostChar},   {"dd", &NormalMode::deleteLine},
-	    {"dw", &NormalMode::deleteWord},	    {"daw", &NormalMode::deleteAllWord},
-	    {"x", &NormalMode::deleteChar},	    {"O", &NormalMode::insertLineAbove},
-	    {"o", &NormalMode::insertLineBelow},    {"i", &NormalMode::switchToInsertLeft},
-	    {"a", &NormalMode::switchToInsertRight}};
-}*/
-
-void NormalMode::moveCursorLeft(FUNC_TYPES) {
+void NormalMode::motionMoveCursorLeft(FUNC_TYPES) const {
 	if (cursor.getX() > 0) {
 		cursor.decrementX();
 	}
 }
 
-void NormalMode::moveCursorRight(FUNC_TYPES) {
+void NormalMode::motionMoveCursorRight(FUNC_TYPES) const {
 	if (text->rowsLength(cursor.getY()) - 1 > cursor.getX()) {
 		cursor.incrementX();
 	}
 }
 
-void NormalMode::moveCursorUp(FUNC_TYPES) {
+void NormalMode::motionMoveCursorUp(FUNC_TYPES) const {
 	if (cursor.getY() > 0) {
 		const auto currRowLength = text->rowsLength(cursor.getY());
 		cursor.decrementY();
@@ -243,12 +231,10 @@ void NormalMode::moveCursorUp(FUNC_TYPES) {
 	}
 }
 
-void NormalMode::moveCursorDown(FUNC_TYPES) {
+void NormalMode::motionMoveCursorDown(FUNC_TYPES) const {
 	if (text->linesCount() - 1 > cursor.getY()) {
 
 		const size_t currRowLength = text->rowsLength(cursor.getY());
-
-		// if (currRowLength > state.)
 
 		cursor.incrementY();
 		const size_t nextRowLength = text->rowsLength(cursor.getY());
@@ -259,21 +245,16 @@ void NormalMode::moveCursorDown(FUNC_TYPES) {
 	}
 }
 
-void NormalMode::moveCursorTopFile(FUNC_TYPES) {
-	cursor.setY(0);
-	cursor.setX(std::min(text->rowsLength(cursor.getY()) - 1, cursor.getX()));
-}
-
-void NormalMode::moveCursorBottomFile(FUNC_TYPES) {
+void NormalMode::motionMoveCursorBottomFile(FUNC_TYPES) const {
 	cursor.setY(text->linesCount() - 1);
 	cursor.setX(std::min(text->rowsLength(cursor.getY()) - 1, cursor.getX()));
 }
 
-void NormalMode::moveRightMost(FUNC_TYPES) {
+void NormalMode::motionMoveRightMost(FUNC_TYPES) const {
 	cursor.setX(text->rowsLength(cursor.getY()) - 1);
 }
 
-void NormalMode::moveLeftMostChar(FUNC_TYPES) {
+void NormalMode::motionMoveLeftMostChar(FUNC_TYPES) const {
 	const auto line = text->rowsView(cursor.getY());
 	// Assuming 'separators' is accessible via state or text
 	const size_t index = line.find_first_not_of(" \t");
@@ -283,44 +264,11 @@ void NormalMode::moveLeftMostChar(FUNC_TYPES) {
 	}
 }
 
-void NormalMode::moveLeftMost(FUNC_TYPES) {
+void NormalMode::motionMoveLeftMost(FUNC_TYPES) const {
 	cursor.setX(0);
 }
 
-void NormalMode::deleteLine(FUNC_TYPES) {
-	if (text->linesCount() == 1 && text->rowsLength(0) == 0) {
-		return;
-	}
-
-	text->deleteLine(cursor.getY());
-	cursor.setY(std::min(text->linesCount() - 1, cursor.getY()));
-	cursor.setX(std::min(text->rowsLength(cursor.getY()) - 1, cursor.getX()));
-}
-
-void NormalMode::deleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) {
-    if (start.y == end.y) {
-        text->deleteRange(start.y, start.x, end.x - start.x + 1);
-    }else {
-        //text->deleteCharacter(cursor.getY(), cursor.getX());
-    }
-}
-
-void NormalMode::deleteWord(FUNC_TYPES) {
-	const auto index = text->rowSubstr(cursor.getY(), cursor.getX()).find_first_of(" \t");
-	text->deleteRange(cursor.getY(), cursor.getX(), index);
-}
-
-void NormalMode::deleteAllWord(FUNC_TYPES) {
-	const auto firstPart = text->rowSubstr(cursor.getY(), 0, cursor.getX());
-	const size_t lastSep = firstPart.find_last_of(" \t");
-	const size_t prevIndex = lastSep == std::string_view::npos ? 0 : lastSep + 1;
-
-	const auto secondPart = text->rowSubstr(cursor.getY(), cursor.getX());
-	const auto relativeNext = secondPart.find_first_of(" \t");
-	const size_t nextIndex =
-	    relativeNext == std::string_view::npos ? text->rowsLength(cursor.getY()) : cursor.getX() + relativeNext;
-
-	text->deleteRange(cursor.getY(), prevIndex, nextIndex - prevIndex);
+void NormalMode::motionDeleteChar(FUNC_TYPES) const {
 }
 
 void NormalMode::insertLineAbove(FUNC_TYPES) {
@@ -336,7 +284,7 @@ void NormalMode::insertLineBelow(FUNC_TYPES) {
 	state.currentMode_ = Modes::Insert;
 }
 
-void NormalMode::findFirstCharRight(FUNC_TYPES) {
+void NormalMode::findFirstCharRight(FUNC_TYPES) const {
 	const auto reversedView = text->rowSubstr(cursor.getY(), 0, cursor.getX()) | std::views::reverse;
 	const auto it = std::ranges::find(reversedView, state.input_.back());
 
@@ -346,7 +294,7 @@ void NormalMode::findFirstCharRight(FUNC_TYPES) {
 	}
 }
 
-void NormalMode::findFirstCharLeft(FUNC_TYPES) {
+void NormalMode::findFirstCharLeft(FUNC_TYPES) const {
 	const auto subView = text->rowSubstr(cursor.getY(), cursor.getX() + 1);
 	const auto it = std::ranges::find(subView, state.input_.back());
 

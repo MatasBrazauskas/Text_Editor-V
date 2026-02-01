@@ -1,1 +1,0 @@
-target_sources(Text_Editor PRIVATE Editor.cpp Editor.hpp Renderer.cpp Renderer.hpp)

@@ -1,1 +1,0 @@
-target_sources(Text_Editor PRIVATE Config.cpp Config.hpp FileHandler.cpp FileHandler.hpp)

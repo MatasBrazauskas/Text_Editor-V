@@ -1,1 +1,0 @@
-target_sources(Text_Editor PRIVATE CommandMode.cpp CommandMode.hpp InsertMode.cpp InsertMode.hpp NormalMode.cpp NormalMode.hpp)

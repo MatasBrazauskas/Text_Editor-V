@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <SDL_events.h>
+#include <SDL2/SDL_events.h>
 
 #include "buffer/Files.hpp"
 #include "commands/NormalMode.hpp"

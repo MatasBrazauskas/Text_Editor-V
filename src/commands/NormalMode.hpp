@@ -1,8 +1,6 @@
 #pragma once
 
-#include <format>
 #include <memory>
-#include <string>
 #include <string_view>
 #include <unordered_map>
 
@@ -23,64 +21,58 @@ struct MotionRange {
 enum class ParsingStages : char {
 	Count1OperationMotionTextObject,
 	Count2MotionTextObject,
-	TextObject,
+	WaitingForTargetChar,
 	Finish,
 };
 
 class NormalModeCommand {
       public:
 	NormalModeCommand();
+    NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar, bool ignoreCount, ParsingStages stage);
 	~NormalModeCommand() noexcept = default;
 
 	int count1;
-	std::string operation;
+	char operation;
+
 	int count2;
-	std::string motion;
-	std::string textObject;
+	char motion;
+	char textObject;
+
+    char targetChar;
+    bool ignoreCount;
+
 	ParsingStages stage;
 };
 
-class NormalMode final {
-      public:
+class NormalMode {
+public:
 	NormalMode();
-	void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>);
-	using Func = void (NormalMode::*)(FUNC_TYPES);
-    using Func2 = void (NormalMode::*)(FUNC_TYPES, const MotionRange&, const MotionRange&);
+    ~NormalMode() noexcept = default;
+    void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>);
+//private:
 
-      private:
-	std::unordered_map<std::string, Func2> operations;
-	std::unordered_map<std::string, Func> motions;
-	std::unordered_map<std::string, Func> textObjects;
+    void operationDeleteChar(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
+    void operationCopyText(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
 
-	bool parseOperation(NormalModeCommand&, char inputChar);
-	bool parseMotion(NormalModeCommand&, char inputChar);
-	bool parseTextObject(NormalModeCommand&, char inputChar);
-    void executeNormalModeCommand(std::unique_ptr<ITextBuffer>&text, Cursor &cursor, EditorState &state);
+	void motionMoveCursorLeft(FUNC_TYPES) const;
+	void motionMoveCursorDown(FUNC_TYPES) const;
+	void motionMoveCursorUp(FUNC_TYPES) const;
+	void motionMoveCursorRight(FUNC_TYPES) const;
 
-	Func paramFunc_;
-	size_t paramCount_;
+    void motionMoveCursorBottomFile(FUNC_TYPES) const;
 
-	NormalModeCommand command;
+    void motionMoveRightMost(FUNC_TYPES) const;
+    void motionMoveLeftMost(FUNC_TYPES) const;
 
-	void moveCursorLeft(FUNC_TYPES);
-	void moveCursorDown(FUNC_TYPES);
-	void moveCursorUp(FUNC_TYPES);
-	void moveCursorRight(FUNC_TYPES);
+    void motionMoveLeftMostChar(FUNC_TYPES) const;
 
-	void moveCursorTopFile(FUNC_TYPES);
-	void moveCursorBottomFile(FUNC_TYPES);
+	void motionDeleteChar(FUNC_TYPES) const;
 
-	void moveRightMost(FUNC_TYPES);
-	void moveLeftMostChar(FUNC_TYPES);
-	void moveLeftMost(FUNC_TYPES);
 
-	void deleteLine(FUNC_TYPES);
-	void deleteChar(FUNC_TYPES, const MotionRange&, const MotionRange&);
-	void deleteWord(FUNC_TYPES);
-	void deleteAllWord(FUNC_TYPES);
+	void findFirstCharRight(FUNC_TYPES) const;
+	void findFirstCharLeft(FUNC_TYPES) const;
 
-	void findFirstCharRight(FUNC_TYPES);
-	void findFirstCharLeft(FUNC_TYPES);
+
 
 	void insertLineAbove(FUNC_TYPES);
 	void insertLineBelow(FUNC_TYPES);
@@ -88,7 +80,19 @@ class NormalMode final {
 	void switchToInsertLeft(FUNC_TYPES);
 	void switchToInsertRight(FUNC_TYPES);
 
-	void currentLine(FUNC_TYPES);
+    void updateView(TextBufferView&, const Cursor&);
+    void parseCommand(std::string& input, char inputChar);
+    void executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state);
 
-	void updateView(TextBufferView&, const Cursor&);
+    using Func = void (NormalMode::*)(FUNC_TYPES) const;
+    using Func2 = void (NormalMode::*)(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
+
+    std::unordered_map<char, Func2> operations;
+    std::unordered_map<char, Func> motions;
+    std::unordered_map<char, Func> textObjects;
+
+    NormalModeCommand command;
 };
+
+using Func = void (NormalMode::*)(FUNC_TYPES) const;
+using Func2 = void (NormalMode::*)(FUNC_TYPES, const MotionRange&, const MotionRange&) const;

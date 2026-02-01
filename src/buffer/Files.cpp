@@ -73,6 +73,10 @@ void Files::addDocument(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem
 }
 
 Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
+    if (argc < 1 || argv == nullptr) {
+        return;
+    }
+
 	if (const std::vector<std::string_view> files(argv + 1, argv + argc); files.empty()) {
 		auto ptr = std::make_unique<Matrix>();
 
