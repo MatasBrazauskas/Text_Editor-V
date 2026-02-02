@@ -67,7 +67,7 @@ class ITextBuffer {
 	[[nodiscard]] virtual int linesCount() const = 0;
 
 	virtual void deleteLine(int row) = 0;
-	virtual void insertLine(int row) = 0;
+	virtual void insertLine(int row, std::string) = 0;
 
 	virtual void deleteCharacter(int row, int col) = 0;
 	virtual void insertCharacter(int row, int col, char c) = 0;
@@ -78,7 +78,8 @@ class ITextBuffer {
 	virtual std::unique_ptr<ITextBufferIterator> forwardIterator(size_t) = 0;
 	virtual std::unique_ptr<ITextBufferIterator> backwardIterator(size_t) = 0;
 
-      protected:
+	inline static auto separators = " !@#$%^&*()-+={}[]:;'<>,.?/|\\\""s;
+protected:
 	size_t rowsCount_;
 	size_t charsCount_;
 };
@@ -112,7 +113,6 @@ class Document final {
 	Document(const Document&) = delete;
 	Document& operator=(const Document&) = delete;
 
-	inline static auto separators = " ,./?<>!@#$%^&*()_-+=|[]{}:'"s;
 
 	std::unique_ptr<ITextBuffer> textBuffer_;
 	TextBufferView textView_;

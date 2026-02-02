@@ -39,15 +39,18 @@ void Matrix::init(std::vector<std::string> lines) {
 }
 
 const std::string_view Matrix::rowsView(const int row) const {
-	return lines_.at(row);
+	const auto& line = lines_.at(row);
+    return std::string_view{line};
 }
 
 const std::string_view Matrix::rowSubstr(const int row, const int col, const int n) const {
-	return lines_.at(row).substr(col, n);
+	const auto& line = lines_.at(row);
+    return std::string_view{line.data() + col, static_cast<size_t>(n)};
 }
 
 const std::string_view Matrix::rowSubstr(const int row, const int col) const {
-	return lines_.at(row).substr(col);
+    const auto& line = lines_.at(row);
+    return std::string_view{line.data() + col};
 }
 
 int Matrix::rowsLength(const int row) const {
@@ -66,8 +69,8 @@ void Matrix::deleteLine(const int row) {
 	}
 }
 
-void Matrix::insertLine(const int row) {
-	lines_.insert(lines_.begin() + row, "");
+void Matrix::insertLine(const int row, const std::string line) {
+	lines_.insert(lines_.begin() + row, line);
 }
 
 void Matrix::deleteCharacter(const int row, const int col) {

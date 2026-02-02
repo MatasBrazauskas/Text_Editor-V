@@ -38,18 +38,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/CMakeLists.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/Files.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Files.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/CMakeLists.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Editor.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Editor.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/CMakeLists.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/Config.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +68,96 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -96,10 +187,15 @@
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "CMake Application.Text_Editor.executor": "Run",
+    "Google Test.CommandParsingTest-NormalModeCommandParsingTest.executor": "Run",
+    "Google Test.CommandStageTest-NormalModeCommandParsingTest.executor": "Debug",
     "Google Test.NormalModeCommandParsingTest.StageParsing.executor": "Run",
     "Google Test.NormalModeCommandParsingTest.executor": "Run",
     "Google Test.NormalModeInputs-NormalModeCommandParsingTest.executor": "Run",
     "Google Test.OperationAndMotionParsing-NormalModeCommandParsingTest.executor": "Run",
+    "Google Test.TextObjectParsingTest-NormalModeCommandParsingTest.executor": "Run",
+    "Google Test.WordMotionCommands-NormalModeMotionsTest.executor": "Run",
+    "Google Test.editor_tests.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.RadMigrateCodeStyle": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -143,25 +239,31 @@
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_CLASS="NormalModeCommandParsingTest" TEST_MODE="SUITE_TEST">
+    <configuration name="CommandParsingTest-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="CommandParsingTest/NormalModeCommandParsingTest.*/*:CommandParsingTest/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NormalModeCommandParsingTest.StageParsing" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_CLASS="NormalModeCommandParsingTest" TEST_MODE="SUITE_TEST">
+    <configuration name="CommandStageTest-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="CommandStageTest/NormalModeCommandParsingTest.*/*:CommandStageTest/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NormalModeInputs-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="NormalModeInputs/NormalModeCommandParsingTest.*/*:NormalModeInputs/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
+    <configuration name="NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_CLASS="NormalModeCommandParsingTest" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="OperationAndMotionParsing-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="OperationAndMotionParsing/NormalModeCommandParsingTest.*/*:OperationAndMotionParsing/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
+    <configuration name="TextObjectParsingTest-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="TextObjectParsingTest/NormalModeCommandParsingTest.*/*:TextObjectParsingTest/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WordMotionCommands-NormalModeMotionsTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="WordMotionCommands/NormalModeMotionsTest.*/*:WordMotionCommands/NormalModeMotionsTest/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -203,7 +305,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="All CTest" type="CTestRunConfiguration" factoryName="CTestRun" PROGRAM_PARAMS="--extra-verbose" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$CMakeCurrentLocalGenerationDir$" PASS_PARENT_ENVS_2="true" RUN_PATH="$CTestCurrentExecutableName$" EXPLICIT_BUILD_TARGET_NAME="all" TEST_MODE="SUITE_TEST">
+    <configuration name="All CTest" type="CTestRunConfiguration" factoryName="CTestRun" PROGRAM_PARAMS="--extra-verbose" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$CMakeCurrentLocalGenerationDir$" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$CTestCurrentExecutableName$" EXPLICIT_BUILD_TARGET_NAME="all" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -218,17 +320,19 @@
       <item itemvalue="CMake Application.gtest_main" />
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.editor_tests" />
+      <item itemvalue="Google Test.WordMotionCommands-NormalModeMotionsTest" />
+      <item itemvalue="Google Test.CommandParsingTest-NormalModeCommandParsingTest" />
+      <item itemvalue="Google Test.CommandStageTest-NormalModeCommandParsingTest" />
+      <item itemvalue="Google Test.TextObjectParsingTest-NormalModeCommandParsingTest" />
       <item itemvalue="Google Test.NormalModeCommandParsingTest" />
-      <item itemvalue="Google Test.NormalModeCommandParsingTest.StageParsing" />
-      <item itemvalue="Google Test.NormalModeInputs-NormalModeCommandParsingTest" />
-      <item itemvalue="Google Test.OperationAndMotionParsing-NormalModeCommandParsingTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Google Test.NormalModeCommandParsingTest.StageParsing" />
+        <item itemvalue="Google Test.WordMotionCommands-NormalModeMotionsTest" />
         <item itemvalue="Google Test.NormalModeCommandParsingTest" />
-        <item itemvalue="Google Test.OperationAndMotionParsing-NormalModeCommandParsingTest" />
-        <item itemvalue="Google Test.NormalModeInputs-NormalModeCommandParsingTest" />
+        <item itemvalue="Google Test.CommandParsingTest-NormalModeCommandParsingTest" />
+        <item itemvalue="Google Test.CommandStageTest-NormalModeCommandParsingTest" />
+        <item itemvalue="Google Test.TextObjectParsingTest-NormalModeCommandParsingTest" />
       </list>
     </recent_temporary>
   </component>
@@ -290,7 +394,10 @@
       <workItem from="1769495421698" duration="5038000" />
       <workItem from="1769527170878" duration="2678000" />
       <workItem from="1769789155948" duration="8843000" />
-      <workItem from="1769856711202" duration="18375000" />
+      <workItem from="1769856711202" duration="20621000" />
+      <workItem from="1769968030785" duration="69000" />
+      <workItem from="1770023823761" duration="6754000" />
+      <workItem from="1770046726664" duration="15211000" />
     </task>
     <servers />
   </component>

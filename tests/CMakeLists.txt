@@ -1,5 +1,6 @@
 # Create the test executable
-add_executable(editor_tests normalModeCommandParsingTest.cpp)
+add_executable(editor_tests normalModeCommandParsingTest.cpp
+        normalModeMotionsTest.cpp)
 
 # This command is what fixes "Cannot find directory 'gtest'"
 target_link_libraries(editor_tests

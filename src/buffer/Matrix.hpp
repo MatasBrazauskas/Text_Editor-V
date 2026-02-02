@@ -32,7 +32,7 @@ class Matrix final : public ITextBuffer {
 	[[nodiscard]] int linesCount() const override;
 
 	void deleteLine(int row) override;
-	void insertLine(int row) override;
+	void insertLine(int row, std::string line) override;
 
 	void deleteCharacter(int row, int col) override;
 	void insertCharacter(int row, int col, char c) override;

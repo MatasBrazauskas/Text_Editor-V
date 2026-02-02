@@ -1,45 +1,45 @@
 #pragma once
 
-#include <memory>
-#include <SDL2/SDL_events.h>
-
 #include "buffer/Files.hpp"
-#include "commands/NormalMode.hpp"
-#include "commands/InsertMode.hpp"
 #include "commands/CommandMode.hpp"
+#include "commands/InsertMode.hpp"
+#include "commands/NormalMode.hpp"
 
-enum class Modes: uint8_t {Normal, Insert, Command};
+#include <SDL2/SDL_events.h>
+#include <memory>
 
-enum class SpecialKeys: uint8_t {Backspace = 129, Enter = 130};
+enum class Modes : uint8_t { Normal, Insert, Command };
+
+enum class SpecialKeys : uint8_t { Backspace = 129, Enter = 130 };
 
 class EditorState final {
-public:
+      public:
 	EditorState();
 	~EditorState() = default;
 
 	std::string input_;
-    std::string commandLineInput_;
+	std::string commandLineInput_;
 
 	int activeTab_;
-    Modes currentMode_;
-    bool running_;
+	Modes currentMode_;
+	bool running_;
 };
 
 class Editor final {
-public:
+      public:
 	Editor() = delete;
 	Editor(Files&, FileHandler&, EditorState&);
 	~Editor() = default;
 
 	void HandleKeyboardInput();
-//private:
+	// private:
 	Files& files_;
-    FileHandler& fileHandler_;
+	FileHandler& fileHandler_;
 	EditorState& editorState_;
 
 	NormalMode normalMode_;
 	InsertMode insertMode_;
 	CommandMode commandMode_;
 
-    std::string EncodeInput(const SDL_Event&);
+	std::string EncodeInput(const SDL_Event&);
 };
