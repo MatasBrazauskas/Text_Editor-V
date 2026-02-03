@@ -176,13 +176,20 @@ NormalMode::NormalMode() {
 	};
 
 	motions = {
-	    {'h', &NormalMode::motionMoveCursorLeft},	   {'j', &NormalMode::motionMoveCursorDown},
-    {'k', &NormalMode::motionMoveCursorUp},	   {'l', &NormalMode::motionMoveCursorRight},
-    {'G', &NormalMode::motionMoveCursorBottomFile}, {'$', &NormalMode::motionMoveRightMost},
-    {'0', &NormalMode::motionMoveLeftMost},	   {'^', &NormalMode::motionMoveLeftMostChar},
-    {'w', &NormalMode::motionStartOfNextWord},	   {'b', &NormalMode::motionStartOfPrevWord},
-    {'W', &NormalMode::motionStartOfNextWORD},	   {'B', &NormalMode::motionStartOfPrevWORD},
-	    {'e', &NormalMode::motionEndOfWord}, {'E', &NormalMode::motionEndOfWORD},
+	    {'h', &NormalMode::motionMoveCursorLeft},
+	    {'j', &NormalMode::motionMoveCursorDown},
+	    {'k', &NormalMode::motionMoveCursorUp},
+	    {'l', &NormalMode::motionMoveCursorRight},
+	    {'G', &NormalMode::motionMoveCursorBottomFile},
+	    {'$', &NormalMode::motionMoveRightMost},
+	    {'0', &NormalMode::motionMoveLeftMost},
+	    {'^', &NormalMode::motionMoveLeftMostChar},
+	    {'w', &NormalMode::motionStartOfNextWord},
+	    {'b', &NormalMode::motionStartOfPrevWord},
+	    {'W', &NormalMode::motionStartOfNextWORD},
+	    {'B', &NormalMode::motionStartOfPrevWORD},
+	    {'e', &NormalMode::motionEndOfWord},
+	    {'E', &NormalMode::motionEndOfWORD},
 	};
 
 	textObjects = {
@@ -196,9 +203,9 @@ void NormalMode::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const
 		text->deleteRange(start.y, start.x, end.x - start.x);
 	} else {
 
-	    /*for (const auto it = text->forwardIterator(cursor.getY()); !it->end(cursor.get); it->next()) {
+		/*for (const auto it = text->forwardIterator(cursor.getY()); !it->end(cursor.get); it->next()) {
 
-	    }*/
+		}*/
 		// text->deleteCharacter(cursor.getY(), cursor.getX());
 	}
 }
@@ -226,44 +233,45 @@ void NormalMode::operationCopyText(FUNC_TYPES, const MotionRange& start, const M
 }
 
 void NormalMode::motionStartOfNextWord(FUNC_TYPES) const {
-    const auto currLine = text->rowsView(cursor.getY());
-    const size_t startX = cursor.getX();
+	const auto currLine = text->rowsView(cursor.getY());
+	const size_t startX = cursor.getX();
 
-    if (startX >= currLine.length()) return;
+	if (startX >= currLine.length())
+		return;
 
-    const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    const std::string space = " \t\r\n";
+	const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+	const std::string space = " \t\r\n";
 
-    char currentCh = currLine[startX];
-    size_t nextPos = startX;
+	char currentCh = currLine[startX];
+	size_t nextPos = startX;
 
-    if (isspace(currentCh)) {
-        nextPos = currLine.find_first_not_of(space, startX);
-    } else {
-        std::string currentGroup = alphabet.contains(currentCh) ? alphabet : text->separators;
+	if (isspace(currentCh)) {
+		nextPos = currLine.find_first_not_of(space, startX);
+	} else {
+		std::string currentGroup = alphabet.contains(currentCh) ? alphabet : text->separators;
 
-        nextPos = currLine.find_first_not_of(currentGroup, startX);
+		nextPos = currLine.find_first_not_of(currentGroup, startX);
 
-        if (nextPos != std::string_view::npos && isspace(currLine[nextPos])) {
-            nextPos = currLine.find_first_not_of(space, nextPos);
-        }
-    }
+		if (nextPos != std::string_view::npos && isspace(currLine[nextPos])) {
+			nextPos = currLine.find_first_not_of(space, nextPos);
+		}
+	}
 
-    if (nextPos == std::string_view::npos) {
-        if (cursor.getY() + 1 < text->linesCount()) {
-            cursor.incrementY();
+	if (nextPos == std::string_view::npos) {
+		if (cursor.getY() + 1 < text->linesCount()) {
+			cursor.incrementY();
 
-            const auto nextLine = text->rowsView(cursor.getY());
-            size_t firstChar = nextLine.find_first_not_of(space);
+			const auto nextLine = text->rowsView(cursor.getY());
+			size_t firstChar = nextLine.find_first_not_of(space);
 
-            cursor.setX(firstChar == std::string_view::npos ? 0 : firstChar);
-        } else {
-            const int index = std::max(0, static_cast<int>(currLine.length()) - 1);
-            cursor.setX(index);
-        }
-    } else {
-        cursor.setX(nextPos);
-    }
+			cursor.setX(firstChar == std::string_view::npos ? 0 : firstChar);
+		} else {
+			const int index = std::max(0, static_cast<int>(currLine.length()) - 1);
+			cursor.setX(index);
+		}
+	} else {
+		cursor.setX(nextPos);
+	}
 }
 
 void NormalMode::motionStartOfNextWORD(FUNC_TYPES) const {
@@ -282,8 +290,8 @@ void NormalMode::motionStartOfNextWORD(FUNC_TYPES) const {
 	}
 
 	if (cursor.getY() + 1 >= text->linesCount()) { // second line check
-	    const int x = std::max(0, static_cast<int>(currLine.length()) - 1);
-	    cursor.setX(x);
+		const int x = std::max(0, static_cast<int>(currLine.length()) - 1);
+		cursor.setX(x);
 		return;
 	}
 
@@ -294,180 +302,192 @@ void NormalMode::motionStartOfNextWORD(FUNC_TYPES) const {
 	if (index != std::string_view::npos) {
 		cursor.setX(index);
 	} else {
-	    const int x = std::max(0, static_cast<int>(nextLine.length()) - 1);
-	    cursor.setX(x);
+		const int x = std::max(0, static_cast<int>(nextLine.length()) - 1);
+		cursor.setX(x);
 	}
 }
 
 void NormalMode::motionStartOfPrevWord(FUNC_TYPES) const {
-    const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    const std::string space = " \t\r\n";
+	const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+	const std::string space = " \t\r\n";
 
-    int y = cursor.getY();
-    int x = cursor.getX();
+	int y = cursor.getY();
+	int x = cursor.getX();
 
-    if (x > 0) x--;
-    else if (y > 0) { y--; x = text->rowsView(y).empty() ? 0 : text->rowsView(y).length() - 1; }
-    else return;
+	if (x > 0)
+		x--;
+	else if (y > 0) {
+		y--;
+		x = text->rowsView(y).empty() ? 0 : text->rowsView(y).length() - 1;
+	} else
+		return;
 
-    auto currLine = text->rowsView(y);
+	auto currLine = text->rowsView(y);
 
-    while (y >= 0 && (currLine.empty() || isspace(currLine[x]))) {
-        if (currLine.empty()) {
-            cursor.setX(0);
-            cursor.setY(y); return;
-        }
+	while (y >= 0 && (currLine.empty() || isspace(currLine[x]))) {
+		if (currLine.empty()) {
+			cursor.setX(0);
+			cursor.setY(y);
+			return;
+		}
 
-        size_t lastVisible = currLine.find_last_not_of(space, x);
-        if (lastVisible != std::string_view::npos) {
-            x = lastVisible;
-            break;
-        }
-        if (y == 0) {
-            cursor.setX(0);
-            cursor.setY(0);
-            return;
-        }
+		size_t lastVisible = currLine.find_last_not_of(space, x);
+		if (lastVisible != std::string_view::npos) {
+			x = lastVisible;
+			break;
+		}
+		if (y == 0) {
+			cursor.setX(0);
+			cursor.setY(0);
+			return;
+		}
 
-        y--;
-        currLine = text->rowsView(y);
-        x = currLine.empty() ? 0 : currLine.length() - 1;
-    }
+		y--;
+		currLine = text->rowsView(y);
+		x = currLine.empty() ? 0 : currLine.length() - 1;
+	}
 
-    char c = currLine[x];
-    std::string currentGroup = alphabet.contains(c) ? alphabet : text->separators;
+	char c = currLine[x];
+	std::string currentGroup = alphabet.contains(c) ? alphabet : text->separators;
 
-    while (x > 0 && currentGroup.contains(currLine[x - 1])) {
-        x--;
-    }
+	while (x > 0 && currentGroup.contains(currLine[x - 1])) {
+		x--;
+	}
 
-    cursor.setY(y);
-    cursor.setX(x);
+	cursor.setY(y);
+	cursor.setX(x);
 }
 
 void NormalMode::motionEndOfWord(FUNC_TYPES) const {
-    int y = cursor.getY();
-    int x = cursor.getX();
-    auto currLine = text->rowsView(y);
-    const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    const std::string space = " \t\r\n";
+	int y = cursor.getY();
+	int x = cursor.getX();
+	auto currLine = text->rowsView(y);
+	const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+	const std::string space = " \t\r\n";
 
-    if (x + 1 < currLine.length()) {
-        x++;
-    } else if (y + 1 < text->linesCount()) {
-        y++;
-        x = 0;
-        currLine = text->rowsView(y);
-    } else return;
+	if (x + 1 < currLine.length()) {
+		x++;
+	} else if (y + 1 < text->linesCount()) {
+		y++;
+		x = 0;
+		currLine = text->rowsView(y);
+	} else
+		return;
 
-    while (y < text->linesCount() && (currLine.empty() || isspace(currLine[x]))) {
-        size_t firstVisible = currLine.find_first_not_of(space, x);
-        if (firstVisible != std::string_view::npos) {
-            x = static_cast<int>(firstVisible);
-            break;
-        }
-        if (++y >= text->linesCount()) return;
-        currLine = text->rowsView(y);
-        x = 0;
-    }
+	while (y < text->linesCount() && (currLine.empty() || isspace(currLine[x]))) {
+		size_t firstVisible = currLine.find_first_not_of(space, x);
+		if (firstVisible != std::string_view::npos) {
+			x = static_cast<int>(firstVisible);
+			break;
+		}
+		if (++y >= text->linesCount())
+			return;
+		currLine = text->rowsView(y);
+		x = 0;
+	}
 
-    char c = currLine[x];
-    std::string currentGroup = alphabet.contains(c) ? alphabet : text->separators;
+	char c = currLine[x];
+	std::string currentGroup = alphabet.contains(c) ? alphabet : text->separators;
 
-    size_t endOfGroup = currLine.find_first_not_of(currentGroup, x);
+	size_t endOfGroup = currLine.find_first_not_of(currentGroup, x);
 
-    if (endOfGroup == std::string_view::npos) {
-        cursor.setX(static_cast<int>(currLine.length()) - 1);
-        cursor.setY(y);
-    } else {
-        cursor.setX(static_cast<int>(endOfGroup) - 1);
-        cursor.setY(y);
-    }
+	if (endOfGroup == std::string_view::npos) {
+		cursor.setX(static_cast<int>(currLine.length()) - 1);
+		cursor.setY(y);
+	} else {
+		cursor.setX(static_cast<int>(endOfGroup) - 1);
+		cursor.setY(y);
+	}
 }
 
 void NormalMode::motionEndOfWORD(FUNC_TYPES) const {
-    int y = cursor.getY();
-    int x = cursor.getX();
-    auto currLine = text->rowsView(y);
-    const std::string space = " \t\r\n";
+	int y = cursor.getY();
+	int x = cursor.getX();
+	auto currLine = text->rowsView(y);
+	const std::string space = " \t\r\n";
 
-    // 1. Step Forward
-    if (x + 1 < currLine.length()) x++;
-    else if (y + 1 < text->linesCount()) {
-        y++; x = 0;
-        currLine = text->rowsView(y);
-    } else return;
+	// 1. Step Forward
+	if (x + 1 < currLine.length())
+		x++;
+	else if (y + 1 < text->linesCount()) {
+		y++;
+		x = 0;
+		currLine = text->rowsView(y);
+	} else
+		return;
 
-    // 2. Skip Whitespace
-    while (y < text->linesCount() && (currLine.empty() || isspace(currLine[x]))) {
-        size_t firstVisible = currLine.find_first_not_of(space, x);
-        if (firstVisible != std::string_view::npos) {
-            x = static_cast<int>(firstVisible);
-            break;
-        }
-        if (++y >= text->linesCount()) return;
-        currLine = text->rowsView(y);
-        x = 0;
-    }
+	// 2. Skip Whitespace
+	while (y < text->linesCount() && (currLine.empty() || isspace(currLine[x]))) {
+		size_t firstVisible = currLine.find_first_not_of(space, x);
+		if (firstVisible != std::string_view::npos) {
+			x = static_cast<int>(firstVisible);
+			break;
+		}
+		if (++y >= text->linesCount())
+			return;
+		currLine = text->rowsView(y);
+		x = 0;
+	}
 
-    size_t nextSpace = currLine.find_first_of(space, x);
+	size_t nextSpace = currLine.find_first_of(space, x);
 
-    if (nextSpace == std::string_view::npos) {
-        cursor.setX(static_cast<int>(currLine.length()) - 1);
-        cursor.setY(y);
-    } else {
-        cursor.setX(static_cast<int>(nextSpace) - 1);
-        cursor.setY(y);
-    }
+	if (nextSpace == std::string_view::npos) {
+		cursor.setX(static_cast<int>(currLine.length()) - 1);
+		cursor.setY(y);
+	} else {
+		cursor.setX(static_cast<int>(nextSpace) - 1);
+		cursor.setY(y);
+	}
 }
 
 void NormalMode::motionStartOfPrevWORD(FUNC_TYPES) const {
-    const auto spaceSeparator = " "s;
-    int y = cursor.getY();
-    int x = cursor.getX();
+	const auto spaceSeparator = " "s;
+	int y = cursor.getY();
+	int x = cursor.getX();
 
-    auto currLine = text->rowsView(y);
+	auto currLine = text->rowsView(y);
 
-    if (x == 0 || isspace(currLine[x]) || (!isspace(currLine[x]) && isspace(currLine[x-1]))) {
-        if (x == 0) {
-            if (y == 0) return; // Top of file
-            y--;
-            currLine = text->rowsView(y);
-            x = currLine.empty() ? 0 : currLine.length() - 1;
-        } else {
-            x--;
-        }
-    }
+	if (x == 0 || isspace(currLine[x]) || (!isspace(currLine[x]) && isspace(currLine[x - 1]))) {
+		if (x == 0) {
+			if (y == 0)
+				return; // Top of file
+			y--;
+			currLine = text->rowsView(y);
+			x = currLine.empty() ? 0 : currLine.length() - 1;
+		} else {
+			x--;
+		}
+	}
 
-    while (y >= 0) {
-        currLine = text->rowsView(y);
-        if (currLine.empty()) {
-            cursor.setY(y);
-            cursor.setX(0);
-            return;
-        }
+	while (y >= 0) {
+		currLine = text->rowsView(y);
+		if (currLine.empty()) {
+			cursor.setY(y);
+			cursor.setX(0);
+			return;
+		}
 
-        size_t lastNonSpace = currLine.find_last_not_of(spaceSeparator, x);
-        if (lastNonSpace != std::string_view::npos) {
-            x = static_cast<int>(lastNonSpace);
-            break;
-        }
+		size_t lastNonSpace = currLine.find_last_not_of(spaceSeparator, x);
+		if (lastNonSpace != std::string_view::npos) {
+			x = static_cast<int>(lastNonSpace);
+			break;
+		}
 
-        if (y == 0) {
-            cursor.setX(0);
-            cursor.setY(0);
-            return;
-        }
+		if (y == 0) {
+			cursor.setX(0);
+			cursor.setY(0);
+			return;
+		}
 
-        y--;
-        currLine = text->rowsView(y);
-        x = currLine.empty() ? 0 : currLine.length() - 1;
-    }
+		y--;
+		currLine = text->rowsView(y);
+		x = currLine.empty() ? 0 : currLine.length() - 1;
+	}
 
-    // Step 3: Find the start of this WORD
-    size_t startOfWord = currLine.find_last_of(spaceSeparator, x);
-    cursor.setY(y);
-    cursor.setX(startOfWord == std::string_view::npos ? 0 : startOfWord + 1);
+	// Step 3: Find the start of this WORD
+	size_t startOfWord = currLine.find_last_of(spaceSeparator, x);
+	cursor.setY(y);
+	cursor.setX(startOfWord == std::string_view::npos ? 0 : startOfWord + 1);
 }
 
 void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {

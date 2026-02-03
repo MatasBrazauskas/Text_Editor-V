@@ -39,12 +39,8 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Files.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -217,7 +213,7 @@
       <recent name="$PROJECT_DIR$/src/wrappers" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.Text_Editor">
+  <component name="RunManager" selected="Google Test.editor_tests">
     <configuration name="CommandParsingTest-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="CommandParsingTest/NormalModeCommandParsingTest.*/*:CommandParsingTest/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -382,7 +378,7 @@
       <workItem from="1769968030785" duration="69000" />
       <workItem from="1770023823761" duration="6754000" />
       <workItem from="1770046726664" duration="15211000" />
-      <workItem from="1770110007032" duration="14443000" />
+      <workItem from="1770110007032" duration="14684000" />
     </task>
     <servers />
   </component>

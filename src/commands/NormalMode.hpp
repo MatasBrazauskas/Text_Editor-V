@@ -87,8 +87,8 @@ class NormalMode {
 	void motionStartOfPrevWord(FUNC_TYPES) const;
 	void motionStartOfPrevWORD(FUNC_TYPES) const;
 
-    void motionEndOfWord(FUNC_TYPES) const;
-    void motionEndOfWORD(FUNC_TYPES) const;
+	void motionEndOfWord(FUNC_TYPES) const;
+	void motionEndOfWORD(FUNC_TYPES) const;
 
 	void updateView(TextBufferView&, const Cursor&) const;
 
