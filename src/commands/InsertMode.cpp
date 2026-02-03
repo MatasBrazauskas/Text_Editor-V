@@ -16,8 +16,7 @@ void InsertMode::handleEnter(EditorState&, Document& doc) const {
 	doc.textBuffer_->insertRange(doc.cursor_.getY() + 1, 0, subRange);
 
 	doc.textBuffer_->deleteRange(doc.cursor_.getY(), doc.cursor_.getX(),
-				     doc.textBuffer_->rowsLength(doc.cursor_.getY()) -
-					 doc.cursor_.getX());
+				     doc.textBuffer_->rowsLength(doc.cursor_.getY()) - doc.cursor_.getX());
 
 	doc.cursor_.incrementY();
 	doc.cursor_.setX(0);
@@ -27,8 +26,7 @@ void InsertMode::handleBackspace(EditorState&, Document& doc) const {
 		const auto movedLine = doc.textBuffer_->rowsView(doc.cursor_.getY());
 		const size_t linesLength = movedLine.length();
 
-		doc.textBuffer_->insertRange(doc.cursor_.getY() - 1,
-					     doc.textBuffer_->rowsLength(doc.cursor_.getY() - 1),
+		doc.textBuffer_->insertRange(doc.cursor_.getY() - 1, doc.textBuffer_->rowsLength(doc.cursor_.getY() - 1),
 					     movedLine);
 		doc.textBuffer_->deleteLine(doc.cursor_.getY() - 1);
 
@@ -40,8 +38,7 @@ void InsertMode::handleBackspace(EditorState&, Document& doc) const {
 	}
 }
 
-void InsertMode::HandleKeyboardInput(EditorState& editorState,
-				     std::reference_wrapper<Document> doc) const {
+void InsertMode::HandleKeyboardInput(EditorState& editorState, std::reference_wrapper<Document> doc) const {
 	if (editorState.input_.empty())
 		return;
 

@@ -35,8 +35,7 @@ class Cursor final {
 
 class ITextBufferIterator {
       public:
-	ITextBufferIterator(const int index_t, const bool flag_t)
-	    : index_(index_t), forwarded_(flag_t) {}
+	ITextBufferIterator(const int index_t, const bool flag_t) : index_(index_t), forwarded_(flag_t) {}
 	virtual ~ITextBufferIterator() noexcept = default;
 
 	virtual void next() = 0;
@@ -78,8 +77,9 @@ class ITextBuffer {
 	virtual std::unique_ptr<ITextBufferIterator> forwardIterator(size_t) = 0;
 	virtual std::unique_ptr<ITextBufferIterator> backwardIterator(size_t) = 0;
 
-	inline static auto separators = " !@#$%^&*()-+={}[]:;'<>,.?/|\\\""s;
-protected:
+	inline static auto separators = "!@#$%^&*()-+={}[]:;'<>,.?/|\\\""s;
+
+      protected:
 	size_t rowsCount_;
 	size_t charsCount_;
 };
@@ -112,7 +112,6 @@ class Document final {
 
 	Document(const Document&) = delete;
 	Document& operator=(const Document&) = delete;
-
 
 	std::unique_ptr<ITextBuffer> textBuffer_;
 	TextBufferView textView_;

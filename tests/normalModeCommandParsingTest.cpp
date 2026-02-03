@@ -46,17 +46,16 @@ TEST_P(NormalModeCommandParsingTest, HandleLotsOfCases) {
 INSTANTIATE_TEST_SUITE_P(
     CommandParsingTest, NormalModeCommandParsingTest,
     ::testing::Values(
-    ParseParameters{"a", NormalModeCommand{0, 'a', 0, ' ', ' ', ' ', false, ParsingStages::Finish}},
-    ParseParameters{"32a", NormalModeCommand{32, 'a', 0, ' ', ' ', ' ', false, ParsingStages::Finish}},
-    ParseParameters{"l", NormalModeCommand{0, ' ', 0, 'l', ' ', ' ', false, ParsingStages::Finish}},
+	ParseParameters{"a", NormalModeCommand{0, 'a', 0, ' ', ' ', ' ', false, ParsingStages::Finish}},
+	ParseParameters{"32a", NormalModeCommand{32, 'a', 0, ' ', ' ', ' ', false, ParsingStages::Finish}},
+	ParseParameters{"l", NormalModeCommand{0, ' ', 0, 'l', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"32l", NormalModeCommand{32, ' ', 0, 'l', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"dl", NormalModeCommand{0, 'd', 0, 'l', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"32dl", NormalModeCommand{32, 'd', 0, 'l', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"d21l", NormalModeCommand{0, 'd', 21, 'l', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"30d21l", NormalModeCommand{30, 'd', 21, 'l', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"0", NormalModeCommand{0, ' ', 0, '0', ' ', ' ', false, ParsingStages::Finish}},
-    ParseParameters{"32d0", NormalModeCommand{32, 'd', 0, '0', ' ', ' ', false, ParsingStages::Finish}}
-));
+	ParseParameters{"32d0", NormalModeCommand{32, 'd', 0, '0', ' ', ' ', false, ParsingStages::Finish}}));
 
 INSTANTIATE_TEST_SUITE_P(
     TextObjectParsingTest, NormalModeCommandParsingTest,

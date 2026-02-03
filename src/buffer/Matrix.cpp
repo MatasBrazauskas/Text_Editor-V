@@ -40,17 +40,17 @@ void Matrix::init(std::vector<std::string> lines) {
 
 const std::string_view Matrix::rowsView(const int row) const {
 	const auto& line = lines_.at(row);
-    return std::string_view{line};
+	return std::string_view{line};
 }
 
 const std::string_view Matrix::rowSubstr(const int row, const int col, const int n) const {
 	const auto& line = lines_.at(row);
-    return std::string_view{line.data() + col, static_cast<size_t>(n)};
+	return std::string_view{line.data() + col, static_cast<size_t>(n)};
 }
 
 const std::string_view Matrix::rowSubstr(const int row, const int col) const {
-    const auto& line = lines_.at(row);
-    return std::string_view{line.data() + col};
+	const auto& line = lines_.at(row);
+	return std::string_view{line.data() + col};
 }
 
 int Matrix::rowsLength(const int row) const {

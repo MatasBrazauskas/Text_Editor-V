@@ -38,19 +38,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Files.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/Files.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Editor.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Editor.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/Config.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,18 +63,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -194,7 +177,8 @@
     "Google Test.NormalModeInputs-NormalModeCommandParsingTest.executor": "Run",
     "Google Test.OperationAndMotionParsing-NormalModeCommandParsingTest.executor": "Run",
     "Google Test.TextObjectParsingTest-NormalModeCommandParsingTest.executor": "Run",
-    "Google Test.WordMotionCommands-NormalModeMotionsTest.executor": "Run",
+    "Google Test.WordMotionCommands-NormalModeMotionsTest.executor": "Debug",
+    "Google Test.WordMotionCommands-WordTests.executor": "Run",
     "Google Test.editor_tests.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.RadMigrateCodeStyle": "true",
@@ -234,11 +218,6 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.Text_Editor">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="CommandParsingTest-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="CommandParsingTest/NormalModeCommandParsingTest.*/*:CommandParsingTest/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -257,13 +236,13 @@
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TextObjectParsingTest-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="TextObjectParsingTest/NormalModeCommandParsingTest.*/*:TextObjectParsingTest/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
+    <configuration name="WordMotionCommands-NormalModeMotionsTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="WordMotionCommands/NormalModeMotionsTest.*/*:WordMotionCommands/NormalModeMotionsTest/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="WordMotionCommands-NormalModeMotionsTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="WordMotionCommands/NormalModeMotionsTest.*/*:WordMotionCommands/NormalModeMotionsTest/*.*" TEST_MODE="PATTERN">
+    <configuration name="WordMotionCommands-WordTests" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="WordMotionCommands/WordTests.*/*:WordMotionCommands/WordTests/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -281,6 +260,11 @@
       </method>
     </configuration>
     <configuration name="Text_Editor" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="text.txt idk.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/cmake-build-debug/Text_Editor" EXPLICIT_BUILD_TARGET_NAME="all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -320,19 +304,19 @@
       <item itemvalue="CMake Application.gtest_main" />
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.editor_tests" />
+      <item itemvalue="Google Test.WordMotionCommands-WordTests" />
       <item itemvalue="Google Test.WordMotionCommands-NormalModeMotionsTest" />
       <item itemvalue="Google Test.CommandParsingTest-NormalModeCommandParsingTest" />
       <item itemvalue="Google Test.CommandStageTest-NormalModeCommandParsingTest" />
-      <item itemvalue="Google Test.TextObjectParsingTest-NormalModeCommandParsingTest" />
       <item itemvalue="Google Test.NormalModeCommandParsingTest" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Google Test.WordMotionCommands-NormalModeMotionsTest" />
+        <item itemvalue="Google Test.WordMotionCommands-WordTests" />
         <item itemvalue="Google Test.NormalModeCommandParsingTest" />
         <item itemvalue="Google Test.CommandParsingTest-NormalModeCommandParsingTest" />
         <item itemvalue="Google Test.CommandStageTest-NormalModeCommandParsingTest" />
-        <item itemvalue="Google Test.TextObjectParsingTest-NormalModeCommandParsingTest" />
       </list>
     </recent_temporary>
   </component>
@@ -398,6 +382,7 @@
       <workItem from="1769968030785" duration="69000" />
       <workItem from="1770023823761" duration="6754000" />
       <workItem from="1770046726664" duration="15211000" />
+      <workItem from="1770110007032" duration="14443000" />
     </task>
     <servers />
   </component>

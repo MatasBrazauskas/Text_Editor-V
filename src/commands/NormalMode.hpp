@@ -46,15 +46,15 @@ class NormalModeCommand {
 };
 
 class NormalMode {
-public:
+      public:
 	NormalModeCommand command;
 	NormalMode();
 	~NormalMode() noexcept = default;
 	void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>);
 	void parseCommand(std::string& input, char inputChar);
 	void executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state);
-private:
 
+      private:
 	void operationDeleteChar(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
 	void operationCopyText(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
 
@@ -81,29 +81,31 @@ private:
 	void actionSwitchToInsertLeft(FUNC_TYPES) const;
 	void actionSwitchToInsertRight(FUNC_TYPES) const;
 
-    void motionStartOfNextWord(FUNC_TYPES) const;
-    void motionStartOfNextWORD(FUNC_TYPES) const;
+	void motionStartOfNextWord(FUNC_TYPES) const;
+	void motionStartOfNextWORD(FUNC_TYPES) const;
 
-    void motionStartOfPrevWord(FUNC_TYPES) const;
-    void motionStartOfPrevWORD(FUNC_TYPES) const;
+	void motionStartOfPrevWord(FUNC_TYPES) const;
+	void motionStartOfPrevWORD(FUNC_TYPES) const;
+
+    void motionEndOfWord(FUNC_TYPES) const;
+    void motionEndOfWORD(FUNC_TYPES) const;
 
 	void updateView(TextBufferView&, const Cursor&) const;
 
 	using Func = void (NormalMode::*)(FUNC_TYPES) const;
 	using Func2 = void (NormalMode::*)(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
 
-    bool parseCount(int count, char inputChar) const;
-    bool parseAction(char inputChar) const;
-    bool parseOperation(char inputChar) const;
-    bool parseMotion(char inputChar) const;
-    bool parseTextObject(char inputChar) const;
+	bool parseCount(int count, char inputChar) const;
+	bool parseAction(char inputChar) const;
+	bool parseOperation(char inputChar) const;
+	bool parseMotion(char inputChar) const;
+	bool parseTextObject(char inputChar) const;
 
 	std::unordered_map<char, Func2> operations;
-    std::unordered_map<char, Func> actions;
+	std::unordered_map<char, Func> actions;
 
 	std::unordered_map<char, Func> motions;
 	std::unordered_map<char, Func> textObjects;
-
 };
 
 using Func = void (NormalMode::*)(FUNC_TYPES) const;
