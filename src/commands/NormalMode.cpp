@@ -23,6 +23,9 @@ bool NormalMode::parseAction(const char inputChar) const {
 }
 
 bool NormalMode::parseOperation(const char inputChar) const {
+    if (inputChar == 'r') {
+        return true;
+    }
 	return operations.contains(inputChar);
 }
 
@@ -57,6 +60,13 @@ void NormalMode::parseCommand(std::string& input, const char inputChar) {
 	const auto addOperation = [inputChar](NormalModeCommand& com) {
 		com.operation = inputChar;
 		com.stage = ParsingStages::Count2MotionTextObject;
+
+	    if (inputChar == 'r') {
+	        com.ignoreCount = true;
+	        com.textObject = inputChar;
+	        com.operation = ' ';
+	        com.stage = ParsingStages::WaitingForTargetChar;
+	    }
 	};
 
 	const auto addMotion = [inputChar](NormalModeCommand& com) {
@@ -142,14 +152,17 @@ void NormalMode::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cu
 
 	const auto startRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
 
-	for (auto i{0zu}; i < std::max(1, command.count1) * std::max(1, command.count2); ++i) {
-		// std::cout << "Called: " << i << '\n';
+    const std::size_t loopCount = command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
+
+
+	for (auto i{0zu}; i < loopCount; ++i) {
 		if (motion != motions.end()) {
 			(this->*motion->second)(text, cursor, state);
 		} else if (textObject != textObjects.end()) {
-			(this->*textObject->second)(text, cursor, state);
+			(this->*textObject->second)(text, cursor, state, command.targetChar);
 		}
 	}
+
 
 	const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
 
@@ -195,6 +208,7 @@ NormalMode::NormalMode() {
 	textObjects = {
 	    {'f', &NormalMode::findFirstCharRight},
 	    {'F', &NormalMode::findFirstCharLeft},
+	    {'r', &NormalMode::replaceChar}
 	};
 }
 
@@ -580,9 +594,9 @@ void NormalMode::actionInsertLineBelow(FUNC_TYPES) const {
 	state.currentMode_ = Modes::Insert;
 }
 
-void NormalMode::findFirstCharRight(FUNC_TYPES) const {
+void NormalMode::findFirstCharRight(FUNC_TYPES, const char newChar) const {
 	const auto reversedView = text->rowSubstr(cursor.getY(), 0, cursor.getX()) | std::views::reverse;
-	const auto it = std::ranges::find(reversedView, state.input_.back());
+	const auto it = std::ranges::find(reversedView, newChar);
 
 	if (it != reversedView.end()) {
 		const auto offset = cursor.getX() - std::distance(reversedView.begin(), it) - 1;
@@ -590,13 +604,20 @@ void NormalMode::findFirstCharRight(FUNC_TYPES) const {
 	}
 }
 
-void NormalMode::findFirstCharLeft(FUNC_TYPES) const {
+void NormalMode::findFirstCharLeft(FUNC_TYPES, const char newChar) const {
 	const auto subView = text->rowSubstr(cursor.getY(), cursor.getX() + 1);
-	const auto it = std::ranges::find(subView, state.input_.back());
+	const auto it = std::ranges::find(subView, newChar);
 
 	if (it != subView.end()) {
 		cursor.setX(cursor.getX() + 1 + std::distance(subView.begin(), it));
 	}
+}
+
+void NormalMode::replaceChar(FUNC_TYPES, const char newChar) const {
+    if (text->rowsLength(cursor.getY())) {
+        text->deleteCharacter(cursor.getY(), cursor.getX());
+        text->insertCharacter(cursor.getY(), cursor.getX(), newChar);
+    }
 }
 
 void NormalMode::actionSwitchToInsertLeft(FUNC_TYPES) const {

@@ -72,8 +72,9 @@ class NormalMode {
 
 	void actionDeleteChar(FUNC_TYPES) const;
 
-	void findFirstCharRight(FUNC_TYPES) const;
-	void findFirstCharLeft(FUNC_TYPES) const;
+	void findFirstCharRight(FUNC_TYPES, char) const;
+	void findFirstCharLeft(FUNC_TYPES, char) const;
+    void replaceChar(FUNC_TYPES, char) const;
 
 	void actionInsertLineAbove(FUNC_TYPES) const;
 	void actionInsertLineBelow(FUNC_TYPES) const;
@@ -94,6 +95,7 @@ class NormalMode {
 
 	using Func = void (NormalMode::*)(FUNC_TYPES) const;
 	using Func2 = void (NormalMode::*)(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
+    using Func3 = void (NormalMode::*)(FUNC_TYPES, const char newChar) const;
 
 	bool parseCount(int count, char inputChar) const;
 	bool parseAction(char inputChar) const;
@@ -105,7 +107,7 @@ class NormalMode {
 	std::unordered_map<char, Func> actions;
 
 	std::unordered_map<char, Func> motions;
-	std::unordered_map<char, Func> textObjects;
+	std::unordered_map<char, Func3> textObjects;
 };
 
 using Func = void (NormalMode::*)(FUNC_TYPES) const;
