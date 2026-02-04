@@ -7,14 +7,14 @@ class EditorState;
 class Document;
 
 class InsertMode final {
-public:
+      public:
 	InsertMode();
 	~InsertMode() = default;
 
 	void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>) const;
 	using Func = void (InsertMode::*)(EditorState&, Document&) const;
 
-private:
+      private:
 	void handleEnter(EditorState&, Document&) const;
 	void handleBackspace(EditorState&, Document&) const;
 

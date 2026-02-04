@@ -39,12 +39,12 @@ void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandl
 		return;
 
 	if (state.input_.back() == static_cast<char>(SpecialKeys::Backspace)) {
-	    if (state.input_.length() > 2) {
-	        state.input_.erase(state.input_.end() - 2, state.input_.end());
-	    } else {
-	        state.input_.clear();
-	        state.currentMode_ = Modes::Normal;
-	    }
+		if (state.input_.length() > 2) {
+			state.input_.erase(state.input_.end() - 2, state.input_.end());
+		} else {
+			state.input_.clear();
+			state.currentMode_ = Modes::Normal;
+		}
 
 	} else if (state.input_.back() == static_cast<char>(SpecialKeys::Enter)) {
 		const auto& com = parseCommand(state.input_);
@@ -54,12 +54,11 @@ void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandl
 			(this->*func)(state, fileHandler, files, com);
 
 			state.input_.clear();
-            state.currentMode_ = Modes::Normal;
+			state.currentMode_ = Modes::Normal;
 		} else {
 			state.input_ = "Unknown command: " + com.command_;
 		}
 	}
-
 }
 
 void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, Files& files, const CommandStructure& com) {

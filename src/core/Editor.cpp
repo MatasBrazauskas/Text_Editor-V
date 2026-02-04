@@ -13,11 +13,13 @@ std::string Editor::EncodeInput(const SDL_Event& event) {
 		editorState_.running_ = false;
 		return {};
 	}
+    auto& doc = files_.getDocument(editorState_.activeTab_).value().get();
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_ESCAPE:
 			editorState_.currentMode_ = Modes::Normal;
 			editorState_.input_.clear();
+		        doc.cursor_.setX(std::min(doc.cursor_.getX(), doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1));
 			break;
 		case SDLK_BACKSPACE:
 			return std::string(1, static_cast<char>(SpecialKeys::Backspace));

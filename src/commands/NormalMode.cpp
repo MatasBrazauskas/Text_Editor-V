@@ -217,20 +217,20 @@ NormalMode::NormalMode() {
 }
 
 void NormalMode::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
-    if (start.y == end.y) {
-        text->deleteRange(start.y, start.x, end.x - start.x);
-    } else {
-        const auto endLineSuffix = std::string{text->rowsView(end.y).substr(end.x)};
+	if (start.y == end.y) {
+		text->deleteRange(start.y, start.x, end.x - start.x);
+	} else {
+		const auto endLineSuffix = std::string{text->rowsView(end.y).substr(end.x)};
 
-        const int startLineLen = text->rowsLength(start.y);
-        text->deleteRange(start.y, start.x, startLineLen - start.x);
+		const int startLineLen = text->rowsLength(start.y);
+		text->deleteRange(start.y, start.x, startLineLen - start.x);
 
-        for (int i = end.y; i > start.y; --i) {
-            text->deleteLine(i);
-        }
+		for (int i = end.y; i > start.y; --i) {
+			text->deleteLine(i);
+		}
 
-        text->insertRange(start.y, start.x, endLineSuffix);
-    }
+		text->insertRange(start.y, start.x, endLineSuffix);
+	}
 }
 
 void NormalMode::operationCopyText(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
@@ -547,7 +547,10 @@ void NormalMode::motionMoveCursorUp(FUNC_TYPES) const {
 		cursor.decrementY();
 		const auto nextRowLength = text->rowsLength(cursor.getY());
 
-		if (currRowLength - 1 == cursor.getX() || nextRowLength - 1 < cursor.getX()) {
+	    if (nextRowLength == 0) {
+	        cursor.setX(0);
+	    }
+		else if (currRowLength - 1 == cursor.getX() || nextRowLength - 1 < cursor.getX()) {
 			cursor.setX(nextRowLength - 1);
 		}
 	}
@@ -559,9 +562,12 @@ void NormalMode::motionMoveCursorDown(FUNC_TYPES) const {
 		const size_t currRowLength = text->rowsLength(cursor.getY());
 
 		cursor.incrementY();
-		const size_t nextRowLength = text->rowsLength(cursor.getY());
+		const std::size_t nextRowLength = text->rowsLength(cursor.getY());
 
-		if (currRowLength - 1 == cursor.getX() || nextRowLength - 1 <= cursor.getX()) {
+	    if (nextRowLength == 0) {
+	        cursor.setX(0);
+	    }
+		else if (currRowLength - 1 == cursor.getX() || nextRowLength - 1 <= cursor.getX()) {
 			cursor.setX(nextRowLength - 1);
 		}
 	}
@@ -590,7 +596,21 @@ void NormalMode::motionMoveLeftMost(FUNC_TYPES) const {
 	cursor.setX(0);
 }
 
-void NormalMode::actionDeleteChar(FUNC_TYPES) const {}
+void NormalMode::actionDeleteChar(FUNC_TYPES) const {
+    if (text->rowsLength(cursor.getY()) == 0) {
+        return;
+    }
+
+    text->deleteCharacter(cursor.getY(), cursor.getX());
+
+    if (text->rowsLength(cursor.getY()) == 0) {
+        cursor.setX(0);
+        return;
+    }
+
+    const std::size_t newIndex = std::min(cursor.getX(), text->rowsLength(cursor.getY()) - 1);
+    cursor.setX(newIndex);
+}
 
 void NormalMode::actionInsertLineAbove(FUNC_TYPES) const {
 	text->insertLine(cursor.getY(), "");

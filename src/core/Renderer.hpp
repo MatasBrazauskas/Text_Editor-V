@@ -7,7 +7,7 @@
 #include <SDL2/SDL_ttf.h>
 
 class Renderer final {
-      public:
+public:
 	Renderer() = delete;
 
 	Renderer(const EditorState&, Files&, const Config&);
@@ -30,7 +30,7 @@ class Renderer final {
 	Files& files_;
 	const Config& config_;
 
-      private:
+private:
 	void RenderText() const;
 	void RenderLine(std::string_view, int) const;
 	void RenderCursor() const;
