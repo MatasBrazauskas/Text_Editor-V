@@ -1,6 +1,7 @@
 #include "commands/InsertMode.hpp"
 
 #include "core/Editor.hpp"
+#include <iostream>
 
 InsertMode::InsertMode() {
 	const auto b = std::string(1, static_cast<char>(SpecialKeys::Enter));
@@ -32,7 +33,7 @@ void InsertMode::handleBackspace(EditorState&, Document& doc) const {
 
 		doc.cursor_.decrementY();
 		doc.cursor_.setX(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - linesLength);
-	} else {
+	} else if (doc.cursor_.getY() > 0) {
 		doc.textBuffer_->deleteCharacter(doc.cursor_.getY(), doc.cursor_.getX() - 1);
 		doc.cursor_.decrementX();
 	}
@@ -47,6 +48,8 @@ void InsertMode::HandleKeyboardInput(EditorState& editorState, std::reference_wr
 	if (const auto it = commands_.find(editorState.input_); it != commands_.end()) {
 		const auto func = it->second;
 		(this->*func)(editorState, doc);
+	    std::cout << "Executed a function\n";
+	    editorState.currentMode_ = Modes::Normal;
 	} else {
 		text->insertCharacter(cursor.getY(), cursor.getX(), editorState.input_.at(0));
 		cursor.incrementX();

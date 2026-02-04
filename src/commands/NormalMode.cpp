@@ -32,9 +32,9 @@ bool NormalMode::parseOperation(const char inputChar) const {
 }
 
 bool NormalMode::parseMotion(const char inputChar, const char operationChar) const {
-    if (operationChar == inputChar && (inputChar == 'y' || inputChar == 'd')) {
-        return true;
-    }
+	if (operationChar == inputChar && (inputChar == 'y' || inputChar == 'd')) {
+		return true;
+	}
 	return motions.contains(inputChar);
 }
 
@@ -75,12 +75,12 @@ void NormalMode::parseCommand(std::string& input, const char inputChar) {
 	};
 
 	const auto addMotion = [inputChar](NormalModeCommand& com) {
-        if (com.operation == inputChar && (inputChar == 'y' || inputChar == 'd')) {
-            com.motion = lineChar;
-        } else {
-            com.motion = inputChar;
-        }
-	    com.stage = ParsingStages::Finish;
+		if (com.operation == inputChar && (inputChar == 'y' || inputChar == 'd')) {
+			com.motion = lineChar;
+		} else {
+			com.motion = inputChar;
+		}
+		com.stage = ParsingStages::Finish;
 	};
 
 	const auto addTextObject = [inputChar](NormalModeCommand& com) {
@@ -196,22 +196,20 @@ NormalMode::NormalMode() {
 	    {'x', &NormalMode::actionDeleteChar},
 	};
 
-	motions = {
-	    {'h', &NormalMode::motionMoveCursorLeft},
-	    {'j', &NormalMode::motionMoveCursorDown},
-	    {'k', &NormalMode::motionMoveCursorUp},
-	    {'l', &NormalMode::motionMoveCursorRight},
-	    {'G', &NormalMode::motionMoveCursorBottomFile},
-	    {'$', &NormalMode::motionMoveRightMost},
-	    {'0', &NormalMode::motionMoveLeftMost},
-	    {'^', &NormalMode::motionMoveLeftMostChar},
-	    {'w', &NormalMode::motionStartOfNextWord},
-	    {'b', &NormalMode::motionStartOfPrevWord},
-	    {'W', &NormalMode::motionStartOfNextWORD},
-	    {'B', &NormalMode::motionStartOfPrevWORD},
-	    {'e', &NormalMode::motionEndOfWord},
-	    {'E', &NormalMode::motionEndOfWORD}
-	};
+	motions = {{'h', &NormalMode::motionMoveCursorLeft},
+		   {'j', &NormalMode::motionMoveCursorDown},
+		   {'k', &NormalMode::motionMoveCursorUp},
+		   {'l', &NormalMode::motionMoveCursorRight},
+		   {'G', &NormalMode::motionMoveCursorBottomFile},
+		   {'$', &NormalMode::motionMoveRightMost},
+		   {'0', &NormalMode::motionMoveLeftMost},
+		   {'^', &NormalMode::motionMoveLeftMostChar},
+		   {'w', &NormalMode::motionStartOfNextWord},
+		   {'b', &NormalMode::motionStartOfPrevWord},
+		   {'W', &NormalMode::motionStartOfNextWORD},
+		   {'B', &NormalMode::motionStartOfPrevWORD},
+		   {'e', &NormalMode::motionEndOfWord},
+		   {'E', &NormalMode::motionEndOfWORD}};
 
 	textObjects = {{'f', &NormalMode::findFirstCharLeft},
 		       {'F', &NormalMode::findFirstCharRight},
@@ -219,15 +217,20 @@ NormalMode::NormalMode() {
 }
 
 void NormalMode::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
-	if (start.y == end.y) {
-		text->deleteRange(start.y, start.x, end.x - start.x);
-	} else {
+    if (start.y == end.y) {
+        text->deleteRange(start.y, start.x, end.x - start.x);
+    } else {
+        const auto endLineSuffix = std::string{text->rowsView(end.y).substr(end.x)};
 
-		/*for (const auto it = text->forwardIterator(cursor.getY()); !it->end(cursor.get); it->next()) {
+        const int startLineLen = text->rowsLength(start.y);
+        text->deleteRange(start.y, start.x, startLineLen - start.x);
 
-		}*/
-		// text->deleteCharacter(cursor.getY(), cursor.getX());
-	}
+        for (int i = end.y; i > start.y; --i) {
+            text->deleteLine(i);
+        }
+
+        text->insertRange(start.y, start.x, endLineSuffix);
+    }
 }
 
 void NormalMode::operationCopyText(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
@@ -508,8 +511,8 @@ void NormalMode::motionStartOfPrevWORD(FUNC_TYPES) const {
 }
 
 void NormalMode::motionLine(FUNC_TYPES, MotionRange& start, MotionRange& end) const {
-    start.x = 0;
-    end.x = text->rowsLength(cursor.getY()) - 1;
+	start.x = 0;
+	end.x = text->rowsLength(cursor.getY()) - 1;
 }
 
 void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {

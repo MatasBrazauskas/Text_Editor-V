@@ -59,7 +59,8 @@ INSTANTIATE_TEST_SUITE_P(
 	ParseParameters{"r", NormalModeCommand{0, ' ', 0, ' ', 'r', ' ', true, ParsingStages::WaitingForTargetChar}},
 	ParseParameters{"rp", NormalModeCommand{0, ' ', 0, ' ', 'r', 'p', true, ParsingStages::Finish}},
 	ParseParameters{"32rp", NormalModeCommand{32, ' ', 0, ' ', 'r', 'p', true, ParsingStages::Finish}},
-ParseParameters{"32dd", NormalModeCommand{32, 'd', 0, static_cast<char>(128), ' ', ' ',false, ParsingStages::Finish}}));
+	ParseParameters{"32dd",
+			NormalModeCommand{32, 'd', 0, static_cast<char>(128), ' ', ' ', false, ParsingStages::Finish}}));
 
 INSTANTIATE_TEST_SUITE_P(
     TextObjectParsingTest, NormalModeCommandParsingTest,

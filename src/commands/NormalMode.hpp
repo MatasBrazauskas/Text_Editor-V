@@ -91,7 +91,7 @@ class NormalMode {
 	void motionEndOfWord(FUNC_TYPES) const;
 	void motionEndOfWORD(FUNC_TYPES) const;
 
-    void motionLine(FUNC_TYPES, MotionRange&, MotionRange&) const;
+	void motionLine(FUNC_TYPES, MotionRange&, MotionRange&) const;
 
 	void updateView(TextBufferView&, const Cursor&) const;
 

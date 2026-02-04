@@ -162,24 +162,25 @@ void Renderer::RenderCursor() const {
 }
 
 void Renderer::RenderCommandLine() const {
-	const auto topLRect = SDL_Rect{0, 800 - charHeight_ - charHeight_, windowWidth_, charHeight_};
-	SDL_SetRenderDrawColor(renderer_, config_.colors_.cursor_color.r, config_.colors_.cursor_color.g,
-			       config_.colors_.cursor_color.b, config_.colors_.cursor_color.a);
+    std::string line{};
+    SDL_Color bg;
+
+    switch (editorState_.currentMode_) {
+        case Modes::Normal:
+            line = "Normal"; bg = SDL_Color{137, 180, 250};
+            break;
+        case Modes::Insert:
+            line = "Insert";bg = SDL_Color{195, 232, 141};
+            break;
+        case Modes::Command:
+            line = "Command"; bg = {254, 198, 118};
+            break;
+    }
+    const auto topLRect = SDL_Rect{0, 800 - charHeight_ - charHeight_, windowWidth_, charHeight_};
+
+	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 	SDL_RenderFillRect(renderer_, &topLRect);
 
-	std::string line{};
-
-	switch (editorState_.currentMode_) {
-	case Modes::Normal:
-		line = "Normal";
-		break;
-	case Modes::Insert:
-		line = "Insert";
-		break;
-	case Modes::Command:
-		line = "Command";
-		break;
-	}
 
 	SDL_Surface* surface = TTF_RenderText_Blended(font_, std::string(line).c_str(), config_.colors_.selection_color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);

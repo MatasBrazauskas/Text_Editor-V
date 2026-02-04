@@ -37,23 +37,32 @@ CommandMode::CommandMode() {
 void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandler, Files& files) {
 	if (state.input_.empty())
 		return;
+
 	if (state.input_.back() == static_cast<char>(SpecialKeys::Backspace)) {
-		state.input_.erase(state.input_.end() - 2, state.input_.end());
+	    if (state.input_.length() > 2) {
+	        state.input_.erase(state.input_.end() - 2, state.input_.end());
+	    } else {
+	        state.input_.clear();
+	        state.currentMode_ = Modes::Normal;
+	    }
+
 	} else if (state.input_.back() == static_cast<char>(SpecialKeys::Enter)) {
 		const auto& com = parseCommand(state.input_);
 
 		if (const auto it = commands_.find(com.command_); it != commands_.end()) {
 			const auto& func = it->second;
 			(this->*func)(state, fileHandler, files, com);
+
 			state.input_.clear();
+            state.currentMode_ = Modes::Normal;
 		} else {
-			state.input_ = "Unknown command";
+			state.input_ = "Unknown command: " + com.command_;
 		}
 	}
+
 }
 
-void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, Files& files,
-			      const CommandStructure& com) {
+void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, Files& files, const CommandStructure& com) {
 	std::cout << "Writing to file...\n";
 	if (com.args_.empty()) {
 		fileHandler.writeToFile(files.getDocument(state.activeTab_).value());
@@ -61,8 +70,7 @@ void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, File
 	}
 }
 
-void CommandMode::closeProgramme(EditorState& state, FileHandler&, Files&,
-				 const CommandStructure& com) {
+void CommandMode::closeProgramme(EditorState& state, FileHandler&, Files&, const CommandStructure& com) {
 	if (!com.args_.empty()) {
 		state.input_ = "Trailing characters";
 	} else {
