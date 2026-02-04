@@ -74,7 +74,7 @@ class NormalMode {
 
 	void findFirstCharRight(FUNC_TYPES, char) const;
 	void findFirstCharLeft(FUNC_TYPES, char) const;
-    void replaceChar(FUNC_TYPES, char) const;
+	void replaceChar(FUNC_TYPES, char) const;
 
 	void actionInsertLineAbove(FUNC_TYPES) const;
 	void actionInsertLineBelow(FUNC_TYPES) const;
@@ -91,16 +91,18 @@ class NormalMode {
 	void motionEndOfWord(FUNC_TYPES) const;
 	void motionEndOfWORD(FUNC_TYPES) const;
 
+    void motionLine(FUNC_TYPES, MotionRange&, MotionRange&) const;
+
 	void updateView(TextBufferView&, const Cursor&) const;
 
 	using Func = void (NormalMode::*)(FUNC_TYPES) const;
 	using Func2 = void (NormalMode::*)(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
-    using Func3 = void (NormalMode::*)(FUNC_TYPES, const char newChar) const;
+	using Func3 = void (NormalMode::*)(FUNC_TYPES, const char newChar) const;
 
 	bool parseCount(int count, char inputChar) const;
 	bool parseAction(char inputChar) const;
 	bool parseOperation(char inputChar) const;
-	bool parseMotion(char inputChar) const;
+	bool parseMotion(char inputChar, char operationChar) const;
 	bool parseTextObject(char inputChar) const;
 
 	std::unordered_map<char, Func2> operations;

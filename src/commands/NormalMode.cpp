@@ -8,6 +8,8 @@
 #include <iostream>
 #include <ranges>
 
+constexpr char lineChar = static_cast<char>(128);
+
 bool NormalMode::parseCount(const int count, const char inputChar) const {
 	if (!std::isdigit(inputChar))
 		return false;
@@ -23,13 +25,16 @@ bool NormalMode::parseAction(const char inputChar) const {
 }
 
 bool NormalMode::parseOperation(const char inputChar) const {
-    if (inputChar == 'r') {
-        return true;
-    }
+	if (inputChar == 'r') {
+		return true;
+	}
 	return operations.contains(inputChar);
 }
 
-bool NormalMode::parseMotion(const char inputChar) const {
+bool NormalMode::parseMotion(const char inputChar, const char operationChar) const {
+    if (operationChar == inputChar && (inputChar == 'y' || inputChar == 'd')) {
+        return true;
+    }
 	return motions.contains(inputChar);
 }
 
@@ -61,17 +66,21 @@ void NormalMode::parseCommand(std::string& input, const char inputChar) {
 		com.operation = inputChar;
 		com.stage = ParsingStages::Count2MotionTextObject;
 
-	    if (inputChar == 'r') {
-	        com.ignoreCount = true;
-	        com.textObject = inputChar;
-	        com.operation = ' ';
-	        com.stage = ParsingStages::WaitingForTargetChar;
-	    }
+		if (inputChar == 'r') {
+			com.ignoreCount = true;
+			com.textObject = inputChar;
+			com.operation = ' ';
+			com.stage = ParsingStages::WaitingForTargetChar;
+		}
 	};
 
 	const auto addMotion = [inputChar](NormalModeCommand& com) {
-		com.motion = inputChar;
-		com.stage = ParsingStages::Finish;
+        if (com.operation == inputChar && (inputChar == 'y' || inputChar == 'd')) {
+            com.motion = lineChar;
+        } else {
+            com.motion = inputChar;
+        }
+	    com.stage = ParsingStages::Finish;
 	};
 
 	const auto addTextObject = [inputChar](NormalModeCommand& com) {
@@ -93,7 +102,7 @@ void NormalMode::parseCommand(std::string& input, const char inputChar) {
 	const bool action = parseAction(inputChar);
 	const bool operation = parseOperation(inputChar);
 	const bool count2 = parseCount(this->command.count2, inputChar);
-	const bool motion = parseMotion(inputChar);
+	const bool motion = parseMotion(inputChar, this->command.operation);
 	const bool textObject = parseTextObject(inputChar);
 
 	if (this->command.stage == ParsingStages::Count1OperationMotionTextObject) {
@@ -152,8 +161,8 @@ void NormalMode::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cu
 
 	const auto startRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
 
-    const std::size_t loopCount = command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
-
+	const std::size_t loopCount =
+	    command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
 
 	for (auto i{0zu}; i < loopCount; ++i) {
 		if (motion != motions.end()) {
@@ -162,7 +171,6 @@ void NormalMode::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cu
 			(this->*textObject->second)(text, cursor, state, command.targetChar);
 		}
 	}
-
 
 	const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
 
@@ -202,14 +210,12 @@ NormalMode::NormalMode() {
 	    {'W', &NormalMode::motionStartOfNextWORD},
 	    {'B', &NormalMode::motionStartOfPrevWORD},
 	    {'e', &NormalMode::motionEndOfWord},
-	    {'E', &NormalMode::motionEndOfWORD},
+	    {'E', &NormalMode::motionEndOfWORD}
 	};
 
-	textObjects = {
-	    {'f', &NormalMode::findFirstCharRight},
-	    {'F', &NormalMode::findFirstCharLeft},
-	    {'r', &NormalMode::replaceChar}
-	};
+	textObjects = {{'f', &NormalMode::findFirstCharLeft},
+		       {'F', &NormalMode::findFirstCharRight},
+		       {'r', &NormalMode::replaceChar}};
 }
 
 void NormalMode::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
@@ -294,7 +300,7 @@ void NormalMode::motionStartOfNextWORD(FUNC_TYPES) const {
 
 	const std::size_t indexPunctuation = currLine.find_first_of(spaceSeparator, cursor.getX());
 
-	if (indexPunctuation != std::string_view::npos) { // first line check
+	if (indexPunctuation != std::string_view::npos) {
 		const std::size_t index = currLine.find_first_not_of(spaceSeparator, indexPunctuation);
 
 		if (index != std::string_view::npos) {
@@ -420,7 +426,6 @@ void NormalMode::motionEndOfWORD(FUNC_TYPES) const {
 	auto currLine = text->rowsView(y);
 	const std::string space = " \t\r\n";
 
-	// 1. Step Forward
 	if (x + 1 < currLine.length())
 		x++;
 	else if (y + 1 < text->linesCount()) {
@@ -430,7 +435,6 @@ void NormalMode::motionEndOfWORD(FUNC_TYPES) const {
 	} else
 		return;
 
-	// 2. Skip Whitespace
 	while (y < text->linesCount() && (currLine.empty() || isspace(currLine[x]))) {
 		size_t firstVisible = currLine.find_first_not_of(space, x);
 		if (firstVisible != std::string_view::npos) {
@@ -464,7 +468,7 @@ void NormalMode::motionStartOfPrevWORD(FUNC_TYPES) const {
 	if (x == 0 || isspace(currLine[x]) || (!isspace(currLine[x]) && isspace(currLine[x - 1]))) {
 		if (x == 0) {
 			if (y == 0)
-				return; // Top of file
+				return;
 			y--;
 			currLine = text->rowsView(y);
 			x = currLine.empty() ? 0 : currLine.length() - 1;
@@ -498,10 +502,14 @@ void NormalMode::motionStartOfPrevWORD(FUNC_TYPES) const {
 		x = currLine.empty() ? 0 : currLine.length() - 1;
 	}
 
-	// Step 3: Find the start of this WORD
 	size_t startOfWord = currLine.find_last_of(spaceSeparator, x);
 	cursor.setY(y);
 	cursor.setX(startOfWord == std::string_view::npos ? 0 : startOfWord + 1);
+}
+
+void NormalMode::motionLine(FUNC_TYPES, MotionRange& start, MotionRange& end) const {
+    start.x = 0;
+    end.x = text->rowsLength(cursor.getY()) - 1;
 }
 
 void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {
@@ -614,10 +622,10 @@ void NormalMode::findFirstCharLeft(FUNC_TYPES, const char newChar) const {
 }
 
 void NormalMode::replaceChar(FUNC_TYPES, const char newChar) const {
-    if (text->rowsLength(cursor.getY())) {
-        text->deleteCharacter(cursor.getY(), cursor.getX());
-        text->insertCharacter(cursor.getY(), cursor.getX(), newChar);
-    }
+	if (text->rowsLength(cursor.getY())) {
+		text->deleteCharacter(cursor.getY(), cursor.getX());
+		text->insertCharacter(cursor.getY(), cursor.getX(), newChar);
+	}
 }
 
 void NormalMode::actionSwitchToInsertLeft(FUNC_TYPES) const {

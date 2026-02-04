@@ -56,10 +56,10 @@ INSTANTIATE_TEST_SUITE_P(
 	ParseParameters{"30d21l", NormalModeCommand{30, 'd', 21, 'l', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"0", NormalModeCommand{0, ' ', 0, '0', ' ', ' ', false, ParsingStages::Finish}},
 	ParseParameters{"32d0", NormalModeCommand{32, 'd', 0, '0', ' ', ' ', false, ParsingStages::Finish}},
-    ParseParameters{"r", NormalModeCommand{0, ' ', 0, ' ', 'r', ' ',true, ParsingStages::WaitingForTargetChar}},
-    ParseParameters{"rp", NormalModeCommand{0, ' ', 0, ' ', 'r', 'p',true, ParsingStages::Finish}},
-    ParseParameters{"32rp", NormalModeCommand{32, ' ', 0, ' ', 'r', 'p', true, ParsingStages::Finish}}
-));
+	ParseParameters{"r", NormalModeCommand{0, ' ', 0, ' ', 'r', ' ', true, ParsingStages::WaitingForTargetChar}},
+	ParseParameters{"rp", NormalModeCommand{0, ' ', 0, ' ', 'r', 'p', true, ParsingStages::Finish}},
+	ParseParameters{"32rp", NormalModeCommand{32, ' ', 0, ' ', 'r', 'p', true, ParsingStages::Finish}},
+ParseParameters{"32dd", NormalModeCommand{32, 'd', 0, static_cast<char>(128), ' ', ' ',false, ParsingStages::Finish}}));
 
 INSTANTIATE_TEST_SUITE_P(
     TextObjectParsingTest, NormalModeCommandParsingTest,
