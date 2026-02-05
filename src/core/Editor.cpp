@@ -13,13 +13,14 @@ std::string Editor::EncodeInput(const SDL_Event& event) {
 		editorState_.running_ = false;
 		return {};
 	}
-    auto& doc = files_.getDocument(editorState_.activeTab_).value().get();
+	auto& doc = files_.getDocument(editorState_.activeTab_).value().get();
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_ESCAPE:
 			editorState_.currentMode_ = Modes::Normal;
 			editorState_.input_.clear();
-		        doc.cursor_.setX(std::min(doc.cursor_.getX(), doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1));
+			doc.cursor_.setX(
+			    std::min(doc.cursor_.getX(), doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1));
 			break;
 		case SDLK_BACKSPACE:
 			return std::string(1, static_cast<char>(SpecialKeys::Backspace));
@@ -54,12 +55,12 @@ void Editor::HandleKeyboardInput() {
 
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
-			normalMode_.HandleKeyboardInput(
-			    editorState_, files_.getDocument(editorState_.activeTab_).value());
+			normalMode_.HandleKeyboardInput(editorState_,
+							files_.getDocument(editorState_.activeTab_).value());
 			break;
 		case Modes::Insert:
-			insertMode_.HandleKeyboardInput(
-			    editorState_, files_.getDocument(editorState_.activeTab_).value());
+			insertMode_.HandleKeyboardInput(editorState_,
+							files_.getDocument(editorState_.activeTab_).value());
 			break;
 		case Modes::Command:
 			commandMode_.HandleKeyboardInput(editorState_, fileHandler_, files_);

@@ -6,18 +6,33 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-class Renderer final {
+inline int charWidth{}, charHeight{};
+
+class RenderWindow final {
 public:
-	Renderer() = delete;
+    RenderWindow(const Document& doc_t, int offsetX_t, int offsetY_t, int width_t, int height_t);
 
-	Renderer(const EditorState&, Files&, const Config&);
+    void Render(const Config&, SDL_Renderer&, TTF_Font&, Modes) const;
 
-	~Renderer();
+    int offsetX_, offsetY_;
+    int width_, height_;
+
+    const Document& doc_;
+private:
+    void RenderText(const Config& , SDL_Renderer&, TTF_Font&) const;
+    void RenderLine(const Config&, SDL_Renderer&, TTF_Font&, std::string_view, int) const;
+    void RenderCursor(const Config&, SDL_Renderer&, TTF_Font&, Modes) const;
+};
+
+class RenderScreen final {
+      public:
+	RenderScreen() = delete;
+
+	RenderScreen(const EditorState&, Files&, const Config&);
+
+	~RenderScreen() noexcept;
 
 	void Render();
-
-	int charWidth_;
-	int charHeight_;
 
 	int windowWidth_;
 	int windowHeight_;
@@ -26,13 +41,18 @@ public:
 	SDL_Renderer* renderer_;
 	TTF_Font* font_;
 
+    int tabOffsetX, tabOffsetY;
+
 	const EditorState& editorState_;
 	Files& files_;
 	const Config& config_;
 
+    std::vector<RenderWindow> windows_;
+
+    void addWindow(const RenderWindow&);
+    void removeWindow(const RenderWindow&);
+
 private:
-	void RenderText() const;
-	void RenderLine(std::string_view, int) const;
-	void RenderCursor() const;
+    void RenderTabs() const;
 	void RenderCommandLine() const;
 };

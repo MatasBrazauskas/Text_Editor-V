@@ -18,7 +18,11 @@ int main(const int argc, char** argv) {
 
 	EditorState editorState;
 	Editor editor{files, fileHandler, editorState};
-	Renderer renderer{editorState, files, config};
+	RenderScreen rendererScreen{editorState, files, config};
+
+    for (const auto& doc : files.files_) {
+        rendererScreen.addWindow(RenderWindow(doc, 0, 0, 800, 600));
+    }
 
 	const Uint64 freq = SDL_GetPerformanceFrequency();
 	Uint64 renderStart = SDL_GetPerformanceCounter();
@@ -32,7 +36,7 @@ int main(const int argc, char** argv) {
 
 		if (renderTime >= ticksPerFrame) {
 			renderStart = end;
-			renderer.Render();
+			rendererScreen.Render();
 		}
 	}
 }

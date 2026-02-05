@@ -131,6 +131,5 @@ class Files final {
 
 	void removeDocument(size_t index_t);
 
-      private:
 	std::vector<Document> files_;
 };
