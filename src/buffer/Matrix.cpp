@@ -35,7 +35,8 @@ const bool MatrixIterator::end(const size_t endIndex_t) const {
 Matrix::Matrix() : lines_{""} {}
 
 void Matrix::init(std::vector<std::string> lines) {
-	lines_ = std::move(lines);
+	//lines_ = std::move(lines);
+    std::copy(lines.begin(), lines.end(), back_inserter(lines_));
 }
 
 const std::string_view Matrix::rowsView(const int row) const {

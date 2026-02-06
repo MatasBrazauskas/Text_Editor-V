@@ -29,14 +29,18 @@ EditorConfig EditorConfig::getEditorConfig(const Json& json) {
 	};
 }
 
-FontConfig::FontConfig(std::filesystem::path fontPath_t, const int fontSize_t)
-    : font_path{std::move(fontPath_t)}, font_size{fontSize_t} {}
+FontConfig::FontConfig(std::filesystem::path fontPath_t, const int fontSize_t, std::filesystem::path uiFondPath_t, const int uiFontSize)
+    : code_font_path{std::move(fontPath_t)}, code_font_size{fontSize_t}, ui_font_path{std::move(uiFondPath_t)}, ui_font_size{uiFontSize} {}
 
 FontConfig FontConfig::getFontConfig(const Json& json) {
 	const auto& e = json.at(Tabs::font);
 
-	return FontConfig{e.at(FontFields::fontPath).get<std::filesystem::path>(),
-			  e.at(FontFields::fontSize).get<int>()};
+	return FontConfig{
+	    e.at(FontFields::codeFontPath).get<std::filesystem::path>(),
+	    e.at(FontFields::codeFontSize).get<int>(),
+	    e.at(FontFields::uiFontPath).get<std::filesystem::path>(),
+        e.at(FontFields::uiFontSize).get<int>()
+    };
 }
 
 ColorsConfig::ColorsConfig(const SDL_Color& backgroundColor_t, const SDL_Color& foregroundColor_t,

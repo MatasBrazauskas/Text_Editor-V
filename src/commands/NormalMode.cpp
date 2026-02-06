@@ -174,8 +174,10 @@ void NormalMode::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cu
 
 	const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
 
-    const auto trueStart = MotionRange{.x = std::min(startRange.x, endRange.x), .y = std::min(startRange.y,endRange.y)};
-    const auto trueEnd = MotionRange{.x = std::max(startRange.x, endRange.x), .y = std::max(startRange.y,endRange.y)};
+	const auto trueStart =
+	    MotionRange{.x = std::min(startRange.x, endRange.x), .y = std::min(startRange.y, endRange.y)};
+	const auto trueEnd =
+	    MotionRange{.x = std::max(startRange.x, endRange.x), .y = std::max(startRange.y, endRange.y)};
 
 	if (action != actions.end()) {
 		(this->*action->second)(text, cursor, state);
@@ -194,10 +196,8 @@ NormalMode::NormalMode() {
 	operations = {{'d', &NormalMode::operationDeleteChar}, {'y', &NormalMode::operationCopyText}};
 
 	actions = {
-	    {'O', &NormalMode::actionInsertLineAbove},
-	    {'o', &NormalMode::actionInsertLineBelow},
-	    {'i', &NormalMode::actionSwitchToInsertLeft},
-	    {'a', &NormalMode::actionSwitchToInsertRight},
+	    {'O', &NormalMode::actionInsertLineAbove},	  {'o', &NormalMode::actionInsertLineBelow},
+	    {'i', &NormalMode::actionSwitchToInsertLeft}, {'a', &NormalMode::actionSwitchToInsertRight},
 	    {'x', &NormalMode::actionDeleteChar},
 	};
 
@@ -216,10 +216,9 @@ NormalMode::NormalMode() {
 		   {'e', &NormalMode::motionEndOfWord},
 		   {'E', &NormalMode::motionEndOfWORD}};
 
-	textObjects = {
-            {'f', &NormalMode::findFirstCharLeft},
-           {'F', &NormalMode::findFirstCharRight},
-           {'r', &NormalMode::replaceChar}};
+	textObjects = {{'f', &NormalMode::findFirstCharLeft},
+		       {'F', &NormalMode::findFirstCharRight},
+		       {'r', &NormalMode::replaceChar}};
 }
 
 void NormalMode::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
@@ -583,9 +582,9 @@ void NormalMode::motionMoveCursorBottomFile(FUNC_TYPES) const {
 }
 
 void NormalMode::motionMoveRightMost(FUNC_TYPES) const {
-    if (text->rowsLength(cursor.getY()) > 0) {
-        cursor.setX(text->rowsLength(cursor.getY()) - 1);
-    }
+	if (text->rowsLength(cursor.getY()) > 0) {
+		cursor.setX(text->rowsLength(cursor.getY()) - 1);
+	}
 }
 
 void NormalMode::motionMoveLeftMostChar(FUNC_TYPES) const {
@@ -618,16 +617,19 @@ void NormalMode::actionDeleteChar(FUNC_TYPES) const {
 	cursor.setX(newIndex);
 }
 
-void NormalMode::actionInsertLineAbove(FUNC_TYPES) const {
+//TODO fix the insert lines tho ma g
+void NormalMode::actionInsertLineAbove(std::unique_ptr<ITextBuffer>&text, Cursor &cursor, EditorState &state) const {
+    motionMoveCursorUp(text, cursor, state);
+
 	text->insertLine(cursor.getY(), "");
-	cursor.setX(0);
-    cursor.decrementY();
+    cursor.setX(0);
+
 	state.currentMode_ = Modes::Insert;
 }
 
 void NormalMode::actionInsertLineBelow(FUNC_TYPES) const {
 	text->insertLine(cursor.getY() + 1, "");
-    cursor.incrementY();
+	cursor.incrementY();
 	cursor.setX(0);
 	state.currentMode_ = Modes::Insert;
 }

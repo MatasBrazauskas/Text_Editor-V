@@ -52,17 +52,9 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-TextBufferView::TextBufferView() : startY_{}, startX_{}, visibleLines_{}, visibleColumns_{} {
+TextBufferView::TextBufferView() : startY_{0}, startX_{0}, visibleLines_{}, visibleColumns_{} {
 	visibleLines_ = 28;
 	visibleColumns_ = 85;
-}
-
-void TextBufferView::clearDirtyLines() {
-	dirtyLinesIndexes_.clear();
-}
-
-void TextBufferView::addDirtyLine(const int index) {
-	dirtyLinesIndexes_.push_back(index);
 }
 
 Document::Document(std::unique_ptr<ITextBuffer> textBuffer_t, std::filesystem::path fileName_t)
@@ -80,7 +72,7 @@ Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
 	if (const std::vector<std::string_view> files(argv + 1, argv + argc); files.empty()) {
 		auto ptr = std::make_unique<Matrix>();
 
-		addDocument(std::move(ptr), "New Document.txt");
+		addDocument(std::move(ptr), "Untitled");
 	} else {
 		for (const auto& file : files) {
 			const auto lines = fileHandler.getContent(file.data());

@@ -6,7 +6,6 @@
 #include "commands/NormalMode.hpp"
 
 #include <SDL2/SDL_events.h>
-#include <memory>
 
 enum class Modes : uint8_t { Normal, Insert, Command };
 
@@ -15,7 +14,7 @@ enum class SpecialKeys : uint8_t { Backspace = 129, Enter = 130 };
 class EditorState final {
       public:
 	EditorState();
-	~EditorState() = default;
+	~EditorState() noexcept = default;
 
 	std::string input_;
 	std::string commandLineInput_;
@@ -29,7 +28,7 @@ class Editor final {
       public:
 	Editor() = delete;
 	Editor(Files&, FileHandler&, EditorState&);
-	~Editor() = default;
+	~Editor() noexcept = default;
 
 	void HandleKeyboardInput();
 	// private:

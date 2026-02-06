@@ -94,11 +94,6 @@ class TextBufferView final {
 
 	int visibleLines_;
 	int visibleColumns_;
-
-	std::vector<int> dirtyLinesIndexes_;
-
-	void clearDirtyLines();
-	void addDirtyLine(int index);
 };
 
 class Document final {

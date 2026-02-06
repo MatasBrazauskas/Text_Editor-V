@@ -13,8 +13,10 @@
     },
     "font":
     {
-        "font_path": "fonts/JetBrainsMono-ExtraLight.ttf",
-        "font_size": 19
+        "code_font_path": "fonts/JetBrainsMono-ExtraLight.ttf",
+        "code_font_size": 19,
+        "ui_font_path": "fonts/JetBrainsMono-Medium.ttf",
+        "ui_font_size": 19
     },
     "colors":
     {

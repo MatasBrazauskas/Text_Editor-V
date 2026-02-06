@@ -26,8 +26,10 @@ constexpr auto verticalRulerCount = "vertical_ruler_count"sv;
 } // namespace EditorFields
 
 namespace FontFields {
-constexpr auto fontPath = "font_path"sv;
-constexpr auto fontSize = "font_size"sv;
+constexpr auto codeFontPath = "code_font_path"sv;
+constexpr auto codeFontSize = "code_font_size"sv;
+constexpr auto uiFontPath = "ui_font_path"sv;
+constexpr auto uiFontSize = "ui_font_size"sv;
 } // namespace FontFields
 
 namespace ColorFields {
@@ -66,11 +68,14 @@ class FontConfig {
 	static FontConfig getFontConfig(const Json&);
 
 	FontConfig() = delete;
-	FontConfig(std::filesystem::path fontPath_t, int fontSize_t);
+	FontConfig(std::filesystem::path codeFontPath_t, int codeFontSize_t, std::filesystem::path uiFontPath_t, int uiFontSize_t);
 	~FontConfig() noexcept = default;
 
-	std::filesystem::path font_path;
-	int font_size;
+	std::filesystem::path code_font_path;
+	int code_font_size;
+
+    std::filesystem::path ui_font_path;
+    int ui_font_size;
 };
 
 class ColorsConfig {

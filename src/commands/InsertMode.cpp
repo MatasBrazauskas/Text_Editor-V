@@ -5,10 +5,10 @@
 #include <iostream>
 
 InsertMode::InsertMode() {
-	const auto b = std::string(1, static_cast<char>(SpecialKeys::Enter));
-	const auto c = std::string(1, static_cast<char>(SpecialKeys::Backspace));
+	const auto enterKey = std::string(1, static_cast<char>(SpecialKeys::Enter));
+	const auto backSpaceKey = std::string(1, static_cast<char>(SpecialKeys::Backspace));
 
-	commands_ = {{b, &InsertMode::handleEnter}, {c, &InsertMode::handleBackspace}};
+	commands_ = {{enterKey, &InsertMode::handleEnter}, {backSpaceKey, &InsertMode::handleBackspace}};
 }
 
 void InsertMode::handleEnter(EditorState&, Document& doc) const {
