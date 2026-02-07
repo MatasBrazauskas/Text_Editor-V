@@ -7,9 +7,10 @@
 #include <vector>
 
 using namespace std::string_literals;
+inline constexpr int framesToSkip = 4;
 
 class Cursor final {
-      public:
+public:
 	Cursor();
 	~Cursor() noexcept = default;
 
@@ -27,15 +28,16 @@ class Cursor final {
 	[[nodiscard]] bool isVisible() const;
 	void setVisible(bool);
 
-      private:
+private:
 	int x_;
 	int y_;
 	bool visible_;
+    int absent_;
 };
 
 class ITextBufferIterator {
       public:
-	ITextBufferIterator(const int index_t, const bool flag_t) : index_(index_t), forwarded_(flag_t) {}
+	ITextBufferIterator(const int index_t, const bool flag_t) : index_{index_t}, forwarded_{flag_t} {}
 	virtual ~ITextBufferIterator() noexcept = default;
 
 	virtual void next() = 0;

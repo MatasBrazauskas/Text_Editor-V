@@ -68,14 +68,15 @@ class FontConfig {
 	static FontConfig getFontConfig(const Json&);
 
 	FontConfig() = delete;
-	FontConfig(std::filesystem::path codeFontPath_t, int codeFontSize_t, std::filesystem::path uiFontPath_t, int uiFontSize_t);
+	FontConfig(std::filesystem::path codeFontPath_t, int codeFontSize_t, std::filesystem::path uiFontPath_t,
+		   int uiFontSize_t);
 	~FontConfig() noexcept = default;
 
 	std::filesystem::path code_font_path;
 	int code_font_size;
 
-    std::filesystem::path ui_font_path;
-    int ui_font_size;
+	std::filesystem::path ui_font_path;
+	int ui_font_size;
 };
 
 class ColorsConfig {

@@ -1,25 +1,27 @@
 #include "Renderer.hpp"
+
 #include <iostream>
 
 RenderWindow::RenderWindow(const std::size_t index_t, const int offsetX_t, const int offsetY_t, const int width_t,
 			   const int height_t)
-    : index{index_t}, offsetX_{offsetX_t}, offsetY_{offsetY_t}, width_{width_t}, height_{height_t} {
-}
+    : index{index_t}, offsetX_{offsetX_t}, offsetY_{offsetY_t}, width_{width_t}, height_{height_t} {}
 
-void RenderWindow::Render(const Document& doc_t, const Config& config, SDL_Renderer& renderer, TTF_Font& font, const Modes mode) const {
+void RenderWindow::Render(const Document& doc_t, const Config& config, SDL_Renderer& renderer, TTF_Font& font,
+			  const Modes mode) const {
 	RenderText(doc_t, config, renderer, font);
 	RenderCursor(doc_t, config, renderer, font, mode);
 }
 
-void RenderWindow::RenderText(const Document& doc_t, const Config& config, SDL_Renderer& renderer, TTF_Font& font) const {
+void RenderWindow::RenderText(const Document& doc_t, const Config& config, SDL_Renderer& renderer,
+			      TTF_Font& font) const {
 	const auto& [text, view, cursor, _] = doc_t;
 
 	int offsetIndex = 0;
 	size_t countLimit = std::min(view.visibleLines_, text->linesCount());
 
-    if (countLimit == 0) {
-        return;
-    }
+	if (countLimit == 0) {
+		return;
+	}
 
 	for (const auto it = text->forwardIterator(view.startY_); !it->end(view.startY_ + countLimit); it->next()) {
 		auto line = it.get()->getLine();
@@ -67,7 +69,7 @@ void RenderWindow::RenderLine(const Config& config, SDL_Renderer& renderer, TTF_
 	const int length = line.length() * codeCharWidth;
 
 	const SDL_Rect src{0, 0, length, surface->h};
-	const SDL_Rect dst{0,  tabOffsetY + lineOffset * codeCharHeight, length, surface->h};
+	const SDL_Rect dst{0, tabOffsetY + lineOffset * codeCharHeight, length, surface->h};
 
 	SDL_RenderCopy(&renderer, texture, &src, &dst);
 
@@ -75,7 +77,8 @@ void RenderWindow::RenderLine(const Config& config, SDL_Renderer& renderer, TTF_
 	SDL_DestroyTexture(texture);
 }
 
-void RenderWindow::RenderCursor(const Document& doc_t, const Config& config, SDL_Renderer& renderer, TTF_Font& font, const Modes mode) const {
+void RenderWindow::RenderCursor(const Document& doc_t, const Config& config, SDL_Renderer& renderer, TTF_Font& font,
+				const Modes mode) const {
 
 	const auto [cr, cg, cb, ca] = config.colors_.cursor_color;
 	const auto& cursorFg = config.colors_.selection_color;
@@ -97,7 +100,8 @@ void RenderWindow::RenderCursor(const Document& doc_t, const Config& config, SDL
 
 			SDL_RenderFillRect(&renderer, &rect);
 		} else {
-			const SDL_Rect cursorRect{cursorOffsetX, tabOffsetY + cursorOffsetY, codeCharWidth, codeCharHeight};
+			const SDL_Rect cursorRect{cursorOffsetX, tabOffsetY + cursorOffsetY, codeCharWidth,
+						  codeCharHeight};
 			SDL_RenderFillRect(&renderer, &cursorRect);
 
 			char ch = ' ';
@@ -151,7 +155,7 @@ RenderScreen::RenderScreen(const EditorState& editorState_t, Files& files_t, con
 	}
 
 	codeFont_ = TTF_OpenFont(config_.font_.code_font_path.c_str(), config_.font_.code_font_size);
-    uiFont_ = TTF_OpenFont(config_.font_.ui_font_path.c_str(), config_.font_.ui_font_size);
+	uiFont_ = TTF_OpenFont(config_.font_.ui_font_path.c_str(), config_.font_.ui_font_size);
 
 	if (!codeFont_ || !uiFont_) {
 		throw std::runtime_error("Failed to open font.");
@@ -162,10 +166,10 @@ RenderScreen::RenderScreen(const EditorState& editorState_t, Files& files_t, con
 
 	TTF_SizeText(codeFont_, "A", &codeCharWidth, &codeCharHeight);
 
-    TTF_SetFontHinting(uiFont_, TTF_HINTING_MONO);
-    TTF_SetFontKerning(uiFont_, 0);
+	TTF_SetFontHinting(uiFont_, TTF_HINTING_MONO);
+	TTF_SetFontKerning(uiFont_, 0);
 
-    TTF_SizeText(uiFont_, "A", &uiCharWidth, &uiCharHeight);
+	TTF_SizeText(uiFont_, "A", &uiCharWidth, &uiCharHeight);
 }
 
 RenderScreen::~RenderScreen() noexcept {
@@ -178,50 +182,89 @@ RenderScreen::~RenderScreen() noexcept {
 		codeFont_ = nullptr;
 	}
 
-    if (uiFont_) {
-        TTF_CloseFont(uiFont_);
-        uiFont_ = nullptr;
-    }
-}
-
-void RenderScreen::RenderTabs() {
-	const auto& [br, bg, bb, ba] = SDL_Color{27, 30, 60};
-    int offsetX{}, offsetY{};
-
-    const SDL_Rect tabBackgroundRect{0,0, windowWidth_, uiCharHeight};
-    SDL_SetRenderDrawColor(renderer_, 0,0,0,0);
-    SDL_RenderFillRect(renderer_, &tabBackgroundRect);
-    SDL_RenderDrawRect(renderer_, &tabBackgroundRect);
-
-    tabOffsetY = std::max(tabOffsetY, offsetY + uiCharHeight);
-
-	for (const auto& file : files_.files_) {
-	    const auto fileName = std::string(file.filesPath_.filename().c_str());
-	    const int tabSize = uiCharWidth * static_cast<int>(fileName.length());
-
-	    if (tabSize + offsetX >= windowWidth_) {
-	        offsetX = 0;
-	        offsetY += uiCharHeight;
-	        tabOffsetY = std::max(tabOffsetY, offsetY + uiCharWidth);
-	    }
-
-	    const auto topLRect = SDL_Rect{offsetX, offsetY, tabSize, uiCharHeight};
-
-	    SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
-	    SDL_RenderFillRect(renderer_, &topLRect);
-
-	    SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, fileName.c_str(), config_.colors_.cursor_color);
-	    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
-
-	    SDL_RenderCopy(renderer_, texture, nullptr, &topLRect);
-
-	    SDL_FreeSurface(surface);
-	    SDL_DestroyTexture(texture);
-
-	    offsetX += uiCharWidth * static_cast<int>(fileName.length());
+	if (uiFont_) {
+		TTF_CloseFont(uiFont_);
+		uiFont_ = nullptr;
 	}
 }
 
+void RenderScreen::RenderTabs() {
+    const int tabHeight = uiCharHeight + 5;
+    const int paddingX  = 25;
+
+    constexpr SDL_Color colBarBg = {30, 30, 30, 255};
+    constexpr SDL_Color colTabInact = {45, 45, 45, 255};
+    constexpr SDL_Color colTabAct = {30, 32, 40, 255};
+    constexpr SDL_Color colAccent = {0, 122, 204, 255};
+    constexpr SDL_Color colTextAct = {255, 255, 255, 255};
+    constexpr SDL_Color colTextInact = {150, 150, 150, 255};
+
+    int currentX{};
+    int currentY{};
+
+    const SDL_Rect barRect = {0, 0, windowWidth_, tabHeight};
+    SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
+    SDL_RenderFillRect(renderer_, &barRect);
+
+    for (size_t i = 0; i < files_.files_.size(); ++i) {
+        const auto& file = files_.files_[i];
+        const auto fileName = file.filesPath_.filename().string();
+
+        int textW{}, textH{};
+        TTF_SizeText(uiFont_, fileName.c_str(), &textW, &textH);
+
+        const int tabWidth = textW + (paddingX * 2);
+        const bool isActive = i == editorState_.activeTab_;
+
+        if (currentX + tabWidth >= windowWidth_) {
+            currentX = 0;
+            currentY += tabHeight;
+
+            const SDL_Rect tempRect = {0, currentY, windowWidth_, tabHeight};
+            SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
+            SDL_RenderFillRect(renderer_, &tempRect);
+        }
+
+        SDL_Rect tabRect = {currentX, currentY, tabWidth, tabHeight};
+
+        // A. Draw Tab Background
+        SDL_Color bg = isActive ? colTabAct : colTabInact;
+        SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
+        SDL_RenderFillRect(renderer_, &tabRect);
+
+        if (isActive) {
+            SDL_Rect accentRect = {currentX, currentY, tabWidth, 2}; // 2px height
+            SDL_SetRenderDrawColor(renderer_, colAccent.r, colAccent.g, colAccent.b, colAccent.a);
+            SDL_RenderFillRect(renderer_, &accentRect);
+        }
+
+        SDL_SetRenderDrawColor(renderer_, 20, 20, 20, 255); // Dark line
+        SDL_RenderDrawLine(renderer_,
+            currentX + tabWidth - 1, currentY,
+            currentX + tabWidth - 1, currentY + tabHeight);
+
+        SDL_Color textColor = isActive ? colTextAct : colTextInact;
+
+        SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, fileName.c_str(), textColor);
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+
+        SDL_Rect textRect = {
+            currentX + paddingX,
+            (tabHeight - textH) / 2 + currentY,
+            textW,
+            textH
+        };
+
+        SDL_RenderCopy(renderer_, texture, nullptr, &textRect);
+
+        SDL_FreeSurface(surface);
+        SDL_DestroyTexture(texture);
+
+        currentX += tabWidth;
+    }
+
+    tabOffsetY = currentY;
+}
 
 void RenderScreen::RenderCommandLine() const {
 	std::string line{"Normal"};
@@ -244,7 +287,8 @@ void RenderScreen::RenderCommandLine() const {
 	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 	SDL_RenderFillRect(renderer_, &topLRect);
 
-	SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, std::string(line).c_str(), config_.colors_.selection_color);
+	SDL_Surface* surface =
+	    TTF_RenderText_Blended(uiFont_, std::string(line).c_str(), config_.colors_.selection_color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 	const SDL_Rect dst{0, windowHeight_ - uiCharHeight - uiCharHeight, surface->w, surface->h};
@@ -252,6 +296,14 @@ void RenderScreen::RenderCommandLine() const {
 
 	if (editorState_.currentMode_ == Modes::Command) {
 		surface = TTF_RenderText_Blended(uiFont_, editorState_.input_.c_str(), config_.colors_.cursor_color);
+
+	    //TODO fix this ugly mess
+        const int lineLength = editorState_.input_.length();
+	    const auto& [r,g,b,a] = config_.colors_.cursor_color;
+	    SDL_SetRenderDrawColor(renderer_, r,g,b,a);
+	    const auto rect = SDL_Rect{lineLength * uiCharWidth, windowHeight_ - uiCharHeight, 1, codeCharHeight};
+
+	    SDL_RenderFillRect(renderer_, &rect);
 
 		if (surface) {
 			texture = SDL_CreateTextureFromSurface(renderer_, surface);
@@ -268,12 +320,11 @@ void RenderScreen::RenderCommandLine() const {
 
 void RenderScreen::Render() {
 	SDL_GetWindowSize(window_, &windowWidth_, &windowHeight_);
-    const auto& [br, bg, bb, ba] = config_.colors_.background_color;
+	const auto& [br, bg, bb, ba] = config_.colors_.background_color;
 
-    SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
-    SDL_RenderClear(renderer_);
+	SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
+	SDL_RenderClear(renderer_);
 
-	RenderTabs();
 
 	for (const auto& win : windows_) {
 		win.Render(files_.files_.at(win.index), config_, *renderer_, *codeFont_, editorState_.currentMode_);

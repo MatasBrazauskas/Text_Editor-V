@@ -1,7 +1,7 @@
 #include "CommandMode.hpp"
 
-#include "core/Editor.hpp"
 #include "buffer/Matrix.hpp"
+#include "core/Editor.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -33,10 +33,7 @@ CommandStructure CommandMode::parseCommand(std::string input) {
 
 CommandMode::CommandMode() {
 	commands_ = {
-	    {"q", &CommandMode::closeProgramme},
-	    {"w", &CommandMode::writeToFile},
-	    {"e", &CommandMode::openFile}
-	};
+	    {"q", &CommandMode::closeProgramme}, {"w", &CommandMode::writeToFile}, {"e", &CommandMode::openFile}};
 }
 
 void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandler, Files& files) {
@@ -71,27 +68,27 @@ void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, File
 	if (com.args_.empty()) {
 		fileHandler.writeToFile(files.getDocument(state.activeTab_).value());
 	} else {
-	    for (const auto& fileNames: com.args_) {
-	    }
+		for (const auto& fileNames : com.args_) {
+		}
 	}
 }
 
 void CommandMode::openFile(EditorState& state, FileHandler& fileHandler, Files& files, const CommandStructure& com) {
-    std::cout << "Opening file...\n";
+	std::cout << "Opening file...\n";
 
-    if (com.args_.empty()) {
-        throw new std::runtime_error("No arguments for open command");
-    }
+	if (com.args_.empty()) {
+		throw new std::runtime_error("No arguments for open command");
+	}
 
-    for (const auto& fileNames: com.args_) {
-        const auto path = std::filesystem::path(fileNames);
+	for (const auto& fileNames : com.args_) {
+		const auto path = std::filesystem::path(fileNames);
 
-        auto it = std::make_unique<Matrix>();
-        const auto& file = fileHandler.getContent(path);
-        it->init(file);
+		auto it = std::make_unique<Matrix>();
+		const auto& file = fileHandler.getContent(path);
+		it->init(file);
 
-        files.addDocument(std::move(it), std::move(path));
-    }
+		files.addDocument(std::move(it), std::move(path));
+	}
 }
 
 void CommandMode::closeProgramme(EditorState& state, FileHandler&, Files&, const CommandStructure& com) {

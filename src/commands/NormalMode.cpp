@@ -617,12 +617,12 @@ void NormalMode::actionDeleteChar(FUNC_TYPES) const {
 	cursor.setX(newIndex);
 }
 
-//TODO fix the insert lines tho ma g
-void NormalMode::actionInsertLineAbove(std::unique_ptr<ITextBuffer>&text, Cursor &cursor, EditorState &state) const {
-    motionMoveCursorUp(text, cursor, state);
+// TODO fix the insert lines tho ma g
+void NormalMode::actionInsertLineAbove(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state) const {
+	motionMoveCursorUp(text, cursor, state);
 
 	text->insertLine(cursor.getY(), "");
-    cursor.setX(0);
+	cursor.setX(0);
 
 	state.currentMode_ = Modes::Insert;
 }

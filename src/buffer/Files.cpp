@@ -4,26 +4,22 @@
 
 #include <SDL.h>
 
-Cursor::Cursor() : x_{}, y_{}, visible_{true} {}
+Cursor::Cursor() : x_{}, y_{}, visible_{true}, absent_{} {}
 
 void Cursor::incrementX() {
-	x_++;
-	visible_ = true;
+    this->setX(x_ + 1);
 }
 
 void Cursor::decrementX() {
-	x_--;
-	visible_ = true;
+    this->setX(x_ - 1);
 }
 
 void Cursor::incrementY() {
-	y_++;
-	visible_ = true;
+    this->setY(y_ + 1);
 }
 
 void Cursor::decrementY() {
-	y_--;
-	visible_ = true;
+    this->setY(y_ - 1);
 }
 
 int Cursor::getX() const {
@@ -37,11 +33,13 @@ int Cursor::getY() const {
 void Cursor::setX(const int x) {
 	x_ = x;
 	visible_ = true;
+    absent_ = framesToSkip;
 }
 
 void Cursor::setY(const int y) {
 	y_ = y;
 	visible_ = true;
+    absent_ = framesToSkip;
 }
 
 bool Cursor::isVisible() const {
