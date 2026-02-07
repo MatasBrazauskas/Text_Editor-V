@@ -189,81 +189,75 @@ RenderScreen::~RenderScreen() noexcept {
 }
 
 void RenderScreen::RenderTabs() {
-    const int tabHeight = uiCharHeight + 5;
-    const int paddingX  = 25;
+	const int tabHeight = uiCharHeight + 5;
+	const int paddingX = 25;
 
-    constexpr SDL_Color colBarBg = {30, 30, 30, 255};
-    constexpr SDL_Color colTabInact = {45, 45, 45, 255};
-    constexpr SDL_Color colTabAct = {30, 32, 40, 255};
-    constexpr SDL_Color colAccent = {0, 122, 204, 255};
-    constexpr SDL_Color colTextAct = {255, 255, 255, 255};
-    constexpr SDL_Color colTextInact = {150, 150, 150, 255};
+	constexpr SDL_Color colBarBg = {30, 30, 30, 255};
+	constexpr SDL_Color colTabInact = {45, 45, 45, 255};
+	constexpr SDL_Color colTabAct = {30, 32, 40, 255};
+	constexpr SDL_Color colAccent = {0, 122, 204, 255};
+	constexpr SDL_Color colTextAct = {255, 255, 255, 255};
+	constexpr SDL_Color colTextInact = {150, 150, 150, 255};
 
-    int currentX{};
-    int currentY{};
+	int currentX{};
+	int currentY{};
 
-    const SDL_Rect barRect = {0, 0, windowWidth_, tabHeight};
-    SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
-    SDL_RenderFillRect(renderer_, &barRect);
+	const SDL_Rect barRect = {0, 0, windowWidth_, tabHeight};
+	SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
+	SDL_RenderFillRect(renderer_, &barRect);
 
-    for (size_t i = 0; i < files_.files_.size(); ++i) {
-        const auto& file = files_.files_[i];
-        const auto fileName = file.filesPath_.filename().string();
+	for (size_t i = 0; i < files_.files_.size(); ++i) {
+		const auto& file = files_.files_[i];
+		const auto fileName = file.filesPath_.filename().string();
 
-        int textW{}, textH{};
-        TTF_SizeText(uiFont_, fileName.c_str(), &textW, &textH);
+		int textW{}, textH{};
+		TTF_SizeText(uiFont_, fileName.c_str(), &textW, &textH);
 
-        const int tabWidth = textW + (paddingX * 2);
-        const bool isActive = i == editorState_.activeTab_;
+		const int tabWidth = textW + (paddingX * 2);
+		const bool isActive = i == editorState_.activeTab_;
 
-        if (currentX + tabWidth >= windowWidth_) {
-            currentX = 0;
-            currentY += tabHeight;
+		if (currentX + tabWidth >= windowWidth_) {
+			currentX = 0;
+			currentY += tabHeight;
 
-            const SDL_Rect tempRect = {0, currentY, windowWidth_, tabHeight};
-            SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
-            SDL_RenderFillRect(renderer_, &tempRect);
-        }
+			const SDL_Rect tempRect = {0, currentY, windowWidth_, tabHeight};
+			SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
+			SDL_RenderFillRect(renderer_, &tempRect);
+		}
 
-        SDL_Rect tabRect = {currentX, currentY, tabWidth, tabHeight};
+		SDL_Rect tabRect = {currentX, currentY, tabWidth, tabHeight};
 
-        // A. Draw Tab Background
-        SDL_Color bg = isActive ? colTabAct : colTabInact;
-        SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
-        SDL_RenderFillRect(renderer_, &tabRect);
+		// A. Draw Tab Background
+		SDL_Color bg = isActive ? colTabAct : colTabInact;
+		SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
+		SDL_RenderFillRect(renderer_, &tabRect);
 
-        if (isActive) {
-            SDL_Rect accentRect = {currentX, currentY, tabWidth, 2}; // 2px height
-            SDL_SetRenderDrawColor(renderer_, colAccent.r, colAccent.g, colAccent.b, colAccent.a);
-            SDL_RenderFillRect(renderer_, &accentRect);
-        }
+		if (isActive) {
+			SDL_Rect accentRect = {currentX, currentY, tabWidth, 2}; // 2px height
+			SDL_SetRenderDrawColor(renderer_, colAccent.r, colAccent.g, colAccent.b, colAccent.a);
+			SDL_RenderFillRect(renderer_, &accentRect);
+		}
 
-        SDL_SetRenderDrawColor(renderer_, 20, 20, 20, 255); // Dark line
-        SDL_RenderDrawLine(renderer_,
-            currentX + tabWidth - 1, currentY,
-            currentX + tabWidth - 1, currentY + tabHeight);
+		SDL_SetRenderDrawColor(renderer_, 20, 20, 20, 255); // Dark line
+		SDL_RenderDrawLine(renderer_, currentX + tabWidth - 1, currentY, currentX + tabWidth - 1,
+				   currentY + tabHeight);
 
-        SDL_Color textColor = isActive ? colTextAct : colTextInact;
+		SDL_Color textColor = isActive ? colTextAct : colTextInact;
 
-        SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, fileName.c_str(), textColor);
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+		SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, fileName.c_str(), textColor);
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-        SDL_Rect textRect = {
-            currentX + paddingX,
-            (tabHeight - textH) / 2 + currentY,
-            textW,
-            textH
-        };
+		SDL_Rect textRect = {currentX + paddingX, (tabHeight - textH) / 2 + currentY, textW, textH};
 
-        SDL_RenderCopy(renderer_, texture, nullptr, &textRect);
+		SDL_RenderCopy(renderer_, texture, nullptr, &textRect);
 
-        SDL_FreeSurface(surface);
-        SDL_DestroyTexture(texture);
+		SDL_FreeSurface(surface);
+		SDL_DestroyTexture(texture);
 
-        currentX += tabWidth;
-    }
+		currentX += tabWidth;
+	}
 
-    tabOffsetY = currentY;
+	tabOffsetY = currentY;
 }
 
 void RenderScreen::RenderCommandLine() const {
@@ -297,13 +291,13 @@ void RenderScreen::RenderCommandLine() const {
 	if (editorState_.currentMode_ == Modes::Command) {
 		surface = TTF_RenderText_Blended(uiFont_, editorState_.input_.c_str(), config_.colors_.cursor_color);
 
-	    //TODO fix this ugly mess
-        const int lineLength = editorState_.input_.length();
-	    const auto& [r,g,b,a] = config_.colors_.cursor_color;
-	    SDL_SetRenderDrawColor(renderer_, r,g,b,a);
-	    const auto rect = SDL_Rect{lineLength * uiCharWidth, windowHeight_ - uiCharHeight, 1, codeCharHeight};
+		// TODO fix this ugly mess
+		const int lineLength = editorState_.input_.length();
+		const auto& [r, g, b, a] = config_.colors_.cursor_color;
+		SDL_SetRenderDrawColor(renderer_, r, g, b, a);
+		const auto rect = SDL_Rect{lineLength * uiCharWidth, windowHeight_ - uiCharHeight, 1, codeCharHeight};
 
-	    SDL_RenderFillRect(renderer_, &rect);
+		SDL_RenderFillRect(renderer_, &rect);
 
 		if (surface) {
 			texture = SDL_CreateTextureFromSurface(renderer_, surface);
@@ -324,7 +318,6 @@ void RenderScreen::Render() {
 
 	SDL_SetRenderDrawColor(renderer_, br, bg, bb, ba);
 	SDL_RenderClear(renderer_);
-
 
 	for (const auto& win : windows_) {
 		win.Render(files_.files_.at(win.index), config_, *renderer_, *codeFont_, editorState_.currentMode_);

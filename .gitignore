@@ -2,5 +2,6 @@ cmake-build-debug/
 .idea/
 build/
 
-text.txt
+*.txt
+config.json
 keymaps.json

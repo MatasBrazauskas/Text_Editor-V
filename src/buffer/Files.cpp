@@ -7,19 +7,19 @@
 Cursor::Cursor() : x_{}, y_{}, visible_{true}, absent_{} {}
 
 void Cursor::incrementX() {
-    this->setX(x_ + 1);
+	this->setX(x_ + 1);
 }
 
 void Cursor::decrementX() {
-    this->setX(x_ - 1);
+	this->setX(x_ - 1);
 }
 
 void Cursor::incrementY() {
-    this->setY(y_ + 1);
+	this->setY(y_ + 1);
 }
 
 void Cursor::decrementY() {
-    this->setY(y_ - 1);
+	this->setY(y_ - 1);
 }
 
 int Cursor::getX() const {
@@ -33,13 +33,13 @@ int Cursor::getY() const {
 void Cursor::setX(const int x) {
 	x_ = x;
 	visible_ = true;
-    absent_ = framesToSkip;
+	absent_ = framesToSkip;
 }
 
 void Cursor::setY(const int y) {
 	y_ = y;
 	visible_ = true;
-    absent_ = framesToSkip;
+	absent_ = framesToSkip;
 }
 
 bool Cursor::isVisible() const {

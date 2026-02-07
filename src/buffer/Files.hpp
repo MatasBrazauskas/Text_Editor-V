@@ -10,7 +10,7 @@ using namespace std::string_literals;
 inline constexpr int framesToSkip = 4;
 
 class Cursor final {
-public:
+      public:
 	Cursor();
 	~Cursor() noexcept = default;
 
@@ -28,11 +28,11 @@ public:
 	[[nodiscard]] bool isVisible() const;
 	void setVisible(bool);
 
-private:
+      private:
 	int x_;
 	int y_;
 	bool visible_;
-    int absent_;
+	int absent_;
 };
 
 class ITextBufferIterator {
