@@ -203,6 +203,42 @@ __
 +x : int
 +y : int
 }
+class "NormalModeTable" as C_0008676354845899506631
+class C_0008676354845899506631 {
++NormalModeTable() : void
++~NormalModeTable() noexcept = default : void
+..
++actionDeleteChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++actionInsertLineAbove(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++actionInsertLineBelow(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++actionSwitchToInsertLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++actionSwitchToInsertRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++findFirstCharLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
++findFirstCharRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
++motionEndOfWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionEndOfWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionLine(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, MotionRange &, MotionRange &) const : void
++motionMoveCursorBottomFile(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorDown(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorUp(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionMoveLeftMost(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionMoveLeftMostChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionMoveRightMost(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfNextWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfNextWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfPrevWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfPrevWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
++operationCopyText(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
++operationDeleteChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
++replaceChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
+__
++actions : std::unordered_map<char,Func>
++motions : std::unordered_map<char,Func>
++operations : std::unordered_map<char,Func2>
++textObjects : std::unordered_map<char,Func3>
+}
 enum "ParsingStages" as C_0012699030901556025511
 enum C_0012699030901556025511 {
 Count1OperationMotionTextObject
@@ -212,9 +248,7 @@ Finish
 }
 class "NormalModeCommand" as C_0017832411717760654500
 class C_0017832411717760654500 {
-+NormalModeCommand() : void
 +NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar, bool ignoreCount, ParsingStages stage) : void
-+~NormalModeCommand() constexpr noexcept = default : void
 __
 +count1 : int
 +count2 : int
@@ -225,51 +259,46 @@ __
 +targetChar : char
 +textObject : char
 }
+class "NormalModeParser" as C_0000298199083752434582
+class C_0000298199083752434582 {
++NormalModeParser(const NormalModeTable &) : void
++NormalModeParser(const NormalModeTable &, int count1, char operation, int count2, char motion, char textObject, char targetChar, bool ignoreCount, ParsingStages stage) : void
++~NormalModeParser() constexpr noexcept = default : void
+..
++clear() : void
++executeCommand() const : bool
++getCommand() const : NormalModeCommand
+-parseAction(char inputChar) const : bool
++parseCommand(std::string & input) : void
+-parseCount1(char inputChar) const : bool
+-parseCount2(char inputChar) const : bool
+-parseMotion(char inputChar) const : bool
+-parseOperation(char inputChar) const : bool
+-parseTextObject(char inputChar) const : bool
+__
+-command : NormalModeCommand
+-table : const NormalModeTable &
+}
+class "NormalModeExecutor" as C_0006600579433868664182
+class C_0006600579433868664182 {
++NormalModeExecutor(const NormalModeTable & table) : void
++~NormalModeExecutor() constexpr noexcept = default : void
+..
++executeNormalModeCommand(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const NormalModeCommand command) : void
+__
+-table : const NormalModeTable &
+}
 class "NormalMode" as C_0007529857750796474345
 class C_0007529857750796474345 {
 +NormalMode() : void
 +~NormalMode() noexcept = default : void
 ..
 +HandleKeyboardInput(EditorState &, std::reference_wrapper<Document>) : void
--actionDeleteChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--actionInsertLineAbove(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--actionInsertLineBelow(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--actionSwitchToInsertLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--actionSwitchToInsertRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+executeNormalModeCommand(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) : void
--findFirstCharLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
--findFirstCharRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
--motionEndOfWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionEndOfWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionLine(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, MotionRange &, MotionRange &) const : void
--motionMoveCursorBottomFile(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionMoveCursorDown(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionMoveCursorLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionMoveCursorRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionMoveCursorUp(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionMoveLeftMost(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionMoveLeftMostChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionMoveRightMost(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionStartOfNextWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionStartOfNextWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionStartOfPrevWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--motionStartOfPrevWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
--operationCopyText(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
--operationDeleteChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
--parseAction(char inputChar) const : bool
-+parseCommand(std::string & input, char inputChar) : void
--parseCount(int count, char inputChar) const : bool
--parseMotion(char inputChar, char operationChar) const : bool
--parseOperation(char inputChar) const : bool
--parseTextObject(char inputChar) const : bool
--replaceChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
 -updateView(TextBufferView &, const Cursor &) const : void
 __
--actions : std::unordered_map<char,Func>
-+command : NormalModeCommand
--motions : std::unordered_map<char,Func>
--operations : std::unordered_map<char,Func2>
--textObjects : std::unordered_map<char,Func3>
+-executor : NormalModeExecutor
+-parser : NormalModeParser
+-table : NormalModeTable
 }
 enum "Modes" as C_0005029623504356834829
 enum C_0005029623504356834829 {
@@ -402,27 +431,39 @@ C_0005074260391803520833 --> C_0010644382166562200619 : -commands_
 C_0012293538125726347222 o-- C_0012293538125726347222 : -commands_
 C_0012293538125726347222 --> C_0001199085475404894889 : -commands_
 C_0012293538125726347222 --> C_0000418121225864476394 : -commands_
+C_0008676354845899506631 o-- C_0008676354845899506631 : +operations
+C_0008676354845899506631 o-- C_0005241398686539464490 : +operations
+C_0008676354845899506631 --> C_0000605994528586582938 : +operations
+C_0008676354845899506631 --> C_0001199085475404894889 : +operations
+C_0008676354845899506631 --> C_0009427962241399365514 : +operations
+C_0008676354845899506631 o-- C_0008676354845899506631 : +actions
+C_0008676354845899506631 o-- C_0005241398686539464490 : +actions
+C_0008676354845899506631 --> C_0000605994528586582938 : +actions
+C_0008676354845899506631 --> C_0001199085475404894889 : +actions
+C_0008676354845899506631 o-- C_0008676354845899506631 : +motions
+C_0008676354845899506631 o-- C_0005241398686539464490 : +motions
+C_0008676354845899506631 --> C_0000605994528586582938 : +motions
+C_0008676354845899506631 --> C_0001199085475404894889 : +motions
+C_0008676354845899506631 o-- C_0008676354845899506631 : +textObjects
+C_0008676354845899506631 o-- C_0005241398686539464490 : +textObjects
+C_0008676354845899506631 --> C_0000605994528586582938 : +textObjects
+C_0008676354845899506631 --> C_0001199085475404894889 : +textObjects
 C_0017832411717760654500 o-- C_0012699030901556025511 : +stage
+C_0000298199083752434582 ..> C_0012699030901556025511
+C_0000298199083752434582 --> C_0008676354845899506631 : -table
+C_0000298199083752434582 o-- C_0017832411717760654500 : -command
+C_0006600579433868664182 ..> C_0005241398686539464490
+C_0006600579433868664182 ..> C_0000605994528586582938
+C_0006600579433868664182 ..> C_0001199085475404894889
+C_0006600579433868664182 ..> C_0017832411717760654500
+C_0006600579433868664182 --> C_0008676354845899506631 : -table
+C_0007529857750796474345 ..> C_0001199085475404894889
 C_0007529857750796474345 ..> C_0000418121225864476394
 C_0007529857750796474345 ..> C_0002928650556855873887
-C_0007529857750796474345 o-- C_0017832411717760654500 : +command
-C_0007529857750796474345 o-- C_0007529857750796474345 : -operations
-C_0007529857750796474345 o-- C_0005241398686539464490 : -operations
-C_0007529857750796474345 --> C_0000605994528586582938 : -operations
-C_0007529857750796474345 --> C_0001199085475404894889 : -operations
-C_0007529857750796474345 --> C_0009427962241399365514 : -operations
-C_0007529857750796474345 o-- C_0007529857750796474345 : -actions
-C_0007529857750796474345 o-- C_0005241398686539464490 : -actions
-C_0007529857750796474345 --> C_0000605994528586582938 : -actions
-C_0007529857750796474345 --> C_0001199085475404894889 : -actions
-C_0007529857750796474345 o-- C_0007529857750796474345 : -motions
-C_0007529857750796474345 o-- C_0005241398686539464490 : -motions
-C_0007529857750796474345 --> C_0000605994528586582938 : -motions
-C_0007529857750796474345 --> C_0001199085475404894889 : -motions
-C_0007529857750796474345 o-- C_0007529857750796474345 : -textObjects
-C_0007529857750796474345 o-- C_0005241398686539464490 : -textObjects
-C_0007529857750796474345 --> C_0000605994528586582938 : -textObjects
-C_0007529857750796474345 --> C_0001199085475404894889 : -textObjects
+C_0007529857750796474345 ..> C_0000605994528586582938
+C_0007529857750796474345 o-- C_0008676354845899506631 : -table
+C_0007529857750796474345 o-- C_0000298199083752434582 : -parser
+C_0007529857750796474345 o-- C_0006600579433868664182 : -executor
 C_0001199085475404894889 o-- C_0005029623504356834829 : +currentMode_
 C_0008029553789768066328 --> C_0018030906234682690639 : +files_
 C_0008029553789768066328 --> C_0002918291441898942593 : +fileHandler_

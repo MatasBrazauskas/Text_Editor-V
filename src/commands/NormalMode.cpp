@@ -8,6 +8,7 @@
 #include <iostream>
 #include <ranges>
 
+//TODO Motions work on ranges, not on cursor. Operation execute the range, not cursor position.
 constexpr char lineChar = static_cast<char>(128);
 
 bool NormalModeParser::parseCount1(const char inputChar) const {
@@ -21,13 +22,13 @@ bool NormalModeParser::parseCount1(const char inputChar) const {
 }
 
 bool NormalModeParser::parseCount2(const char inputChar) const {
-    if (!std::isdigit(inputChar))
-        return false;
+	if (!std::isdigit(inputChar))
+		return false;
 
-    if (inputChar == '0' && command.count2 == 0)
-        return false;
+	if (inputChar == '0' && command.count2 == 0)
+		return false;
 
-    return true;
+	return true;
 }
 
 bool NormalModeParser::parseAction(const char inputChar) const {
@@ -52,15 +53,16 @@ bool NormalModeParser::parseTextObject(const char inputChar) const {
 	return table.textObjects.contains(inputChar);
 }
 
-NormalModeParser::NormalModeParser(const NormalModeTable& table_t) :
-NormalModeParser(table_t, 0, ' ', 0, ' ', ' ', ' ', false, ParsingStages::Count1OperationMotionTextObject){}
+NormalModeParser::NormalModeParser(const NormalModeTable& table_t)
+    : NormalModeParser(table_t, 0, ' ', 0, ' ', ' ', ' ', false, ParsingStages::Count1OperationMotionTextObject) {}
 
-NormalModeParser::NormalModeParser(const NormalModeTable& table_t, const int count1, const char operation, const int count2, const char motion, const char textObject,
-				     const char targetChar, const bool ignoreCount, const ParsingStages stage)
+NormalModeParser::NormalModeParser(const NormalModeTable& table_t, const int count1, const char operation,
+				   const int count2, const char motion, const char textObject, const char targetChar,
+				   const bool ignoreCount, const ParsingStages stage)
     : table{table_t}, command{count1, operation, count2, motion, textObject, targetChar, ignoreCount, stage} {}
 
 void NormalModeParser::parseCommand(std::string& input) {
-    const char inputChar = input.back();
+	const char inputChar = input.back();
 
 	auto addCount = [&, inputChar](int& cnt) {
 		cnt *= 10;
@@ -103,9 +105,7 @@ void NormalModeParser::parseCommand(std::string& input) {
 		command.stage = ParsingStages::Finish;
 	};
 
-	const auto clearInputs = [&] {
-		input.clear();
-	};
+	const auto clearInputs = [&] { input.clear(); };
 
 	const bool count1 = parseCount1(inputChar);
 	const bool action = parseAction(inputChar);
@@ -144,49 +144,50 @@ void NormalModeParser::parseCommand(std::string& input) {
 }
 
 bool NormalModeParser::executeCommand() const {
-    return command.stage == ParsingStages::Finish;
+	return command.stage == ParsingStages::Finish;
 }
 
 void NormalModeParser::clear() {
-    command.count1 = 0;
-    command.count2 = 0;
-    command.operation = ' ';
-    command.motion = ' ';
-    command.textObject = ' ';
-    command.targetChar = ' ';
-    command.ignoreCount = false;
-    command.stage = ParsingStages::Count1OperationMotionTextObject;
+	command.count1 = 0;
+	command.count2 = 0;
+	command.operation = ' ';
+	command.motion = ' ';
+	command.textObject = ' ';
+	command.targetChar = ' ';
+	command.ignoreCount = false;
+	command.stage = ParsingStages::Count1OperationMotionTextObject;
 }
 
 NormalModeCommand NormalModeParser::getCommand() const {
-    return command;
+	return command;
 }
 
 void NormalMode::HandleKeyboardInput(EditorState& state, const std::reference_wrapper<Document> doc) {
 	auto& [text, view, cursor, _] = doc.get();
 
-    parser.parseCommand(state.input_);
+	parser.parseCommand(state.input_);
 
-    const auto command = parser.getCommand();
+	const auto command = parser.getCommand();
 
-    std::cout << "Parse mode: " << (int)command.stage << ". Count1: " << command.count1
-          << ", operation: " << command.operation << ", count2: " << command.count2
-          << ", motion: " << command.motion << ", text object: " << command.textObject
-          << ", target char: " << command.targetChar << '\n';
+	std::cout << "Parse mode: " << (int)command.stage << ". Count1: " << command.count1
+		  << ", operation: " << command.operation << ", count2: " << command.count2
+		  << ", motion: " << command.motion << ", text object: " << command.textObject
+		  << ", target char: " << command.targetChar << '\n';
 
-    if (parser.executeCommand()) {
-        executor.executeNormalModeCommand(text, cursor, state, command);
-        parser.clear();
-        state.input_.clear();
-        updateView(view, cursor);
-    }
+	if (parser.executeCommand()) {
+		executor.executeNormalModeCommand(text, cursor, state, command);
+		parser.clear();
+		state.input_.clear();
+		updateView(view, cursor);
+	}
 }
 
-NormalMode::NormalMode(): parser{table}, executor{table} {}
+NormalMode::NormalMode() : parser{table}, executor{table} {}
 
-NormalModeExecutor::NormalModeExecutor(const NormalModeTable &table):  table{table} {}
+NormalModeExecutor::NormalModeExecutor(const NormalModeTable& table) : table{table} {}
 
-void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state, const NormalModeCommand command) {
+void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state,
+						  const NormalModeCommand command) {
 	const auto action = table.actions.find(command.operation);
 	const auto operation = table.operations.find(command.operation);
 	const auto motion = table.motions.find(command.motion);
@@ -229,7 +230,7 @@ NormalModeTable::NormalModeTable() {
 	operations = {{'d', &NormalModeTable::operationDeleteChar}, {'y', &NormalModeTable::operationCopyText}};
 
 	actions = {
-	    {'O', &NormalModeTable::actionInsertLineAbove},	  {'o', &NormalModeTable::actionInsertLineBelow},
+	    {'O', &NormalModeTable::actionInsertLineAbove},    {'o', &NormalModeTable::actionInsertLineBelow},
 	    {'i', &NormalModeTable::actionSwitchToInsertLeft}, {'a', &NormalModeTable::actionSwitchToInsertRight},
 	    {'x', &NormalModeTable::actionDeleteChar},
 	};
@@ -651,7 +652,8 @@ void NormalModeTable::actionDeleteChar(FUNC_TYPES) const {
 }
 
 // TODO fix the insert lines tho with count
-void NormalModeTable::actionInsertLineAbove(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state) const {
+void NormalModeTable::actionInsertLineAbove(std::unique_ptr<ITextBuffer>& text, Cursor& cursor,
+					    EditorState& state) const {
 	motionMoveCursorUp(text, cursor, state);
 
 	text->insertLine(cursor.getY(), "");

@@ -49,10 +49,10 @@ TEST_P(NormalModeMotionsTest, HandleLotsOfCases) {
 	this->doc.cursor_.setX(curX);
 	this->doc.cursor_.setY(curY);
 
-    const NormalModeTable table{};
-    NormalModeExecutor executor{table};
+	const NormalModeTable table{};
+	NormalModeExecutor executor{table};
 
-    executor.executeNormalModeCommand(doc.textBuffer_, doc.cursor_, state, command);
+	executor.executeNormalModeCommand(doc.textBuffer_, doc.cursor_, state, command);
 
 	ASSERT_EQ(doc.cursor_.getX(), x);
 	ASSERT_EQ(doc.cursor_.getY(), y);
@@ -106,8 +106,8 @@ TEST_P(WordTests, HandleLotsOfCases) {
 	this->doc.cursor_.setX(curX);
 	this->doc.cursor_.setY(curY);
 
-    const NormalModeTable table{};
-    NormalModeExecutor executor{table};
+	const NormalModeTable table{};
+	NormalModeExecutor executor{table};
 
 	executor.executeNormalModeCommand(doc.textBuffer_, doc.cursor_, state, command);
 
