@@ -23,24 +23,24 @@ class NormalModeCommandParsingTest : public ::testing::TestWithParam<ParseParame
 
 TEST_P(NormalModeCommandParsingTest, HandleLotsOfCases) {
 	const auto& [input, command] = GetParam();
+    const NormalModeTable table;
+    NormalModeParser parser{table};
 
-	auto matrix = std::make_unique<Matrix>();
-	const std::filesystem::path inputPath = "temp";
-	auto doc = Document(std::move(matrix), inputPath);
-
-	for (char i : input) {
+	for (const auto i : input) {
 		editor.editorState_.input_.push_back(i);
-		normalMode.parseCommand(editor.editorState_.input_, editor.editorState_.input_.back());
+		parser.parseCommand(editor.editorState_.input_);
 	}
 
-	ASSERT_EQ(normalMode.command.count1, command.count1);
-	ASSERT_EQ(normalMode.command.operation, command.operation);
-	ASSERT_EQ(normalMode.command.count2, command.count2);
-	ASSERT_EQ(normalMode.command.motion, command.motion);
-	ASSERT_EQ(normalMode.command.textObject, command.textObject);
-	ASSERT_EQ(normalMode.command.targetChar, command.targetChar);
-	ASSERT_EQ(normalMode.command.ignoreCount, command.ignoreCount);
-	ASSERT_EQ(normalMode.command.stage, command.stage);
+    const auto com = parser.getCommand();
+
+	ASSERT_EQ(com.count1, command.count1);
+	ASSERT_EQ(com.operation, command.operation);
+	ASSERT_EQ(com.count2, command.count2);
+	ASSERT_EQ(com.motion, command.motion);
+	ASSERT_EQ(com.textObject, command.textObject);
+	ASSERT_EQ(com.targetChar, command.targetChar);
+	ASSERT_EQ(com.ignoreCount, command.ignoreCount);
+	ASSERT_EQ(com.stage, command.stage);
 }
 
 INSTANTIATE_TEST_SUITE_P(

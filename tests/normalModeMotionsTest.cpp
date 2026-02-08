@@ -46,11 +46,13 @@ class NormalModeMotionsTest : public NormalModeMotions, public testing::WithPara
 TEST_P(NormalModeMotionsTest, HandleLotsOfCases) {
 	const auto& [curX, curY, x, y, command] = GetParam();
 
-	this->normalMode.command = command;
 	this->doc.cursor_.setX(curX);
 	this->doc.cursor_.setY(curY);
 
-	this->normalMode.executeNormalModeCommand(doc.textBuffer_, doc.cursor_, state);
+    const NormalModeTable table{};
+    NormalModeExecutor executor{table};
+
+    executor.executeNormalModeCommand(doc.textBuffer_, doc.cursor_, state, command);
 
 	ASSERT_EQ(doc.cursor_.getX(), x);
 	ASSERT_EQ(doc.cursor_.getY(), y);
@@ -101,11 +103,13 @@ class WordTests : public Word, public testing::WithParamInterface<Param> {};
 TEST_P(WordTests, HandleLotsOfCases) {
 	const auto& [curX, curY, x, y, command] = GetParam();
 
-	this->normalMode.command = command;
 	this->doc.cursor_.setX(curX);
 	this->doc.cursor_.setY(curY);
 
-	this->normalMode.executeNormalModeCommand(doc.textBuffer_, doc.cursor_, state);
+    const NormalModeTable table{};
+    NormalModeExecutor executor{table};
+
+	executor.executeNormalModeCommand(doc.textBuffer_, doc.cursor_, state, command);
 
 	ASSERT_EQ(doc.cursor_.getX(), x);
 	ASSERT_EQ(doc.cursor_.getY(), y);

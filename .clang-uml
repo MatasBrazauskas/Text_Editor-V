@@ -1,19 +1,31 @@
 compilation_database_dir: build
-output_directory: diagrams
+output_directory: docs/diagrams
+
 diagrams:
-  my_holder_diagram:
+  editor_structure:
     type: class
-    # 1. Choose which files to look at
     glob:
-      - src/holders/*.cpp
-    # 2. Define the specific classes to include
-    include:
+      - src/**/*.cpp
+      - src/**/*.hpp
+    exclude:
+      paths:
+        - src/includes/**
       namespaces:
-        - myproject::holders
-      classes:
-        - myproject::holders::DataHolder
-    # 3. Define how they relate to others
-    relationships:
-      - inheritance
-      - aggregation
-      - association
+        - std
+        - SDL
+      dependencies:
+        - system
+
+  keyboard_input_flow:
+    type: sequence
+    glob:
+      - src/core/main.cpp
+      - src/core/NormalMode.cpp
+    start_from:
+      - function: "main"
+    exclude:
+      paths:
+        - src/includes/**
+      namespaces:
+        - std
+        - SDL
