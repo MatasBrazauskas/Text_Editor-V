@@ -186,41 +186,42 @@ NormalMode::NormalMode() : parser{table}, executor{table} {}
 NormalModeExecutor::NormalModeExecutor(const NormalModeTable& table) : table{table} {}
 
 void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state,
-						  const NormalModeCommand command) {
+                          const NormalModeCommand command) {
+    const auto action = table.actions.find(command.operation);
+    const auto operation = table.operations.find(command.operation);
+    const auto motion = table.motions.find(command.motion);
+    const auto textObject = table.textObjects.find(command.textObject);
 
-	const auto action = table.actions.find(command.operation);
-	const auto operation = table.operations.find(command.operation);
-	const auto motion = table.motions.find(command.motion);
-	const auto textObject = table.textObjects.find(command.textObject);
+    const auto startRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
 
-	const std::size_t loopCount =
-	    command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
+    const std::size_t loopCount =
+        command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
 
-    Cursor ghostCursor = cursor;
+    for (auto i{0zu}; i < loopCount; ++i) {
+        if (motion != table.motions.end()) {
+            (&table->*motion->second)(text, cursor, state);
+        } else if (textObject != table.textObjects.end()) {
+            (&table->*textObject->second)(text, cursor, state, command.targetChar);
+        }
+    }
 
-	for (auto i{0zu}; i < loopCount; ++i) {
-		if (motion != table.motions.end()) {
-			(&table->*motion->second)(text, ghostCursor, state);
-		} else if (textObject != table.textObjects.end()) {
-			(&table->*textObject->second)(text, cursor, state, command.targetChar);
-		}
-	}
+    const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
 
-	const auto trueStart =
-	    MotionRange{.x = std::min(cursor.getX(), ghostCursor.getX()), .y = std::min(cursor.getY(), ghostCursor.getY())};
-	const auto trueEnd =
-        MotionRange{.x = std::max(cursor.getX(), ghostCursor.getX()), .y = std::max(cursor.getY(), ghostCursor.getY())};
+    const auto trueStart =
+        MotionRange{.x = std::min(startRange.x, endRange.x), .y = std::min(startRange.y, endRange.y)};
+    const auto trueEnd =
+        MotionRange{.x = std::max(startRange.x, endRange.x), .y = std::max(startRange.y, endRange.y)};
 
-	if (action != table.actions.end()) {
-		(&table->*action->second)(text, cursor, state);
-	} else if (operation != table.operations.end()) {
-		(&table->*operation->second)(text, cursor, state, trueStart, trueEnd);
+    if (action != table.actions.end()) {
+        (&table->*action->second)(text, cursor, state);
+    } else if (operation != table.operations.end()) {
+        (&table->*operation->second)(text, cursor, state, trueStart, trueEnd);
 
-		if (command.operation != 'd') {
-			cursor.setX(trueEnd.x);
-			cursor.setY(trueEnd.y);
-		}
-	}
+        if (command.operation == 'd') {
+            cursor.setX(trueStart.x);
+            cursor.setY(trueStart.y);
+        }
+    }
 }
 
 NormalModeTable::NormalModeTable() {

@@ -40,7 +40,6 @@
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -153,7 +152,7 @@
       <recent name="$PROJECT_DIR$/src/wrappers" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.Text_Editor">
+  <component name="RunManager" selected="Google Test.editor_tests">
     <configuration name="CommandParsingTest-NormalModeCommandParsingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="CommandParsingTest/NormalModeCommandParsingTest.*/*:CommandParsingTest/NormalModeCommandParsingTest/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -320,7 +319,7 @@
       <workItem from="1770388821554" duration="1114000" />
       <workItem from="1770389986700" duration="13266000" />
       <workItem from="1770546440814" duration="5415000" />
-      <workItem from="1770559840485" duration="10556000" />
+      <workItem from="1770559840485" duration="10843000" />
     </task>
     <servers />
   </component>

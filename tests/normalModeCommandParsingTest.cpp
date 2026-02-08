@@ -17,7 +17,7 @@ TEST_P(NormalModeCommandParsingTest, HandleLotsOfCases) {
 	const NormalModeTable table;
 	NormalModeParser parser{table};
 
-    std::string keyInput{};
+	std::string keyInput{};
 	for (const auto i : setInput) {
 		keyInput.push_back(i);
 		parser.parseCommand(keyInput);
