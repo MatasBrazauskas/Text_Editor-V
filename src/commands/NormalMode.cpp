@@ -8,8 +8,7 @@
 #include <iostream>
 #include <ranges>
 
-//TODO Motions work on ranges, not on cursor. Operation execute the range, not cursor position.
-constexpr char lineChar = static_cast<char>(128);
+// TODO Motions work on ranges, not on cursor. Operation execute the range, not cursor position.
 
 bool NormalModeParser::parseCount1(const char inputChar) const {
 	if (!std::isdigit(inputChar))
@@ -66,7 +65,7 @@ void NormalModeParser::parseCommand(std::string& input) {
 
 	auto addCount = [&, inputChar](int& cnt) {
 		cnt *= 10;
-		cnt += (inputChar - '0');
+		cnt += inputChar - '0';
 	};
 
 	const auto addAction = [&] {
@@ -169,7 +168,7 @@ void NormalMode::HandleKeyboardInput(EditorState& state, const std::reference_wr
 
 	const auto command = parser.getCommand();
 
-	std::cout << "Parse mode: " << (int)command.stage << ". Count1: " << command.count1
+	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ". Count1: " << command.count1
 		  << ", operation: " << command.operation << ", count2: " << command.count2
 		  << ", motion: " << command.motion << ", text object: " << command.textObject
 		  << ", target char: " << command.targetChar << '\n';
@@ -188,71 +187,79 @@ NormalModeExecutor::NormalModeExecutor(const NormalModeTable& table) : table{tab
 
 void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state,
 						  const NormalModeCommand command) {
+
 	const auto action = table.actions.find(command.operation);
 	const auto operation = table.operations.find(command.operation);
 	const auto motion = table.motions.find(command.motion);
 	const auto textObject = table.textObjects.find(command.textObject);
 
-	const auto startRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
-
 	const std::size_t loopCount =
 	    command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
 
+    Cursor ghostCursor = cursor;
+
 	for (auto i{0zu}; i < loopCount; ++i) {
 		if (motion != table.motions.end()) {
-			(&table->*motion->second)(text, cursor, state);
+			(&table->*motion->second)(text, ghostCursor, state);
 		} else if (textObject != table.textObjects.end()) {
 			(&table->*textObject->second)(text, cursor, state, command.targetChar);
 		}
 	}
 
-	const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
-
 	const auto trueStart =
-	    MotionRange{.x = std::min(startRange.x, endRange.x), .y = std::min(startRange.y, endRange.y)};
+	    MotionRange{.x = std::min(cursor.getX(), ghostCursor.getX()), .y = std::min(cursor.getY(), ghostCursor.getY())};
 	const auto trueEnd =
-	    MotionRange{.x = std::max(startRange.x, endRange.x), .y = std::max(startRange.y, endRange.y)};
+        MotionRange{.x = std::max(cursor.getX(), ghostCursor.getX()), .y = std::max(cursor.getY(), ghostCursor.getY())};
 
 	if (action != table.actions.end()) {
 		(&table->*action->second)(text, cursor, state);
 	} else if (operation != table.operations.end()) {
 		(&table->*operation->second)(text, cursor, state, trueStart, trueEnd);
 
-		if (command.operation == 'd') {
-			cursor.setX(trueStart.x);
-			cursor.setY(trueStart.y);
+		if (command.operation != 'd') {
+			cursor.setX(trueEnd.x);
+			cursor.setY(trueEnd.y);
 		}
 	}
 }
 
 NormalModeTable::NormalModeTable() {
 
-	operations = {{'d', &NormalModeTable::operationDeleteChar}, {'y', &NormalModeTable::operationCopyText}};
+	operations = {
+	    {'d', &NormalModeTable::operationDeleteChar},
+	    {'y', &NormalModeTable::operationCopyText}
+	};
 
 	actions = {
-	    {'O', &NormalModeTable::actionInsertLineAbove},    {'o', &NormalModeTable::actionInsertLineBelow},
-	    {'i', &NormalModeTable::actionSwitchToInsertLeft}, {'a', &NormalModeTable::actionSwitchToInsertRight},
+	    {'O', &NormalModeTable::actionInsertLineAbove},
+	    {'o', &NormalModeTable::actionInsertLineBelow},
+	    {'i', &NormalModeTable::actionSwitchToInsertLeft},
+	    {'a', &NormalModeTable::actionSwitchToInsertRight},
 	    {'x', &NormalModeTable::actionDeleteChar},
 	};
 
-	motions = {{'h', &NormalModeTable::motionMoveCursorLeft},
-		   {'j', &NormalModeTable::motionMoveCursorDown},
-		   {'k', &NormalModeTable::motionMoveCursorUp},
-		   {'l', &NormalModeTable::motionMoveCursorRight},
-		   {'G', &NormalModeTable::motionMoveCursorBottomFile},
-		   {'$', &NormalModeTable::motionMoveRightMost},
-		   {'0', &NormalModeTable::motionMoveLeftMost},
-		   {'^', &NormalModeTable::motionMoveLeftMostChar},
-		   {'w', &NormalModeTable::motionStartOfNextWord},
-		   {'b', &NormalModeTable::motionStartOfPrevWord},
-		   {'W', &NormalModeTable::motionStartOfNextWORD},
-		   {'B', &NormalModeTable::motionStartOfPrevWORD},
-		   {'e', &NormalModeTable::motionEndOfWord},
-		   {'E', &NormalModeTable::motionEndOfWORD}};
+	motions = {
+	    {'h', &NormalModeTable::motionMoveCursorLeft},
+        {'j', &NormalModeTable::motionMoveCursorDown},
+        {'k', &NormalModeTable::motionMoveCursorUp},
+	    {'l', &NormalModeTable::motionMoveCursorRight},
+	    {'G', &NormalModeTable::motionMoveCursorBottomFile},
+	    {'$', &NormalModeTable::motionMoveRightMost},
+	    {'0', &NormalModeTable::motionMoveLeftMost},
+	    {'^', &NormalModeTable::motionMoveLeftMostChar},
+	    {'w', &NormalModeTable::motionStartOfNextWord},
+	    {'b', &NormalModeTable::motionStartOfPrevWord},
+	    {'W', &NormalModeTable::motionStartOfNextWORD},
+	    {'B', &NormalModeTable::motionStartOfPrevWORD},
+	    {'e', &NormalModeTable::motionEndOfWord},
+	    {'E', &NormalModeTable::motionEndOfWORD}
+	};
 
-	textObjects = {{'f', &NormalModeTable::findFirstCharLeft},
-		       {'F', &NormalModeTable::findFirstCharRight},
-		       {'r', &NormalModeTable::replaceChar}};
+	textObjects = {
+        {'f', &NormalModeTable::findFirstCharLeft},
+        {'F', &NormalModeTable::findFirstCharRight},
+        {'r', &NormalModeTable::replaceChar}
+	};
 }
 
 void NormalModeTable::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {

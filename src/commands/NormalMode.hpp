@@ -13,6 +13,7 @@ class Cursor;
 using namespace std::string_view_literals;
 
 #define FUNC_TYPES std::unique_ptr<ITextBuffer>&text, Cursor &cursor, EditorState &state
+constexpr char lineChar = static_cast<char>(128);
 
 struct MotionRange {
 	int x, y;
