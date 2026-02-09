@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <unordered_map>
 
 class EditorState;
@@ -18,5 +17,5 @@ class InsertMode final {
 	void handleEnter(EditorState&, Document&) const;
 	void handleBackspace(EditorState&, Document&) const;
 
-	std::unordered_map<std::string, Func> commands_;
+	std::unordered_map<char, Func> commands_;
 };

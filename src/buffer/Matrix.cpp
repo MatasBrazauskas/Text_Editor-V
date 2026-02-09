@@ -36,7 +36,12 @@ Matrix::Matrix() : lines_{""} {}
 
 void Matrix::init(std::vector<std::string> lines) {
 	// lines_ = std::move(lines);
-	std::copy(lines.begin(), lines.end(), back_inserter(lines_));
+
+    if (lines_.size() == 1 && lines_.at(0).empty()) {
+        lines_ = std::move(lines);
+    } else {
+        std::ranges::copy(lines, back_inserter(lines_));
+    }
 }
 
 const std::string_view Matrix::rowsView(const int row) const {

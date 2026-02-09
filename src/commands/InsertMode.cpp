@@ -1,21 +1,22 @@
 #include "commands/InsertMode.hpp"
 
-#include "core/Editor.hpp"
+#include <core/Editor.hpp>
 
-#include <iostream>
+constexpr char enterKey = static_cast<char>(SpecialKeys::Enter);
+constexpr char backSpaceKey = static_cast<char>(SpecialKeys::Backspace);
 
 InsertMode::InsertMode() {
-	const auto enterKey = std::string(1, static_cast<char>(SpecialKeys::Enter));
-	const auto backSpaceKey = std::string(1, static_cast<char>(SpecialKeys::Backspace));
-
-	commands_ = {{enterKey, &InsertMode::handleEnter}, {backSpaceKey, &InsertMode::handleBackspace}};
+	commands_ = {
+	    {enterKey, &InsertMode::handleEnter},
+	    {backSpaceKey, &InsertMode::handleBackspace}
+	};
 }
 
 void InsertMode::handleEnter(EditorState&, Document& doc) const {
 	const auto subRange = doc.textBuffer_->rowSubstr(doc.cursor_.getY(), doc.cursor_.getX());
 
-	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1, "");
-	doc.textBuffer_->insertRange(doc.cursor_.getY() + 1, 0, subRange);
+	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1, std::string{subRange});
+	//doc.textBuffer_->insertRange(doc.cursor_.getY() + 1, 0, subRange);
 
 	doc.textBuffer_->deleteRange(doc.cursor_.getY(), doc.cursor_.getX(),
 				     doc.textBuffer_->rowsLength(doc.cursor_.getY()) - doc.cursor_.getX());
@@ -30,7 +31,7 @@ void InsertMode::handleBackspace(EditorState&, Document& doc) const {
 
 		doc.textBuffer_->insertRange(doc.cursor_.getY() - 1, doc.textBuffer_->rowsLength(doc.cursor_.getY() - 1),
 					     movedLine);
-		doc.textBuffer_->deleteLine(doc.cursor_.getY() - 1);
+		doc.textBuffer_->deleteLine(doc.cursor_.getY());
 
 		doc.cursor_.decrementY();
 		doc.cursor_.setX(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - linesLength);
@@ -46,7 +47,7 @@ void InsertMode::HandleKeyboardInput(EditorState& editorState, std::reference_wr
 
 	auto& [text, _, cursor, idk] = doc.get();
 
-	if (const auto it = commands_.find(editorState.input_); it != commands_.end()) {
+	if (const auto it = commands_.find(editorState.input_.back()); it != commands_.end()) {
 		const auto func = it->second;
 		(this->*func)(editorState, doc);
 	} else {

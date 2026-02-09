@@ -11,7 +11,7 @@ struct Param {
 	NormalModeCommand command;
 };
 
-class NormalModeMotions : public ::testing::Test {
+class NormalModeMotions : public testing::Test {
       protected:
 	NormalMode normalMode;
 	std::unique_ptr<ITextBuffer> matrix;

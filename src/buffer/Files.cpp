@@ -4,7 +4,7 @@
 
 #include <SDL.h>
 
-Cursor::Cursor() : x_{}, y_{}, visible_{true}, absent_{} {}
+Cursor::Cursor() : x_{0}, y_{0}, visible_{true}, absent_{} {}
 
 void Cursor::incrementX() {
 	this->setX(x_ + 1);
