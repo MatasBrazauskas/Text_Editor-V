@@ -6,17 +6,14 @@ constexpr char enterKey = static_cast<char>(SpecialKeys::Enter);
 constexpr char backSpaceKey = static_cast<char>(SpecialKeys::Backspace);
 
 InsertMode::InsertMode() {
-	commands_ = {
-	    {enterKey, &InsertMode::handleEnter},
-	    {backSpaceKey, &InsertMode::handleBackspace}
-	};
+	commands_ = {{enterKey, &InsertMode::handleEnter}, {backSpaceKey, &InsertMode::handleBackspace}};
 }
 
 void InsertMode::handleEnter(EditorState&, Document& doc) const {
 	const auto subRange = doc.textBuffer_->rowSubstr(doc.cursor_.getY(), doc.cursor_.getX());
 
 	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1, std::string{subRange});
-	//doc.textBuffer_->insertRange(doc.cursor_.getY() + 1, 0, subRange);
+	// doc.textBuffer_->insertRange(doc.cursor_.getY() + 1, 0, subRange);
 
 	doc.textBuffer_->deleteRange(doc.cursor_.getY(), doc.cursor_.getX(),
 				     doc.textBuffer_->rowsLength(doc.cursor_.getY()) - doc.cursor_.getX());

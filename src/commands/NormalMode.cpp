@@ -198,9 +198,9 @@ void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& 
 	    command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
 
 	for (auto i{0zu}; i < loopCount; ++i) {
-	    if (action != table.actions.end()) {
-		    (&table->*action->second)(text, cursor, state);
-	    }
+		if (action != table.actions.end()) {
+			(&table->*action->second)(text, cursor, state);
+		}
 		if (motion != table.motions.end()) {
 			(&table->*motion->second)(text, cursor, state);
 		} else if (textObject != table.textObjects.end()) {
@@ -663,7 +663,7 @@ void NormalModeTable::actionInsertLineAbove(std::unique_ptr<ITextBuffer>& text, 
 }
 
 void NormalModeTable::actionInsertLineBelow(FUNC_TYPES) const {
-    motionMoveCursorDown(text, cursor, state);
+	motionMoveCursorDown(text, cursor, state);
 	text->insertLine(cursor.getY(), "");
 
 	cursor.setX(0);
@@ -701,6 +701,6 @@ void NormalModeTable::actionSwitchToInsertLeft(FUNC_TYPES) const {
 }
 
 void NormalModeTable::actionSwitchToInsertRight(FUNC_TYPES) const {
-    motionMoveCursorRight(text, cursor, state);
+	motionMoveCursorRight(text, cursor, state);
 	state.currentMode_ = Modes::Insert;
 }

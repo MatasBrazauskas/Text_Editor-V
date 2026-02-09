@@ -38,16 +38,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/insertModeOperationTest.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Files.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/insertModeOperationTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/insertModeOperationTest.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -192,7 +188,9 @@
     "Google Test.TextObjectParsingTest-NormalModeCommandParsingTest.executor": "Run",
     "Google Test.WordMotionCommands-NormalModeMotionsTest.executor": "Debug",
     "Google Test.WordMotionCommands-WordTests.executor": "Run",
+    "Google Test.backSpaceKeyOperations-InsertModeTestWithParams.executor": "Run",
     "Google Test.editor_tests.executor": "Run",
+    "Google Test.insertKeyOperations-InsertModeTestWithParams.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.RadMigrateCodeStyle": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -230,7 +228,7 @@
       <recent name="$PROJECT_DIR$/src/wrappers" />
     </key>
   </component>
-  <component name="RunManager" selected="Google Test.insertKeyOperations-InsertModeTestWithParams">
+  <component name="RunManager" selected="Google Test.editor_tests">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
@@ -242,19 +240,19 @@
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="InsertKeyOperations-InsertModeTestWithParams" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="InsertKeyOperations/InsertModeTestWithParams.*/*:InsertKeyOperations/InsertModeTestWithParams/*.*" TEST_MODE="PATTERN">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="StartOfAFileOperations-InsertModeTestWithParams" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="StartOfAFileOperations/InsertModeTestWithParams.*/*:StartOfAFileOperations/InsertModeTestWithParams/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="WordMotionCommands-NormalModeMotionsTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="WordMotionCommands/NormalModeMotionsTest.*/*:WordMotionCommands/NormalModeMotionsTest/*.*" TEST_MODE="PATTERN">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-        <option name="BeforeTestRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="WordMotionCommands-WordTests" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="WordMotionCommands/WordTests.*/*:WordMotionCommands/WordTests/*.*" TEST_MODE="PATTERN">
+    <configuration name="backSpaceKeyOperations-InsertModeTestWithParams" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="backSpaceKeyOperations/InsertModeTestWithParams.*/*:backSpaceKeyOperations/InsertModeTestWithParams/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -318,18 +316,18 @@
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.editor_tests" />
       <item itemvalue="Google Test.FirstLineOperations-InsertModeTestWithParams" />
+      <item itemvalue="Google Test.InsertKeyOperations-InsertModeTestWithParams" />
       <item itemvalue="Google Test.StartOfAFileOperations-InsertModeTestWithParams" />
+      <item itemvalue="Google Test.backSpaceKeyOperations-InsertModeTestWithParams" />
       <item itemvalue="Google Test.insertKeyOperations-InsertModeTestWithParams" />
-      <item itemvalue="Google Test.WordMotionCommands-WordTests" />
-      <item itemvalue="Google Test.WordMotionCommands-NormalModeMotionsTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Google Test.InsertKeyOperations-InsertModeTestWithParams" />
         <item itemvalue="Google Test.insertKeyOperations-InsertModeTestWithParams" />
+        <item itemvalue="Google Test.backSpaceKeyOperations-InsertModeTestWithParams" />
         <item itemvalue="Google Test.StartOfAFileOperations-InsertModeTestWithParams" />
         <item itemvalue="Google Test.FirstLineOperations-InsertModeTestWithParams" />
-        <item itemvalue="Google Test.WordMotionCommands-NormalModeMotionsTest" />
-        <item itemvalue="Google Test.WordMotionCommands-WordTests" />
       </list>
     </recent_temporary>
   </component>
@@ -402,7 +400,7 @@
       <workItem from="1770388821554" duration="1114000" />
       <workItem from="1770389986700" duration="13266000" />
       <workItem from="1770546440814" duration="5415000" />
-      <workItem from="1770559840485" duration="20358000" />
+      <workItem from="1770559840485" duration="22860000" />
     </task>
     <servers />
   </component>

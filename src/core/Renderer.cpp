@@ -202,7 +202,7 @@ void RenderScreen::RenderTabs() {
 	int currentX{};
 	int currentY{};
 
-    tabOffsetY = tabHeight;
+	tabOffsetY = tabHeight;
 
 	const SDL_Rect barRect = {0, 0, windowWidth_, tabHeight};
 	SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
@@ -221,7 +221,7 @@ void RenderScreen::RenderTabs() {
 		if (currentX + tabWidth >= windowWidth_) {
 			currentX = 0;
 			currentY += tabHeight;
-		    tabOffsetY += tabHeight;
+			tabOffsetY += tabHeight;
 
 			const SDL_Rect tempRect = {0, currentY, windowWidth_, tabHeight};
 			SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
