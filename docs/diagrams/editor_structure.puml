@@ -195,7 +195,7 @@ class C_0012293538125726347222 {
 -handleBackspace(EditorState &, Document &) const : void
 -handleEnter(EditorState &, Document &) const : void
 __
--commands_ : std::unordered_map<std::string,Func>
+-commands_ : std::unordered_map<char,Func>
 }
 class "MotionRange" as C_0009427962241399365514
 class C_0009427962241399365514 {

@@ -3,24 +3,24 @@
 #include <SDL.h>
 #include <iostream>
 
-EditorState::EditorState() : activeTab_{}, currentMode_{Modes::Normal}, running_{true} {}
+EditorState::EditorState(const FileId activeFileId_t) : currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
-Editor::Editor(Files& files, FileHandler& fileHandler, EditorState& editorState)
-    : files_{files}, fileHandler_{fileHandler}, editorState_{editorState} {}
+Editor::Editor(const int argc, char** argv) : files_{fileHandler_, argc, argv}, panes_{}, editorState_{0} {
+}
 
 std::string Editor::EncodeInput(const SDL_Event& event) {
 	if (event.type == SDL_QUIT) {
 		editorState_.running_ = false;
 		return {};
 	}
-	auto& doc = files_.getDocument(editorState_.activeTab_).value().get();
+	auto& doc = files_.getFile(editorState_.activeFileId_).value().get();
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_ESCAPE:
 			editorState_.currentMode_ = Modes::Normal;
-			editorState_.input_.clear();
+			editorInputAndOutput_.input_.clear();
 			doc.cursor_.setX(
-			    std::min(doc.cursor_.getX(), doc.textBuffer_->rowsLength(doc.cursor_.getY()) - 1));
+			    std::min(doc.cursor_.getX(), doc.textBuffer_->getLineLength(doc.cursor_.getY()) - 1));
 			break;
 		case SDLK_BACKSPACE:
 			return std::string(1, static_cast<char>(SpecialKeys::Backspace));
@@ -32,7 +32,7 @@ std::string Editor::EncodeInput(const SDL_Event& event) {
 	} else if (event.type == SDL_TEXTINPUT) {
 		if (event.text.text[0] == ':') {
 			editorState_.currentMode_ = Modes::Command;
-			editorState_.input_.clear();
+			editorInputAndOutput_.input_.clear();
 			return ":";
 		}
 		return event.text.text;
@@ -50,17 +50,17 @@ void Editor::HandleKeyboardInput() {
 		if (input.empty())
 			return;
 
-		editorState_.input_.append(input);
-		std::cout << "Input state: " << editorState_.input_ << '\n';
+		editorInputAndOutput_.input_.append(input);
+		std::cout << "Input state: " << editorInputAndOutput_.input_ << '\n';
+
+	    const auto file = std::move(files_.getFile(this->editorState_.activeFileId_));
 
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
-			normalMode_.HandleKeyboardInput(editorState_,
-							files_.getDocument(editorState_.activeTab_).value());
+			normalMode_.HandleKeyboardInput(editorState_, file);
 			break;
 		case Modes::Insert:
-			insertMode_.HandleKeyboardInput(editorState_,
-							files_.getDocument(editorState_.activeTab_).value());
+			insertMode_.HandleKeyboardInput(editorState_, file);
 			break;
 		case Modes::Command:
 			commandMode_.HandleKeyboardInput(editorState_, fileHandler_, files_);

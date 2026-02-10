@@ -1,4 +1,5 @@
 #pragma once
+#include <stack>
 #include "utils/FileHandler.hpp"
 
 #include <filesystem>
@@ -7,33 +8,10 @@
 #include <vector>
 
 using namespace std::string_literals;
+
+using FileId = uint_fast64_t;
+
 inline constexpr int framesToSkip = 4;
-
-class Cursor final {
-      public:
-	Cursor();
-	~Cursor() noexcept = default;
-
-	void incrementX();
-	void decrementX();
-	void incrementY();
-	void decrementY();
-
-	[[nodiscard]] int getX() const;
-	[[nodiscard]] int getY() const;
-
-	void setX(int);
-	void setY(int);
-
-	[[nodiscard]] bool isVisible() const;
-	void setVisible(bool);
-
-      private:
-	int x_;
-	int y_;
-	bool visible_;
-	int absent_;
-};
 
 class ITextBufferIterator {
       public:
@@ -58,14 +36,14 @@ class ITextBuffer {
 
 	virtual void init(std::vector<std::string> matrix) = 0;
 
-	[[nodiscard]] virtual const std::string_view rowsView(int row) const = 0;
+	[[nodiscard]] virtual const std::string_view getLine(int row) const = 0;
 
-	[[nodiscard]] virtual const std::string_view rowSubstr(int row, int col) const = 0;
-	[[nodiscard]] virtual const std::string_view rowSubstr(int row, int col, int n) const = 0;
+	[[nodiscard]] virtual const std::string_view getLineSubstr(int row, int col) const = 0;
+	[[nodiscard]] virtual const std::string_view getLineSubstr(int row, int col, int n) const = 0;
 
-	[[nodiscard]] virtual int rowsLength(int row) const = 0;
+	[[nodiscard]] virtual int getLineLength(int row) const = 0;
 
-	[[nodiscard]] virtual int linesCount() const = 0;
+	[[nodiscard]] virtual int getLinesCount() const = 0;
 
 	virtual void deleteLine(int row) = 0;
 	virtual void insertLine(int row, std::string) = 0;
@@ -81,52 +59,67 @@ class ITextBuffer {
 
 	inline static auto separators = "!@#$%^&*()-+={}[]:;'<>,.?/|\\\""s;
 
-      protected:
+protected:
 	size_t rowsCount_;
 	size_t charsCount_;
 };
 
-class TextBufferView final {
-      public:
-	TextBufferView();
-	~TextBufferView() noexcept = default;
+class Cursor final {
+public:
+    Cursor();
+    ~Cursor() noexcept = default;
 
-	int startY_;
-	int startX_;
+    void incrementX();
+    void decrementX();
+    void incrementY();
+    void decrementY();
 
-	int visibleLines_;
-	int visibleColumns_;
+    [[nodiscard]] int getX() const;
+    [[nodiscard]] int getY() const;
+
+    void setX(int);
+    void setY(int);
+
+    [[nodiscard]] bool isVisible() const;
+    void setVisible(bool);
+
+private:
+    int x_;
+    int y_;
+    bool visible_;
+    int absent_;
 };
 
-class Document final {
-      public:
-	Document() = delete;
-	explicit Document(std::unique_ptr<ITextBuffer>, std::filesystem::path);
-	~Document() noexcept = default;
+class File final {
+public:
+    File() = delete;
+    explicit File(std::unique_ptr<ITextBuffer>, std::filesystem::path);
+    ~File() noexcept = default;
 
-	Document(Document&&) noexcept = default;
-	Document& operator=(Document&&) noexcept = default;
+    File(File&&) noexcept = default;
+    File& operator=(File&&) noexcept = default;
 
-	Document(const Document&) = delete;
-	Document& operator=(const Document&) = delete;
+    File(const File&) = delete;
+    File& operator=(const File&) = delete;
 
-	std::unique_ptr<ITextBuffer> textBuffer_;
-	TextBufferView textView_;
-	Cursor cursor_;
-	std::filesystem::path filesPath_;
+    std::unique_ptr<ITextBuffer> textBuffer_;
+    std::stack<int> undoStack_; // temp implement tho
+    Cursor cursor_;
+
+    std::filesystem::path filesPath_;
+    FileId fileId_;
 };
 
 class Files final {
-      public:
-	Files() = delete;
-	explicit Files(const FileHandler&, int argc, char** argv);
+public:
+    Files(const FileHandler&, int argc, char** argv);
 	~Files() noexcept = default;
 
-	void addDocument(std::unique_ptr<ITextBuffer>, std::filesystem::path);
+	void addFile(std::unique_ptr<ITextBuffer>, std::filesystem::path);
 
-	[[nodiscard]] std::optional<std::reference_wrapper<Document>> getDocument(size_t index_t);
+	[[nodiscard]] std::reference_wrapper<File> getFile(size_t fileId_t);
 
-	void removeDocument(size_t index_t);
+	void removeFile(size_t fileId_t);
 
-	std::vector<Document> files_;
+	std::vector<File> files_;
 };

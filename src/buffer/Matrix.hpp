@@ -23,13 +23,13 @@ class Matrix final : public ITextBuffer {
 
 	void init(std::vector<std::string> lines) override;
 
-	[[nodiscard]] const std::string_view rowsView(int row) const override;
-	[[nodiscard]] const std::string_view rowSubstr(int row, int col) const override;
-	[[nodiscard]] const std::string_view rowSubstr(int row, int col, int n) const override;
+	[[nodiscard]] const std::string_view getLine(int row) const override;
+	[[nodiscard]] const std::string_view getLineSubstr(int row, int col) const override;
+	[[nodiscard]] const std::string_view getLineSubstr(int row, int col, int n) const override;
 
-	[[nodiscard]] int rowsLength(int row) const override;
+	[[nodiscard]] int getLineLength(int row) const override;
 
-	[[nodiscard]] int linesCount() const override;
+	[[nodiscard]] int getLinesCount() const override;
 
 	void deleteLine(int row) override;
 	void insertLine(int row, std::string line) override;

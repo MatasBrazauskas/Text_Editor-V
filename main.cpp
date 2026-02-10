@@ -10,13 +10,13 @@ using namespace std::string_literals;
 const std::filesystem::path configPath = "config.json";
 
 int main(const int argc, char** argv) {
+
 	Config config(configPath);
 	const auto ticksPerFrame = 1.0 / static_cast<double>(config.editor_.fps);
 
 	FileHandler fileHandler;
 	Files files{fileHandler, argc, argv};
 
-	EditorState editorState;
 	Editor editor{files, fileHandler, editorState};
 	RenderScreen rendererScreen{editorState, files, config};
 

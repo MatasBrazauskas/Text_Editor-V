@@ -3,6 +3,8 @@
 #include "Matrix.hpp"
 
 #include <SDL.h>
+#include <algorithm>
+#include <numeric>
 
 Cursor::Cursor() : x_{0}, y_{0}, visible_{true}, absent_{} {}
 
@@ -50,48 +52,52 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-TextBufferView::TextBufferView() : startY_{0}, startX_{0}, visibleLines_{}, visibleColumns_{} {
-	visibleLines_ = 28;
-	visibleColumns_ = 85;
+File::File(std::unique_ptr<ITextBuffer> text_t, std::filesystem::path path_t): textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{} {
+    const std::string filePathStr = std::string{filesPath_};
+    const std::size_t sum = std::accumulate(filePathStr.begin(), filePathStr.end(), 0);
+
+    fileId_ = sum * textBuffer_->getLinesCount() * 69420;
 }
 
-Document::Document(std::unique_ptr<ITextBuffer> textBuffer_t, std::filesystem::path fileName_t)
-    : textBuffer_(std::move(textBuffer_t)), filesPath_(std::move(fileName_t)) {}
+void Files::addFile(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
+    files_.emplace_back(std::move(textBuffer), std::move(filePath_t));
+}
 
-void Files::addDocument(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
-	files_.emplace_back(std::move(textBuffer), std::move(filePath_t));
+std::reference_wrapper<File> Files::getFile(const size_t fileId_t) {
+    const auto predicate = [fileId_t](const File& file){return file.fileId_ == fileId_t; };
+    const auto it = std::ranges::find_if(files_, predicate);
+
+    return *it;
+}
+
+void Files::removeFile(const size_t fileId_t) {
+    const auto predicate = [fileId_t](const File& file){return file.fileId_ == fileId_t; };
+    const auto it = std::ranges::find_if(files_, predicate);
+
+    if (it != files_.end()) {
+        files_.erase(it);
+    }
 }
 
 Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
-	if (argc < 1 || argv == nullptr) {
-		return;
-	}
+    if (argc < 1 || argv == nullptr) {
+        return;
+    }
 
-	if (const std::vector<std::string_view> files(argv + 1, argv + argc); files.empty()) {
-		auto ptr = std::make_unique<Matrix>();
+    const std::vector<std::string_view> filePaths(argv + 1, argv + argc);
 
-		addDocument(std::move(ptr), "Untitled");
-	} else {
-		for (const auto& file : files) {
-			const auto lines = fileHandler.getContent(file.data());
+    if (filePaths.empty()) {
+        auto ptr = std::make_unique<Matrix>();
 
-			auto ptr = std::make_unique<Matrix>();
-			ptr->init(lines);
+        this->addFile(std::move(ptr), "Untitled");
+    } else {
+        for (const auto& path: filePaths) {
+            const auto lines = fileHandler.getContent(path.data());
 
-			addDocument(std::move(ptr), file);
-		}
-	}
-}
+            auto ptr = std::make_unique<Matrix>();
+            ptr->init(lines);
 
-std::optional<std::reference_wrapper<Document>> Files::getDocument(const size_t index_t) {
-	if (index_t < files_.size()) {
-		return files_.at(index_t);
-	}
-	return std::nullopt;
-}
-
-void Files::removeDocument(const size_t index_t) {
-	if (index_t < files_.size()) {
-		files_.erase(files_.begin() + index_t);
-	}
+            this->addFile(std::move(ptr), path);
+        }
+    }
 }

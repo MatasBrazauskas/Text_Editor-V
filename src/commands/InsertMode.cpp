@@ -13,8 +13,6 @@ void InsertMode::handleEnter(EditorState&, Document& doc) const {
 	const auto subRange = doc.textBuffer_->rowSubstr(doc.cursor_.getY(), doc.cursor_.getX());
 
 	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1, std::string{subRange});
-	// doc.textBuffer_->insertRange(doc.cursor_.getY() + 1, 0, subRange);
-
 	doc.textBuffer_->deleteRange(doc.cursor_.getY(), doc.cursor_.getX(),
 				     doc.textBuffer_->rowsLength(doc.cursor_.getY()) - doc.cursor_.getX());
 
