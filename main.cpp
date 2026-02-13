@@ -1,4 +1,4 @@
-#include "buffer/Files.hpp"
+#include "buffer/FilesAndCursor.hpp"
 #include "buffer/Matrix.hpp"
 #include "core/Editor.hpp"
 #include "core/Renderer.hpp"
@@ -14,10 +14,10 @@ int main(const int argc, char** argv) {
 	Config config(configPath);
 	const auto ticksPerFrame = 1.0 / static_cast<double>(config.editor_.fps);
 
-	FileHandler fileHandler;
-	Files files{fileHandler, argc, argv};
+	/*FileHandler fileHandler;
+	FilesAndCursor files{fileHandler, argc, argv};*/
 
-	Editor editor{files, fileHandler, editorState};
+	Editor editor{argc, argv};
 	RenderScreen rendererScreen{editorState, files, config};
 
 	for (auto i{0zu}; i < files.files_.size(); i++) {

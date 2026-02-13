@@ -5,7 +5,8 @@
 #include <unordered_map>
 
 class EditorState;
-class Document;
+class EditorInputAndOutput;
+class File;
 class ITextBuffer;
 class TextBufferView;
 class Cursor;
@@ -138,12 +139,12 @@ class NormalMode {
       public:
 	NormalMode();
 	~NormalMode() noexcept = default;
-	void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>);
+	void HandleKeyboardInput(std::reference_wrapper<File>, EditorState&, EditorInputAndOutput&);
 
       private:
 	NormalModeTable table;
 	NormalModeParser parser;
 	NormalModeExecutor executor;
 
-	void updateView(TextBufferView&, const Cursor&) const;
+	//void updateView(TextBufferView&, const Cursor&) const;
 };

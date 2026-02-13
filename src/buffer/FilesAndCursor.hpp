@@ -1,10 +1,9 @@
 #pragma once
-#include <stack>
 #include "utils/FileHandler.hpp"
 
 #include <filesystem>
 #include <memory>
-#include <optional>
+#include <stack>
 #include <vector>
 
 using namespace std::string_literals;
@@ -14,7 +13,7 @@ using FileId = uint_fast64_t;
 inline constexpr int framesToSkip = 4;
 
 class ITextBufferIterator {
-      public:
+public:
 	ITextBufferIterator(const int index_t, const bool flag_t) : index_{index_t}, forwarded_{flag_t} {}
 	virtual ~ITextBufferIterator() noexcept = default;
 
@@ -24,7 +23,7 @@ class ITextBufferIterator {
 
 	int index_;
 
-      protected:
+protected:
 	std::string_view currLine_;
 	bool forwarded_;
 };
@@ -59,61 +58,63 @@ class ITextBuffer {
 
 	inline static auto separators = "!@#$%^&*()-+={}[]:;'<>,.?/|\\\""s;
 
-protected:
+      protected:
 	size_t rowsCount_;
 	size_t charsCount_;
 };
 
 class Cursor final {
-public:
-    Cursor();
-    ~Cursor() noexcept = default;
+      public:
+	Cursor();
+	~Cursor() noexcept = default;
 
-    void incrementX();
-    void decrementX();
-    void incrementY();
-    void decrementY();
+	void incrementX();
+	void decrementX();
+	void incrementY();
+	void decrementY();
 
-    [[nodiscard]] int getX() const;
-    [[nodiscard]] int getY() const;
+	[[nodiscard]] int getX() const;
+	[[nodiscard]] int getY() const;
 
-    void setX(int);
-    void setY(int);
+	void setX(int);
+	void setY(int);
 
-    [[nodiscard]] bool isVisible() const;
-    void setVisible(bool);
+	[[nodiscard]] bool isVisible() const;
+	void setVisible(bool);
 
-private:
-    int x_;
-    int y_;
-    bool visible_;
-    int absent_;
+      private:
+	int x_;
+	int y_;
+	bool visible_;
+	int absent_;
 };
 
 class File final {
-public:
-    File() = delete;
-    explicit File(std::unique_ptr<ITextBuffer>, std::filesystem::path);
-    ~File() noexcept = default;
+      public:
+	File() = delete;
+	explicit File(std::unique_ptr<ITextBuffer>, std::filesystem::path);
+	~File() noexcept = default;
 
-    File(File&&) noexcept = default;
-    File& operator=(File&&) noexcept = default;
+	File(File&&) noexcept = default;
+	File& operator=(File&&) noexcept = default;
 
-    File(const File&) = delete;
-    File& operator=(const File&) = delete;
+	File(const File&) = delete;
+	File& operator=(const File&) = delete;
 
-    std::unique_ptr<ITextBuffer> textBuffer_;
-    std::stack<int> undoStack_; // temp implement tho
-    Cursor cursor_;
+	std::unique_ptr<ITextBuffer> textBuffer_;
+	std::stack<int> undoStack_; // temp implement tho
+	Cursor cursor_;
 
-    std::filesystem::path filesPath_;
-    FileId fileId_;
+	std::filesystem::path filesPath_;
+	FileId fileId_;
+private:
+    static inline int fileIdCounter_{0};
 };
 
-class Files final {
-public:
-    Files(const FileHandler&, int argc, char** argv);
-	~Files() noexcept = default;
+class FilesAndCursor final {
+      public:
+	FilesAndCursor(const FileHandler&, int argc, char** argv);
+	~FilesAndCursor() noexcept = default;
 
 	void addFile(std::unique_ptr<ITextBuffer>, std::filesystem::path);
 

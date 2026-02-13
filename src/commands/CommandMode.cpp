@@ -36,7 +36,7 @@ CommandMode::CommandMode() {
 	    {"q", &CommandMode::closeProgramme}, {"w", &CommandMode::writeToFile}, {"e", &CommandMode::openFile}};
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandler, Files& files) {
+void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandler, FilesAndCursor& files) {
 	if (state.input_.empty())
 		return;
 
@@ -63,7 +63,7 @@ void CommandMode::HandleKeyboardInput(EditorState& state, FileHandler& fileHandl
 	}
 }
 
-void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, Files& files, const CommandStructure& com) {
+void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, FilesAndCursor& files, const CommandStructure& com) {
 	std::cout << "Writing to file...\n";
 	if (com.args_.empty()) {
 		fileHandler.writeToFile(files.getDocument(state.activeTab_).value());
@@ -73,7 +73,7 @@ void CommandMode::writeToFile(EditorState& state, FileHandler& fileHandler, File
 	}
 }
 
-void CommandMode::openFile(EditorState& state, FileHandler& fileHandler, Files& files, const CommandStructure& com) {
+void CommandMode::openFile(EditorState& state, FileHandler& fileHandler, FilesAndCursor& files, const CommandStructure& com) {
 	std::cout << "Opening file...\n";
 
 	if (com.args_.empty()) {
@@ -91,7 +91,7 @@ void CommandMode::openFile(EditorState& state, FileHandler& fileHandler, Files& 
 	}
 }
 
-void CommandMode::closeProgramme(EditorState& state, FileHandler&, Files&, const CommandStructure& com) {
+void CommandMode::closeProgramme(EditorState& state, FileHandler&, FilesAndCursor&, const CommandStructure& com) {
 	if (!com.args_.empty()) {
 		state.input_ = "Trailing characters";
 	} else {

@@ -3,17 +3,17 @@
 #include <SDL.h>
 #include <iostream>
 
-EditorState::EditorState(const FileId activeFileId_t) : currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
+EditorState::EditorState(const FileId activeFileId_t)
+    : currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
-Editor::Editor(const int argc, char** argv) : files_{fileHandler_, argc, argv}, panes_{}, editorState_{0} {
-}
+Editor::Editor(const int argc, char** argv) : files_{fileHandler_, argc, argv}, panes_{}, editorState_{0} {}
 
 std::string Editor::EncodeInput(const SDL_Event& event) {
 	if (event.type == SDL_QUIT) {
 		editorState_.running_ = false;
 		return {};
 	}
-	auto& doc = files_.getFile(editorState_.activeFileId_).value().get();
+	auto& doc = files_.getFile(editorState_.activeFileId_).get();
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_ESCAPE:
@@ -53,14 +53,14 @@ void Editor::HandleKeyboardInput() {
 		editorInputAndOutput_.input_.append(input);
 		std::cout << "Input state: " << editorInputAndOutput_.input_ << '\n';
 
-	    const auto file = std::move(files_.getFile(this->editorState_.activeFileId_));
+		const auto file = files_.getFile(this->editorState_.activeFileId_);
 
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
-			normalMode_.HandleKeyboardInput(editorState_, file);
+			normalMode_.HandleKeyboardInput(file, editorState_, editorInputAndOutput_);
 			break;
 		case Modes::Insert:
-			insertMode_.HandleKeyboardInput(editorState_, file);
+			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file);
 			break;
 		case Modes::Command:
 			commandMode_.HandleKeyboardInput(editorState_, fileHandler_, files_);

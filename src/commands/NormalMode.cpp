@@ -1,6 +1,6 @@
 #include "commands/NormalMode.hpp"
 
-#include "buffer/Files.hpp"
+#include "buffer/FilesAndCursor.hpp"
 #include "core/Editor.hpp"
 
 #include <SDL_clipboard.h>
@@ -161,10 +161,10 @@ NormalModeCommand NormalModeParser::getCommand() const {
 	return command;
 }
 
-void NormalMode::HandleKeyboardInput(EditorState& state, const std::reference_wrapper<Document> doc) {
-	auto& [text, view, cursor, _] = doc.get();
+void NormalMode::HandleKeyboardInput(std::reference_wrapper<File> file_t, EditorState& state, EditorInputAndOutput& inOut) {
+	auto& [text, stack, cursor, path, id] = file_t.get();
 
-	parser.parseCommand(state.input_);
+	parser.parseCommand(inOut.input_);
 
 	const auto command = parser.getCommand();
 
@@ -176,8 +176,8 @@ void NormalMode::HandleKeyboardInput(EditorState& state, const std::reference_wr
 	if (parser.executeCommand()) {
 		executor.executeNormalModeCommand(text, cursor, state, command);
 		parser.clear();
-		state.input_.clear();
-		updateView(view, cursor);
+		inOut.input_.clear();
+		//updateView(view, cursor);
 	}
 }
 
@@ -554,7 +554,7 @@ void NormalModeTable::motionLine(FUNC_TYPES, MotionRange& start, MotionRange& en
 	end.x = text->getLineLength(cursor.getY()) - 1;
 }
 
-void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {
+/*void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {
 	if (cursor.getX() < view.startX_) {
 		view.startX_ = cursor.getX();
 	} else if (cursor.getX() >= view.startX_ + view.visibleColumns_) {
@@ -566,7 +566,7 @@ void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {
 	} else if (cursor.getY() >= view.startY_ + view.visibleLines_) {
 		view.startY_ = cursor.getY() - view.visibleLines_ + 1;
 	}
-}
+}*/
 
 void NormalModeTable::motionMoveCursorLeft(FUNC_TYPES) const {
 	if (cursor.getX() > 0) {

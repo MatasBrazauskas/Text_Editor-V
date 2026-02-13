@@ -29,8 +29,8 @@ file(GLOB_RECURSE LIB_SOURCES
 
 # 4. Define Logic Library
 add_library(EditorLogic STATIC ${LIB_SOURCES}
-        src/buffer/Panes.cpp
-        src/buffer/Panes.hpp)
+        src/buffer/PanesAndLayers.cpp
+        src/buffer/PanesAndLayers.hpp)
 # 5. Link Dependencies to the Library
 # We use PUBLIC so that anyone linking to EditorLogic (like main or tests)
 # automatically gets the SDL include paths and libraries.

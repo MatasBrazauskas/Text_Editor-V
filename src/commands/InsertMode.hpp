@@ -2,20 +2,22 @@
 
 #include <unordered_map>
 
+
 class EditorState;
-class Document;
+class EditorInputAndOutput;
+class File;
 
 class InsertMode final {
       public:
 	InsertMode();
 	~InsertMode() = default;
 
-	void HandleKeyboardInput(EditorState&, std::reference_wrapper<Document>) const;
-	using Func = void (InsertMode::*)(EditorState&, Document&) const;
+	void HandleKeyboardInput(EditorState&, EditorInputAndOutput& , std::reference_wrapper<File>) const;
+	using Func = void (InsertMode::*)(File&) const;
 
       private:
-	void handleEnter(EditorState&, Document&) const;
-	void handleBackspace(EditorState&, Document&) const;
+	void handleEnter(File&) const;
+	void handleBackspace(File&) const;
 
 	std::unordered_map<char, Func> commands_;
 };
