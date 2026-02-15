@@ -1,6 +1,6 @@
 #include "commands/InsertMode.hpp"
 
-#include <core/Editor.hpp>
+#include <core/EditorCore.hpp>
 
 constexpr char enterKey = static_cast<char>(SpecialKeys::Enter);
 constexpr char backSpaceKey = static_cast<char>(SpecialKeys::Backspace);

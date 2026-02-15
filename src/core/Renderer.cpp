@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#include "utils/Config.hpp"
+#include "buffer/PanesAndLayers.hpp"
+
 Renderer::Renderer(const Config& t_config): config_{t_config} {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         throw std::runtime_error(SDL_GetError());
@@ -198,7 +201,7 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, const int windowHeight, const int windowWidth) const {
     const auto& [mode, currFileName, currCommand, cursorX, cursorY, charCount, lineCount, args] = t_commandLineLayout;
     std::string line{};
-    SDL_Color bg = {};
+    SDL_Color bg;
 
     switch (mode) {
         case Modes::Normal:
@@ -227,10 +230,11 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, c
     SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
     if (mode == Modes::Command) {
-        surface = TTF_RenderText_Blended(uiFont_, editorState_.input_.c_str(), config_.colors_.cursor_color);
+        const auto& temp = std::string{args};
+        surface = TTF_RenderText_Blended(uiFont_, temp.c_str(), config_.colors_.cursor_color);
 
         // TODO fix this ugly mess
-        const int lineLength = editorState_.input_.length();
+        const int lineLength = args.length();
         const auto& [r, g, b, a] = config_.colors_.cursor_color;
         SDL_SetRenderDrawColor(renderer_, r, g, b, a);
         const auto rect = SDL_Rect{lineLength * uiCharWidth, windowHeight - uiCharHeight, 1, codeCharHeight};

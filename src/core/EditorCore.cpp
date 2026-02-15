@@ -1,14 +1,16 @@
-#include "Editor.hpp"
+#include "EditorCore.hpp"
 
+#include <algorithm>
 #include <SDL.h>
 #include <iostream>
+#include <ranges>
 
 EditorState::EditorState(const FileId activeFileId_t)
     : currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
-Editor::Editor(const int argc, char** argv) : files_{fileHandler_, argc, argv}, panes_{}, editorState_{0} {}
+EditorCore::EditorCore(const int argc, char** argv) : files_{fileHandler_, argc, argv}, panes_{}, editorState_{0} {}
 
-std::string Editor::EncodeInput(const SDL_Event& event) {
+std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	if (event.type == SDL_QUIT) {
 		editorState_.running_ = false;
 		return {};
@@ -40,8 +42,9 @@ std::string Editor::EncodeInput(const SDL_Event& event) {
 	return {};
 }
 
-void Editor::HandleKeyboardInput() {
+void EditorCore::HandleKeyboardInput() {
 	SDL_Event event;
+    dirty = false;
 
 	while (SDL_PollEvent(&event)) {
 
@@ -66,5 +69,23 @@ void Editor::HandleKeyboardInput() {
 			commandMode_.HandleKeyboardInput(editorState_, fileHandler_, files_);
 			break;
 		}
+
+	    dirty = true;
 	}
+}
+
+const Files& EditorCore::getFiles() const {
+    return files_;
+}
+
+const PanesManager& EditorCore::getPanesManager() const {
+    return panes_;
+}
+
+const EditorState& EditorCore::getEditorState() const {
+    return editorState_;
+}
+
+const EditorInputAndOutput& EditorCore::getEditorInputAndOutput() const {
+    return editorInputAndOutput_;
 }

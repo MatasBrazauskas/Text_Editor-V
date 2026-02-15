@@ -42,7 +42,7 @@ constexpr auto verticalRulerColor = "vertical_ruler_color"sv;
 
 using Json = nlohmann::json;
 
-class EditorConfig {
+class EditorConfig final {
       public:
 	static EditorConfig getEditorConfig(const Json&);
 
@@ -63,7 +63,7 @@ class EditorConfig {
 	int vertical_ruler_count;
 };
 
-class FontConfig {
+class FontConfig final {
       public:
 	static FontConfig getFontConfig(const Json&);
 
@@ -79,7 +79,7 @@ class FontConfig {
 	int ui_font_size;
 };
 
-class ColorsConfig {
+class ColorsConfig final {
       public:
 	static ColorsConfig getColorConfig(const Json&);
 
@@ -93,21 +93,26 @@ class ColorsConfig {
 	SDL_Color selection_color;
 	SDL_Color vertical_ruler_color;
 
-      private:
+private:
 	static SDL_Color getColorFromHex(std::string&);
+};
+
+class ConstantsConfig final {
+public:
+    ConstantsConfig() = default;
+
 };
 
 class Config final {
       public:
-	explicit Config(const std::filesystem::path&);
-
 	Config() = delete;
-
+	explicit Config(const std::filesystem::path&);
 	~Config() noexcept;
 
 	EditorConfig editor_;
 	FontConfig font_;
 	ColorsConfig colors_;
+    ConstantsConfig constantConfig_;
 
 	explicit Config(const Json&);
 };

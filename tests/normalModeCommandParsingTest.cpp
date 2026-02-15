@@ -1,7 +1,7 @@
 #include "utils/Config.hpp"
 
 #include <commands/NormalMode.hpp>
-#include <core/Editor.hpp>
+#include <core/EditorCore.hpp>
 #include <gtest/gtest.h>
 
 struct ParseParameters {

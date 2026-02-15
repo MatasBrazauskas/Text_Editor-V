@@ -1,11 +1,16 @@
 #pragma once
 
-#include "utils/Config.hpp"
-#include "../buffer/PanesAndLayers.hpp"
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+class Config;
+class TabLayout;
+class PanesLayout;
+class CursorLayout;
+class CommandLineLayout;
+class LayoutManager;
 
 class Renderer final {
 public:

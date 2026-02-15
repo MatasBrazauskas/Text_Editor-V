@@ -7,7 +7,7 @@
 
 class EditorState;
 class Document;
-class FilesAndCursor;
+class Files;
 
 class CommandStructure final {
       public:
@@ -21,13 +21,13 @@ class CommandMode final {
       public:
 	CommandMode();
 	~CommandMode() noexcept = default;
-	void HandleKeyboardInput(EditorState&, FileHandler&, FilesAndCursor&);
+	void HandleKeyboardInput(EditorState&, FileHandler&, Files&);
 
-	using Func = void (CommandMode::*)(EditorState&, FileHandler&, FilesAndCursor&, const CommandStructure&);
+	using Func = void (CommandMode::*)(EditorState&, FileHandler&, Files&, const CommandStructure&);
 
-	void writeToFile(EditorState&, FileHandler&, FilesAndCursor&, const CommandStructure&);
-	void openFile(EditorState&, FileHandler&, FilesAndCursor&, const CommandStructure&);
-	void closeProgramme(EditorState&, FileHandler&, FilesAndCursor&, const CommandStructure&);
+	void writeToFile(EditorState&, FileHandler&, Files&, const CommandStructure&);
+	void openFile(EditorState&, FileHandler&, Files&, const CommandStructure&);
+	void closeProgramme(EditorState&, FileHandler&, Files&, const CommandStructure&);
 
       private:
 	CommandStructure parseCommand(std::string input);

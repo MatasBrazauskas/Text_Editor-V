@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-class Document;
+class File;
 
 class FileHandler final {
 public :
@@ -13,6 +13,6 @@ public :
 
 	std::vector<std::string> getContent(std::filesystem::path) const;
 
-    void writeToFile(const Document&) const;
+    void writeToFile(const File&) const;
 
 };

@@ -2,7 +2,7 @@
 
 #include <buffer/Matrix.hpp>
 #include <commands/InsertMode.hpp>
-#include <core/Editor.hpp>
+#include <core/EditorCore.hpp>
 #include <gtest/gtest.h>
 
 constexpr char enterKey = static_cast<char>(130);

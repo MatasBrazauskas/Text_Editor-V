@@ -1,6 +1,6 @@
 #pragma once
 
-#include "buffer/FilesAndCursor.hpp"
+#include "buffer/Files.hpp"
 
 #include <string>
 #include <vector>

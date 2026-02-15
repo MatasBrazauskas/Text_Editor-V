@@ -1,7 +1,7 @@
 #include "commands/NormalMode.hpp"
 
-#include "buffer/FilesAndCursor.hpp"
-#include "core/Editor.hpp"
+#include "buffer/Files.hpp"
+#include "core/EditorCore.hpp"
 
 #include <SDL_clipboard.h>
 #include <algorithm>

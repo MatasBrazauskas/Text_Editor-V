@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "core/Editor.hpp"
+#include "core/EditorCore.hpp"
 
 std::vector<std::string> FileHandler::getContent(std::filesystem::path filesPath) const {
 	std::ifstream file_(filesPath, std::ios::in);
@@ -16,7 +16,8 @@ std::vector<std::string> FileHandler::getContent(std::filesystem::path filesPath
 	return lines;
 }
 
-void FileHandler::writeToFile(const Document& doc) const {
+void FileHandler::writeToFile(const File& doc) const {
+    auto& [text, stack, cursor, path, id] = doc;
     auto tempFilesPath = doc.filesPath_;
     tempFilesPath += ".tmp";
 
@@ -26,8 +27,8 @@ void FileHandler::writeToFile(const Document& doc) const {
             throw std::runtime_error("Failed to open file for writing");
         }
 
-        for (int i = 0; i < doc.textBuffer_->linesCount(); i++) {
-            tempFile_.write(doc.textBuffer_->rowsView(i).data(), doc.textBuffer_->rowsLength(i));
+        for (int i = 0; i < text->getLinesCount(); i++) {
+            tempFile_.write(text->getLine(i).data(), text->getLineLength(i));
             tempFile_.put('\n');
         }
 

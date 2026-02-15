@@ -1,4 +1,4 @@
-#include "FilesAndCursor.hpp"
+#include "Files.hpp"
 
 #include "Matrix.hpp"
 
@@ -58,18 +58,18 @@ File::File(std::unique_ptr<ITextBuffer> text_t, std::filesystem::path path_t)
     fileIdCounter_++;
 }
 
-void FilesAndCursor::addFile(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
+void Files::addFile(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
 	files_.emplace_back(std::move(textBuffer), std::move(filePath_t));
 }
 
-std::reference_wrapper<File> FilesAndCursor::getFile(const size_t fileId_t) {
+std::reference_wrapper<File> Files::getFile(const size_t fileId_t) {
 	const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
 	const auto it = std::ranges::find_if(files_, predicate);
 
 	return *it;
 }
 
-void FilesAndCursor::removeFile(const size_t fileId_t) {
+void Files::removeFile(const size_t fileId_t) {
 	const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
 	const auto it = std::ranges::find_if(files_, predicate);
 
@@ -78,7 +78,7 @@ void FilesAndCursor::removeFile(const size_t fileId_t) {
 	}
 }
 
-FilesAndCursor::FilesAndCursor(const FileHandler& fileHandler, const int argc, char** argv) {
+Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
 	if (argc < 1 || argv == nullptr) {
 		return;
 	}

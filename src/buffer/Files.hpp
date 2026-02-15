@@ -111,10 +111,10 @@ private:
     static inline int fileIdCounter_{0};
 };
 
-class FilesAndCursor final {
+class Files final {
       public:
-	FilesAndCursor(const FileHandler&, int argc, char** argv);
-	~FilesAndCursor() noexcept = default;
+	Files(const FileHandler&, int argc, char** argv);
+	~Files() noexcept = default;
 
 	void addFile(std::unique_ptr<ITextBuffer>, std::filesystem::path);
 
