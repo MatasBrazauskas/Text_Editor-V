@@ -2,24 +2,24 @@
 
 #include <algorithm>
 
-Pane::Pane(const PaneView paneView_t, const TextBufferView textView_t, const FileId fileId_t)
-    : paneView_{paneView_t}, textView_{textView_t}, fileId_{fileId_t} {}
+Pane::Pane(const PaneView paneView_t, const BufferView textView_t, const FileId t_fileId, const PaneId t_paneId)
+    : paneView_{paneView_t}, textView_{textView_t}, fileId_{t_fileId}, paneId_{t_paneId} {}
 
-PanesManager::PanesManager(const int t_winH, const int t_winW) : windowHeight{t_winH}, windowWidth{t_winW},  activeFileId_{} {
-
+SplitNode::SplitNode(const SplitType t_splitType, const bool t_isLeaf, const Pane& t_pane): splitType{t_splitType}, isLeaf {t_isLeaf} {
+    pane = std::make_unique<Pane>(t_pane.paneView_, t_pane.textView_, t_pane.fileId_, t_pane.paneId_);
 }
 
-void PanesManager::addPane(const PaneView paneView_t, const TextBufferView textView_t, const FileId fileId_t) {
-    panes_.emplace_back(paneView_t, textView_t, fileId_t);
-}
+PanesManager::PanesManager(const Pane& t_pane): activePaneId_{}, head{SplitType::None, false, t_pane} {}
 
-void PanesManager::removePane(const FileId fileId_t) {
-    const auto predicate = [fileId_t](const Pane& pane) { return pane.fileId_ == fileId_t; };
-    std::erase_if(panes_, predicate);
+/*void PanesManager::addPane(const PaneView paneView_t, const BufferView textView_t) {
+}*/
+
+Pane PanesManager::getPane(const PaneId t_paneId) {
+    
 }
 
 TabLayout::TabLayout(const int activeTab_t, const int t_tabCapLines,  const std::vector<strView> tabs_t)
-    : activeTab{activeTab_t}, tabCapturedLines{t_tabCapLines}, tabs{tabs_t} {}
+    : activeTab{activeTab_t}, tabCapturedLinesOffsetY{t_tabCapLines}, tabs{tabs_t} {}
 
 
 CommandLineLayout::CommandLineLayout(const Modes mode_t, const strView currFileName_t, const strView t_currCommand, const int cursorX_t, const int cursorY_t,
@@ -42,10 +42,13 @@ LayoutManager::LayoutManager(const EditorCore& t_editorCore, const Config& t_con
     const auto& editorState = t_editorCore.getEditorState();
     const auto& editorIO = t_editorCore.getEditorInputAndOutput();
 
-    addTabLayout(files, t_config);
+    addTabLayout(files, t_config.constantConfig_);
+    for (const auto& pane: paneManager.getPanes()) {
+        addPanesLayout();
+    }
 }
 
-void LayoutManager::addTabLayout(const Files& files, const Config& config) {
+void LayoutManager::addTabLayout(const Files& files, const ConstantsConfig& constConfig) {
     std::vector<std::string_view> tabVec;
 
     auto to_filename_view = [](const auto& obj) {
@@ -56,7 +59,24 @@ void LayoutManager::addTabLayout(const Files& files, const Config& config) {
 
     std::ranges::transform(files.files_, std::back_inserter(tabVec), to_filename_view);
 
+    const auto temp = [constConfig](int a, std::string_view b) {
+        const int tabWidth = (b.length() * constConfig.uiCharWidth) + (constConfig.uiCharWidth * 2);
+        if (a + tabWidth) {
+            return 0;
+        }
+        return tabWidth;
+    };
+    const int tabLines = std::accumulate(tabVec.begin(), tabVec.end(), 0, temp);
 
+    int activePane{};
+    const auto it = std::ranges::find(files.files_, 0, &File::fileId_);
+    if (it != files.files_.end()) {
+        activePane = std::distance(files.files_.begin(), it);
+    }
+
+    this->tabLayout.activeTab = activePane;
+    this->tabLayout.tabCapturedLinesOffsetY = tabLines * constConfig.tabHeight;
+    this->tabLayout.tabs = tabVec;
 }
 
 void LayoutManager::addPanesLayout(const PanesLayout& t_panesLayout) {

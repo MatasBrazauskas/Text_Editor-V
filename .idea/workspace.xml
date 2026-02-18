@@ -39,27 +39,13 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keymaps.json" beforeDir="false" afterPath="$PROJECT_DIR$/keymaps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/FilesAndCursor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/FilesAndCursor.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Matrix.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Matrix.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Editor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Editor.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/Config.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/Config.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/FileHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/FileHandler.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/FileHandler.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/FileHandler.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/insertModeOperationTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/insertModeOperationTest.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeCommandParsingTest.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/normalModeMotionsTest.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,11 +232,6 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.Text_Editor">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="FirstLineOperations-InsertModeTestWithParams" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="editor_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Text_Editor" RUN_TARGET_NAME="editor_tests" TEST_PATTERN="FirstLineOperations/InsertModeTestWithParams.*/*:FirstLineOperations/InsertModeTestWithParams/*.*" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -293,6 +274,11 @@
       </method>
     </configuration>
     <configuration name="Text_Editor" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="text.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/cmake-build-debug/Text_Editor" EXPLICIT_BUILD_TARGET_NAME="all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -419,7 +405,8 @@
       <workItem from="1770546440814" duration="5415000" />
       <workItem from="1770559840485" duration="23953000" />
       <workItem from="1770655598645" duration="39888000" />
-      <workItem from="1770978712945" duration="33003000" />
+      <workItem from="1770978712945" duration="42417000" />
+      <workItem from="1771437014502" duration="3527000" />
     </task>
     <servers />
   </component>

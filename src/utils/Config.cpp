@@ -90,6 +90,7 @@ static Json loadJson(const std::string& configPath) {
 	return json;
 }
 
+
 Config::Config(const std::filesystem::path& configPath) : Config(loadJson(configPath)) {}
 
 Config::Config(const Json& json)

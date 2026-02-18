@@ -5,7 +5,7 @@
 #include "utils/Config.hpp"
 #include "buffer/PanesAndLayers.hpp"
 
-Renderer::Renderer(const Config& t_config): config_{t_config} {
+Renderer::Renderer(Config& t_config): config_{t_config} {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         throw std::runtime_error(SDL_GetError());
     }
@@ -39,6 +39,9 @@ Renderer::Renderer(const Config& t_config): config_{t_config} {
         throw std::runtime_error("Failed to open font.");
     }
 
+    ConstantsConfig constConfig{};
+    auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = constConfig;
+
     TTF_SetFontHinting(codeFont_, TTF_HINTING_MONO);
     TTF_SetFontKerning(codeFont_, 0);
 
@@ -48,6 +51,8 @@ Renderer::Renderer(const Config& t_config): config_{t_config} {
     TTF_SetFontKerning(uiFont_, 0);
 
     TTF_SizeText(uiFont_, "A", &uiCharWidth, &uiCharHeight);
+
+    tabHeight = uiCharHeight + 5;
 }
 
 Renderer::~Renderer() noexcept {
@@ -76,9 +81,6 @@ void Renderer::Render(const LayoutManager & t_layoutManage) const {
 
 void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, const int windowWidth) const {
     const auto& [activeTab, tabCapLines, tabs] = t_tabLayout;
-
-    const int tabHeight = uiCharHeight + 5;
-	const int paddingX = 25;
 
 	constexpr SDL_Color colBarBg = {30, 30, 30, 255};
 	constexpr SDL_Color colTabInact = {45, 45, 45, 255};

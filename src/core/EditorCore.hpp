@@ -22,6 +22,7 @@ enum class SpecialKeys : char {
 };
 
 using FileId = uint_fast64_t;
+using PaneId = uint_fast64_t;
 
 class EditorState final {
       public:

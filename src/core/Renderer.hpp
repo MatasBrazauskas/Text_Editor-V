@@ -15,14 +15,11 @@ class LayoutManager;
 class Renderer final {
 public:
     Renderer() = delete;
-    explicit Renderer(const Config&);
+    explicit Renderer(Config&);
     ~Renderer() noexcept;
 
     void Render(const LayoutManager&) const;
 private:
-    int codeCharWidth{}, codeCharHeight{};
-    int uiCharWidth{}, uiCharHeight{};
-
     SDL_Window* window_;
     SDL_Renderer* renderer_;
     TTF_Font* codeFont_;

@@ -7,50 +7,61 @@
 #include <string_view>
 
 using FileId = uint_fast64_t;
+using PaneId = uint_fast64_t;
 using strView = std::string_view;
 
 struct PaneView final {
-    int startX;
-    int startY;
-
-    int endX_;
-    int endY_;
+    int startX, startY;
+    int endX_, endY_;
 };
 
-struct TextBufferView final {
+struct BufferView final {
     int startY_;
     int startX_;
-
-    int visibleLines_;
-    int visibleColumns_;
 };
 
 class Pane final {
 public:
     Pane() = delete;
-    Pane(PaneView, TextBufferView, FileId);
+    Pane(PaneView, BufferView, FileId, PaneId);
     ~Pane() noexcept = default;
 
     PaneView paneView_;
-    TextBufferView textView_;
+    BufferView textView_;
 
     FileId fileId_;
+    PaneId paneId_;
+};
+
+enum class SplitType: char {Vertical, Horizontal, None};
+
+class SplitNode final {
+public:
+    SplitNode(SplitType, bool t_isLeaf, const Pane&);
+    ~SplitNode() noexcept = default;
+
+    SplitType splitType;
+    float leftChildRation = 0.5f;
+    bool isLeaf;
+
+    std::unique_ptr<SplitNode> leftChild;
+    std::unique_ptr<SplitNode> rightChild;
+    std::unique_ptr<Pane> pane;
 };
 
 class PanesManager final {
 public:
-    PanesManager(int t_winH, int t_winW);
+    explicit PanesManager(const Pane&);
     ~PanesManager() noexcept = default;
 
-    void addPane(PaneView, TextBufferView, FileId);
-    void removePane(FileId);
-    void setActivePane();
-    void setHeightAndWidth(int height, int width);
+    Pane getPane(PaneId);
 
-    int windowHeight, windowWidth;
+    //void addPane(PaneView, BufferView);
 
-    FileId activeFileId_;
-    std::vector<Pane> panes_;
+    PaneId activePaneId_;
+    SplitNode head;
+private:
+    inline static PaneId paneIdCounter_{};
 };
 
 class TabLayout final {
@@ -60,7 +71,7 @@ public:
     ~TabLayout() noexcept = default;
 
     int activeTab;
-    int tabCapturedLines;
+    int tabCapturedLinesOffsetY;
     std::vector<strView> tabs;
 };
 
@@ -119,7 +130,7 @@ public:
     CursorLayout cursorLayout;
     CommandLineLayout commandLineLayout;
 private:
-    void addTabLayout(const Files&, const Config&);
+    void addTabLayout(const Files&, const ConstantsConfig&);
     void addPanesLayout(const PanesLayout&);
     void addCursorLayout(const CursorLayout&);
     void addCommandLineLayout(const CommandLineLayout&);

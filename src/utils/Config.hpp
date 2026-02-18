@@ -99,8 +99,14 @@ private:
 
 class ConstantsConfig final {
 public:
-    ConstantsConfig() = default;
+    ConstantsConfig();
+    ~ConstantsConfig() noexcept = default;
 
+    int codeCharWidth{}, codeCharHeight{};
+    int uiCharWidth{}, uiCharHeight{};
+
+    int tabHeight{};
+    const int paddingX = 25;
 };
 
 class Config final {
