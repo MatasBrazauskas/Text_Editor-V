@@ -52,33 +52,10 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-File::File(std::unique_ptr<ITextBuffer> text_t, std::filesystem::path path_t)
-    : textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{} {
-	fileId_ = fileIdCounter_;
-    fileIdCounter_++;
-}
+File::File(std::unique_ptr<ITextBuffer> text_t, std::filesystem::path path_t, const FileId t_fileId)
+    : textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{t_fileId} {}
 
-void Files::addFile(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
-	files_.emplace_back(std::move(textBuffer), std::move(filePath_t));
-}
-
-std::reference_wrapper<File> Files::getFile(const size_t fileId_t) {
-	const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
-	const auto it = std::ranges::find_if(files_, predicate);
-
-	return *it;
-}
-
-void Files::removeFile(const size_t fileId_t) {
-	const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
-	const auto it = std::ranges::find_if(files_, predicate);
-
-	if (it != files_.end()) {
-		files_.erase(it);
-	}
-}
-
-Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
+FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char** argv) {
 	if (argc < 1 || argv == nullptr) {
 		return;
 	}
@@ -99,4 +76,30 @@ Files::Files(const FileHandler& fileHandler, const int argc, char** argv) {
 			this->addFile(std::move(ptr), path);
 		}
 	}
+}
+
+void FilesManager::addFile(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
+    files_.emplace_back(std::move(textBuffer), std::move(filePath_t), fileIdCounter_);
+    fileIdCounter_++;
+}
+
+std::reference_wrapper<File> FilesManager::getFile(const FileId fileId_t) {
+    const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
+    const auto it = std::ranges::find_if(files_, predicate);
+
+    if (it == files_.end()) {
+        throw std::out_of_range("File not found");
+    }
+
+    return *it;
+}
+
+void FilesManager::removeFile(const size_t fileId_t) {
+    const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
+    const auto it = std::ranges::find_if(files_, predicate);
+
+    if (it == files_.end()) {
+        throw std::out_of_range("File not found when  removing");
+    }
+    files_.erase(it);
 }

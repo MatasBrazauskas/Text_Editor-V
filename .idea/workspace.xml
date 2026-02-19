@@ -39,13 +39,13 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Files.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Files.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/Config.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/Config.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Config.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -278,11 +278,6 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="gmock" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Text_Editor" TARGET_NAME="gmock" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -406,7 +401,8 @@
       <workItem from="1770559840485" duration="23953000" />
       <workItem from="1770655598645" duration="39888000" />
       <workItem from="1770978712945" duration="42417000" />
-      <workItem from="1771437014502" duration="3527000" />
+      <workItem from="1771437014502" duration="4258000" />
+      <workItem from="1771525621692" duration="6403000" />
     </task>
     <servers />
   </component>

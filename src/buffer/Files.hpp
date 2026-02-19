@@ -92,7 +92,7 @@ class Cursor final {
 class File final {
       public:
 	File() = delete;
-	explicit File(std::unique_ptr<ITextBuffer>, std::filesystem::path);
+	explicit File(std::unique_ptr<ITextBuffer>, std::filesystem::path, FileId);
 	~File() noexcept = default;
 
 	File(File&&) noexcept = default;
@@ -107,20 +107,19 @@ class File final {
 
 	std::filesystem::path filesPath_;
 	FileId fileId_;
-private:
-    static inline int fileIdCounter_{0};
 };
 
-class Files final {
-      public:
-	Files(const FileHandler&, int argc, char** argv);
-	~Files() noexcept = default;
+class FilesManager final {
+public:
+	FilesManager(const FileHandler&, int argc, char** argv);
+	~FilesManager() noexcept = default;
 
 	void addFile(std::unique_ptr<ITextBuffer>, std::filesystem::path);
 
-	[[nodiscard]] std::reference_wrapper<File> getFile(size_t fileId_t);
+	[[nodiscard]] std::reference_wrapper<File> getFile(FileId fileId_t);
 
 	void removeFile(size_t fileId_t);
 
 	std::vector<File> files_;
+    static inline FileId fileIdCounter_{0};
 };

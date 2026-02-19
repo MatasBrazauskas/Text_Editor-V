@@ -52,7 +52,7 @@ public:
 
 	void HandleKeyboardInput();
 
-    const Files& getFiles() const;
+    const FilesManager& getFiles() const;
     const PanesManager& getPanesManager() const;
     const EditorState& getEditorState() const;
     const EditorInputAndOutput& getEditorInputAndOutput() const;
@@ -62,8 +62,8 @@ private:
 
     FileHandler fileHandler_;
 
-    Files files_;
-    PanesManager panes_;
+    FilesManager filesManager_;
+    PanesManager panesManager_;
 
     EditorState editorState_;
     EditorInputAndOutput editorInputAndOutput_;
