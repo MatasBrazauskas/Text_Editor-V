@@ -1,38 +1,67 @@
 #pragma once
 
-#include "core/EditorCore.hpp"
-#include "utils/Config.hpp"
-
 #include <vector>
+#include <unordered_map>
+#include <memory>
 
-using FileId = uint_fast64_t;
+using FileId = std::uint_fast64_t;
 using PaneId = uint_fast64_t;
+
+class EditorCore;
+class EditorState;
+class EditorInputAndOutput;
+class ConstantsConfig;
+class Config;
+class FilesManager;
+
+enum class Modes: uint8_t;
+enum class SplitType: char {Vertical, Horizontal, None};
 
 struct PaneView final {
     int startX, startY;
     int endX_, endY_;
+    int indexX, indexY;
 };
 
-struct BufferView final {
-    int startY_;
-    int startX_;
+class Cursor final {
+public:
+	Cursor();
+	~Cursor() noexcept = default;
+
+	void incrementX();
+	void decrementX();
+	void incrementY();
+	void decrementY();
+
+	[[nodiscard]] int getX() const;
+	[[nodiscard]] int getY() const;
+
+	void setX(int);
+	void setY(int);
+
+	[[nodiscard]] bool isVisible() const;
+	void setVisible(bool);
+
+private:
+	int x_;
+	int y_;
+	bool visible_;
+	int absent_;
 };
 
 class Pane final {
 public:
     Pane() = delete;
-    Pane(PaneView, BufferView, FileId, PaneId);
+    Pane(PaneView, FileId, PaneId);
     Pane(const Pane&);
     ~Pane() noexcept = default;
 
     PaneView paneView_;
-    BufferView textView_;
 
-    FileId fileId_;
-    PaneId paneId_;
+	PaneId paneId_;
+	FileId fileId_;
+	Cursor cursor_;
 };
-
-enum class SplitType: char {Vertical, Horizontal, None};
 
 class SplitNode final {
 public:
@@ -50,14 +79,12 @@ public:
 
 class PanesManager final {
 public:
-    explicit PanesManager(const Pane&);
+    PanesManager(const Pane&);
     ~PanesManager() noexcept = default;
 
     Pane getPane(PaneId);
 
-    //void addPane(PaneView, BufferView);
-
-    PaneId activePaneId_;
+	PaneId activePaneId_;
     std::unordered_map<PaneId, Pane*> paneMap_;
     SplitNode head_;
 private:
@@ -107,31 +134,36 @@ public:
     std::vector<std::string> lines;
 };
 
+enum class CursorType {Line, Block};
+
 class CursorLayout final {
 public:
     CursorLayout() = default;
-    CursorLayout(bool t_visible, int t_cursorX, int t_cursorY, char t_letter, PaneId);
+    CursorLayout(bool t_visible, int t_cursorX, int t_cursorY, char t_letter, CursorType);
     ~CursorLayout() noexcept = default;
 
     bool visible;
     int cursorX, cursorY;
     char letter;
-    PaneId paneId;
+	CursorType cursorType;
 };
 
 class LayoutManager final {
 public:
     LayoutManager() = delete;
-    explicit LayoutManager(const EditorCore&, const Config&);
+    explicit LayoutManager(EditorCore&, const Config&);
     ~LayoutManager() noexcept = default;
+
+	int windowHeight, windowWidth;
 
     TabLayout tabLayout;
     std::vector<PanesLayout> panesLayout;
     CursorLayout cursorLayout;
     CommandLineLayout commandLineLayout;
+
 private:
     void addTabLayout(const FilesManager&, const ConstantsConfig&);
-    void addPanesLayout(FilesManager&, const PanesManager&, const ConstantsConfig&);
-    void addCursorLayout(const PanesManager&);
-    void addCommandLineLayout(const CommandLineLayout&);
+    void addPanesLayout(FilesManager&, const PanesManager&, const ConstantsConfig&, int t_tabOffsetY);
+	void addCursorLayout(PanesManager& t_paneManager, const ConstantsConfig& t_config, FilesManager& t_filesManager);
+	void addCommandLineLayout(PanesManager& t_panesManager, const ConstantsConfig& t_constConfig, const EditorState& t_editorState, const EditorInputAndOutput& t_io, FilesManager& t_filesManager);
 };

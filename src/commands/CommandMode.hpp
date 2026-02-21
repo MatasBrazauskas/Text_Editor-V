@@ -6,8 +6,9 @@
 #include <vector>
 
 class EditorState;
+class EditorInputAndOutput;
 class Document;
-class Files;
+class FilesManager;
 
 class CommandStructure final {
       public:
@@ -21,13 +22,13 @@ class CommandMode final {
       public:
 	CommandMode();
 	~CommandMode() noexcept = default;
-	void HandleKeyboardInput(EditorState&, FileHandler&, Files&);
+	void HandleKeyboardInput(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&);
 
-	using Func = void (CommandMode::*)(EditorState&, FileHandler&, Files&, const CommandStructure&);
+	using Func = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, const CommandStructure&);
 
-	void writeToFile(EditorState&, FileHandler&, Files&, const CommandStructure&);
-	void openFile(EditorState&, FileHandler&, Files&, const CommandStructure&);
-	void closeProgramme(EditorState&, FileHandler&, Files&, const CommandStructure&);
+	void writeToFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, const CommandStructure&);
+	void openFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, const CommandStructure&);
+	void closeProgramme(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, const CommandStructure&);
 
       private:
 	CommandStructure parseCommand(std::string input);

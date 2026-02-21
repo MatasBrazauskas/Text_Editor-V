@@ -1,5 +1,3 @@
-#include "buffer/Files.hpp"
-#include "buffer/Matrix.hpp"
 #include "core/EditorCore.hpp"
 #include "core/Renderer.hpp"
 #include "utils/Config.hpp"

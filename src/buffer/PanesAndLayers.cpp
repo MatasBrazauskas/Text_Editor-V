@@ -1,15 +1,64 @@
 #include "PanesAndLayers.hpp"
 
+#include "core/EditorCore.hpp"
+#include "utils/Config.hpp"
+
 #include <algorithm>
 #include <ranges>
 
-Pane::Pane(const PaneView paneView_t, const BufferView textView_t, const FileId t_fileId, const PaneId t_paneId)
-    : paneView_{paneView_t}, textView_{textView_t}, fileId_{t_fileId}, paneId_{t_paneId} {}
+Cursor::Cursor() : x_{0}, y_{0}, visible_{true}, absent_{} {}
 
-Pane::Pane(const Pane& t_pane): Pane(t_pane.paneView_, t_pane.textView_, t_pane.fileId_, t_pane.paneId_) {}
+void Cursor::incrementX() {
+	this->setX(x_ + 1);
+}
+
+void Cursor::decrementX() {
+	this->setX(x_ - 1);
+}
+
+void Cursor::incrementY() {
+	this->setY(y_ + 1);
+}
+
+void Cursor::decrementY() {
+	this->setY(y_ - 1);
+}
+
+int Cursor::getX() const {
+	return x_;
+}
+
+int Cursor::getY() const {
+	return y_;
+}
+
+void Cursor::setX(const int x) {
+	x_ = x;
+	visible_ = true;
+	absent_ = framesToSkip;
+}
+
+void Cursor::setY(const int y) {
+	y_ = y;
+	visible_ = true;
+	absent_ = framesToSkip;
+}
+
+bool Cursor::isVisible() const {
+	return visible_;
+}
+
+void Cursor::setVisible(const bool visible) {
+	visible_ = visible;
+}
+
+Pane::Pane(const PaneView paneView_t, const FileId t_fileId, const PaneId t_paneId)
+    : paneView_{paneView_t}, fileId_{t_fileId}, paneId_{t_paneId} {}
+
+Pane::Pane(const Pane& t_pane): Pane(t_pane.paneView_, t_pane.fileId_, t_pane.paneId_) {}
 
 SplitNode::SplitNode(const SplitType t_splitType, const bool t_isLeaf, const Pane& t_pane): splitType{t_splitType}, isLeaf {t_isLeaf} {
-    pane = std::make_unique<Pane>(t_pane.paneView_, t_pane.textView_, t_pane.fileId_, t_pane.paneId_);
+    pane = std::make_unique<Pane>(t_pane.paneView_, t_pane.fileId_, t_pane.paneId_);
 }
 
 PanesManager::PanesManager(const Pane& t_pane): activePaneId_{}, head_{SplitType::None, false, t_pane} {
@@ -37,43 +86,53 @@ PanesLayout::PanesLayout(const int t_startX, const int t_startY, const int t_end
     :
     startX{t_startX}, startY{t_startY}, endX{t_endX}, endY{t_endY}, leftDataOffsetX{t_leftDataOffsetX}, leftData{t_leftData}, lines{t_lines} {}
 
-CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int t_cursorY, const char t_letter, const PaneId t_paneId)
-    : visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letter}, paneId{t_paneId} {}
+CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int t_cursorY, const char t_letter, const CursorType t_cursorType)
+    : visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letter}, cursorType{t_cursorType} {}
 
-LayoutManager::LayoutManager(const EditorCore& t_editorCore, const Config& t_config) {
-    const auto& files = t_editorCore.getFiles();
-    const auto& paneManager = t_editorCore.getPanesManager();
+
+LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config) {
+    auto& fileManager = t_editorCore.getFilesManager();
+    auto& paneManager = t_editorCore.getPanesManager();
     const auto& editorState = t_editorCore.getEditorState();
     const auto& editorIO = t_editorCore.getEditorInputAndOutput();
 
-    addTabLayout(files, t_config.constantConfig_);
-    addPanesLayout(files, paneManager, t_config);
+    addTabLayout(fileManager, t_config.constantConfig_);
+    addPanesLayout(fileManager, paneManager, t_config.constantConfig_, tabLayout.tabCapturedLinesOffsetY);
+	addCursorLayout(paneManager, t_config.constantConfig_, fileManager);
+	addCommandLineLayout(paneManager, t_config.constantConfig_, t_editorCore.getEditorState(), t_editorCore.getEditorInputAndOutput(), fileManager);
 }
 
 void LayoutManager::addTabLayout(const FilesManager& files, const ConstantsConfig& constConfig) {
-    std::vector<std::string_view> tabVec;
 
-    auto to_filename_view = [](const auto& obj) {
-        std::string_view sv = obj.filesPath_.native();
+    auto to_filename_view = [](const File& t_file) -> std::string {
+        std::string_view sv = t_file.filesPath_.native();
         const auto pos = sv.find_last_of("/\\");
-        return pos == std::string_view::npos ? sv : sv.substr(pos + 1);
+
+        if (pos != std::string::npos) {
+            sv = sv.substr(pos + 1);
+        }
+
+        return std::string{sv};
     };
 
-    std::ranges::transform(files.files_, std::back_inserter(tabVec), to_filename_view);
+	const auto fileVec = files.files_ | std::views::values;
+	const auto temp = fileVec | std::views::transform(to_filename_view);
 
-    const auto temp = [constConfig](int a, std::string_view b) {
+	const std::vector<std::string> tabVec{temp.begin(), temp.end()};
+
+    const auto tempLambda = [constConfig](int a, std::string_view b) {
         const int tabWidth = (b.length() * constConfig.uiCharWidth) + (constConfig.uiCharWidth * 2);
         if (a + tabWidth) {
             return 0;
         }
         return tabWidth;
     };
-    const int tabLines = std::accumulate(tabVec.begin(), tabVec.end(), 0, temp);
+    const int tabLines = std::accumulate(tabVec.begin(), tabVec.end(), 0, tempLambda);
 
     int activePane{};
-    const auto it = std::ranges::find(files.files_, 0, &File::fileId_);
-    if (it != files.files_.end()) {
-        activePane = std::distance(files.files_.begin(), it);
+    const auto it = std::ranges::find(fileVec, 0, &File::fileId_);
+    if (it != fileVec.end()) {
+        activePane = std::distance(fileVec.begin(), it);
     }
 
     this->tabLayout.activeTab = activePane;
@@ -81,37 +140,65 @@ void LayoutManager::addTabLayout(const FilesManager& files, const ConstantsConfi
     this->tabLayout.tabs = tabVec;
 }
 
-void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesLayout, const ConstantsConfig& t_config) {
+void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesLayout, const ConstantsConfig& t_config, const int t_tabOffsetY) {
     const auto& pane = t_panesLayout.head_.pane.get();
     const auto file = t_filesManager.getFile(pane->fileId_);
+    const auto& [text, stack, path, id] = file;
+
+    const int startIndexY = pane->paneView_.startY / t_config.codeCharHeight;
+    const int startIndexX = pane->paneView_.startX / t_config.codeCharHeight;
     const int charCountInWidth = (pane->paneView_.endX_ - pane->paneView_.startX) / t_config.codeCharWidth;
     const int charCountInHeight = (pane->paneView_.endY_ - pane->paneView_.startY) / t_config.codeCharHeight;
 
     std::vector<std::string> linesVec;
+    std::vector<std::string> leftSide;
 
-    for (const auto it = file.get().textBuffer_->forwardIterator(charCountInHeight); !it->end(); it->next()) {
-        std::string_view strView = it->getLine();
+    for (auto it = text.forwardIterator(startIndexY); !it.end(startIndexY + charCountInHeight); it.next()) {
+        std::string_view strView = it.getLine();
 
-        if (strView.length() < (pane->paneView_.startX / t_config.codeCharWidth)) {
+        if (strView.length() < startIndexX) {
             linesVec.push_back("");
             continue;
         }
 
-        int length = std::min(pane->paneView_.endX_ / t_config.codeCharWidth + charCountInWidth, static_cast<int>(strView.length()));
-        std::string_view subStrView = strView.substr((pane->paneView_.startX / t_config.codeCharWidth, length);
+        const int length = std::min(startIndexX + charCountInWidth, static_cast<int>(strView.length()));
+        std::string_view subStrView = strView.substr(startIndexX, length);
         linesVec.push_back(subStrView.data());
     }
 
-    std::vector<std::string> leftSide;
-    const auto& layoutPane = PanesLayout(pane->paneView_.startX, pane->paneView_.endX_, pane->paneView_.startY, pane->paneView_.endY_, 0, leftSide, linesVec);
+    const auto& layoutPane = PanesLayout(pane->paneView_.startX, pane->paneView_.endX_, pane->paneView_.startY + t_tabOffsetY, pane->paneView_.endY_, 0, leftSide, linesVec);
     panesLayout.push_back(layoutPane);
 }
 
-void LayoutManager::addCursorLayout(const PanesManager& t_paneManager) {
-    const auto* pane = t_paneManager.paneMap_[t_paneManager.activePaneId_];
+void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const ConstantsConfig& t_config, FilesManager& t_filesManager) {
+    const auto pane = t_paneManager.paneMap_[t_paneManager.activePaneId_];
+	const auto [startX, startY, endX_, endY_, indexX, indexY] = pane->paneView_;
 
+	const int cursorOffsetX = (pane->cursor_.getY() - indexY)  * t_config.uiCharWidth + startX;
+	const int cursorOffsetY = (pane->cursor_.getY() - indexX) * t_config.uiCharHeight + startY ;
+
+	const auto line = t_filesManager.getFile(pane->fileId_).textBuffer_.getLine(pane->cursor_.getY());
+	char cursorChar = ' ';
+
+	if (line.length() < pane->cursor_.getX()) {
+		cursorChar = line.at(pane->cursor_.getX());
+	}
+
+	cursorLayout = CursorLayout(pane->cursor_.isVisible(), cursorChar, cursorOffsetX, cursorOffsetY, CursorType::Block);
 }
 
-void LayoutManager::addCommandLineLayout(const CommandLineLayout& t_commandLineLayout) {
-    commandLineLayout = t_commandLineLayout;
+void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const ConstantsConfig& t_constConfig, const EditorState& t_editorState, const EditorInputAndOutput& t_io, FilesManager& t_filesManager) {
+	const Modes mode = t_editorState.currentMode_;
+	const std::string fileName = t_filesManager.getFile().filesPath_.filename();
+	const std::string currCommand = t_io.input_;
+
+	const int cursorPotionX = t_panesManager.paneMap_[t_panesManager.activePaneId_]->cursor_.getX();
+	const int cursorPotionY = t_panesManager.paneMap_[t_panesManager.activePaneId_]->cursor_.getY();
+
+	const int charCount = t_filesManager.getFile().textBuffer_.getCharCount();
+	const int linesCount = t_filesManager.getFile().textBuffer_.getLinesCount();
+
+	const std::string commandLineArgs = t_io.commandLineMessage_;
+
+	commandLineLayout = CommandLineLayout(mode, fileName, currCommand, cursorPotionX, cursorPotionY, charCount, linesCount, commandLineArgs);
 }

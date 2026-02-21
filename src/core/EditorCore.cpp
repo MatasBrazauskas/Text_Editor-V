@@ -1,6 +1,5 @@
 #include "EditorCore.hpp"
 
-#include <algorithm>
 #include <SDL.h>
 #include <iostream>
 
@@ -14,14 +13,12 @@ std::string EditorCore::EncodeInput(const SDL_Event& event) {
 		editorState_.running_ = false;
 		return {};
 	}
-	auto& doc = filesManager_.getFile(editorState_.activeFileId_).get();
+	auto& doc = filesManager_.getFile(editorState_.activeFileId_);
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_ESCAPE:
 			editorState_.currentMode_ = Modes::Normal;
 			editorInputAndOutput_.input_.clear();
-			doc.cursor_.setX(
-			    std::min(doc.cursor_.getX(), doc.textBuffer_->getLineLength(doc.cursor_.getY()) - 1));
 			break;
 		case SDLK_BACKSPACE:
 			return std::string(1, static_cast<char>(SpecialKeys::Backspace));
@@ -65,7 +62,7 @@ void EditorCore::HandleKeyboardInput() {
 			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file);
 			break;
 		case Modes::Command:
-			commandMode_.HandleKeyboardInput(editorState_, fileHandler_, filesManager_);
+			commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_);
 			break;
 		}
 
@@ -73,11 +70,11 @@ void EditorCore::HandleKeyboardInput() {
 	}
 }
 
-const FilesManager& EditorCore::getFiles() const {
+FilesManager& EditorCore::getFilesManager() {
     return filesManager_;
 }
 
-const PanesManager& EditorCore::getPanesManager() const {
+PanesManager& EditorCore::getPanesManager() {
     return panesManager_;
 }
 

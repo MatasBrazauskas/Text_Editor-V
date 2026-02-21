@@ -52,8 +52,8 @@ public:
 
 	void HandleKeyboardInput();
 
-    const FilesManager& getFiles() const;
-    const PanesManager& getPanesManager() const;
+    FilesManager& getFilesManager();
+    PanesManager& getPanesManager();
     const EditorState& getEditorState() const;
     const EditorInputAndOutput& getEditorInputAndOutput() const;
 

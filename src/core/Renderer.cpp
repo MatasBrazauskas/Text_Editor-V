@@ -1,5 +1,7 @@
 #include "Renderer.hpp"
 
+#include "EditorCore.hpp"
+
 #include <iostream>
 
 #include "utils/Config.hpp"
@@ -81,6 +83,7 @@ void Renderer::Render(const LayoutManager & t_layoutManage) const {
 
 void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, const int windowWidth) const {
     const auto& [activeTab, tabCapLines, tabs] = t_tabLayout;
+	const auto constConfig = config_.constantConfig_;
 
 	constexpr SDL_Color colBarBg = {30, 30, 30, 255};
 	constexpr SDL_Color colTabInact = {45, 45, 45, 255};
@@ -92,7 +95,7 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, 
 	int currentX{};
 	int currentY{};
 
-	const SDL_Rect barRect = {0, 0, windowWidth, tabHeight * tabCapLines};
+	const SDL_Rect barRect = {0, 0, windowWidth, tabCapLines * tabCapLines};
 	SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
 	SDL_RenderFillRect(renderer_, &barRect);
 
@@ -102,10 +105,10 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, 
 		int textW{}, textH{};
 		TTF_SizeText(uiFont_, filename.c_str(), &textW, &textH);
 
-		const int tabWidth = textW + (paddingX * 2);
+		const int tabWidth = textW + (constConfig.paddingX * 2);
 		const bool isActive = i == activeTab;
 
-		SDL_Rect tabRect = {currentX, currentY, tabWidth, tabHeight};
+		SDL_Rect tabRect = {currentX, currentY, tabWidth, constConfig.uiCharHeight};
 
 		// A. Draw Tab Background
 		SDL_Color bg = isActive ? colTabAct : colTabInact;
@@ -120,27 +123,27 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, 
 
 		SDL_SetRenderDrawColor(renderer_, 20, 20, 20, 255); // Dark line
 		SDL_RenderDrawLine(renderer_, currentX + tabWidth - 1, currentY, currentX + tabWidth - 1,
-				   currentY + tabHeight);
+				   currentY + constConfig.uiCharHeight);
 
 		SDL_Color textColor = isActive ? colTextAct : colTextInact;
 
 		SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, filename.c_str(), textColor);
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-		SDL_Rect textRect = {currentX + paddingX, (tabHeight - textH) / 2 + currentY, textW, textH};
+		SDL_Rect textRect = {currentX + constConfig.paddingX, (constConfig.uiCharHeight - textH) / 2 + currentY, textW, textH};
 
 		SDL_RenderCopy(renderer_, texture, nullptr, &textRect);
 
 		SDL_FreeSurface(surface);
 		SDL_DestroyTexture(texture);
 
-	    currentY += tabHeight;
 		currentX += tabWidth;
 	}
 }
 
 void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
     const auto& fg = config_.colors_.foreground_color;
+	const auto constConfig = config_.constantConfig_;
 
     for (const auto& pane: panes) {
         const auto& [startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = pane;
@@ -151,11 +154,11 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
             SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), fg);
             SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-            const int length = line.length() * codeCharWidth;
-            const int lineOffset = i * codeCharHeight;
+            const int length = line.length() * constConfig.codeCharWidth;
+            const int lineOffset = i * constConfig.codeCharHeight;
 
             const SDL_Rect src{0, 0, length, surface->h};
-            const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset * codeCharHeight, length, surface->h};
+            const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset * constConfig.codeCharHeight, length, surface->h};
 
             SDL_RenderCopy(renderer_, texture, &src, &dst);
 
@@ -172,9 +175,11 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
     const auto& [active, cursorX, cursorY, letter, panesLayout] = t_cursorLayout;
 
     SDL_SetRenderDrawColor(renderer_, cr, cg, cb, ca);
+	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = config_.constantConfig_;
 
-    const int cursorOffsetY = cursorY * codeCharHeight + panesLayout->startY;
-    const int cursorOffsetX = cursorX * codeCharWidth + panesLayout->startX;
+
+    const int cursorOffsetY = codeCharHeight;
+    const int cursorOffsetX = codeCharWidth;
 
     if (active) {
         if (letter == '\0') {
@@ -201,6 +206,7 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 }
 
 void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, const int windowHeight, const int windowWidth) const {
+	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = config_.constantConfig_;
     const auto& [mode, currFileName, currCommand, cursorX, cursorY, charCount, lineCount, args] = t_commandLineLayout;
     std::string line{};
     SDL_Color bg;

@@ -1,61 +1,114 @@
 #include "Files.hpp"
 
-#include "Matrix.hpp"
+#include "utils/FileHandler.hpp"
 
 #include <SDL.h>
 #include <algorithm>
 #include <numeric>
 
-Cursor::Cursor() : x_{0}, y_{0}, visible_{true}, absent_{} {}
-
-void Cursor::incrementX() {
-	this->setX(x_ + 1);
+MatrixIterator::MatrixIterator(const std::vector<std::string>& t_matrix, const int t_index, const bool t_flag)
+    : matrix_{t_matrix}, index_{t_index}, forwarded_{t_flag} {
+	this->currLine_ = matrix_.at(index_);
 }
 
-void Cursor::decrementX() {
-	this->setX(x_ - 1);
+void MatrixIterator::next() {
+	if (this->forwarded_) {
+		this->index_++;
+	} else {
+		this->index_--;
+	}
+
+	if (matrix_.size() <= this->index_ || 0 > this->index_) {
+		return;
+	}
+	this->currLine_ = matrix_.at(this->index_);
 }
 
-void Cursor::incrementY() {
-	this->setY(y_ + 1);
+std::string_view MatrixIterator::getLine()const {
+	return currLine_;
 }
 
-void Cursor::decrementY() {
-	this->setY(y_ - 1);
+bool MatrixIterator::end(const size_t endIndex_t) const {
+	if (this->forwarded_) {
+		return this->index_ >= endIndex_t;
+	}
+	return this->index_ < endIndex_t;
 }
 
-int Cursor::getX() const {
-	return x_;
+Matrix::Matrix(const std::vector<std::string>& t_lines) : lines_{std::move(t_lines)}, charsCount_{} {
+    if (lines_.size() == 1 && lines_.at(0).empty()) {
+        lines_.push_back("");
+    }
 }
 
-int Cursor::getY() const {
-	return y_;
+std::string_view Matrix::getLine(const int row) const {
+	const auto& line = lines_.at(row);
+	return std::string_view{line};
 }
 
-void Cursor::setX(const int x) {
-	x_ = x;
-	visible_ = true;
-	absent_ = framesToSkip;
+std::string_view Matrix::getLineSubstr(const int row, const int col, const int n) const {
+	const auto& line = lines_.at(row);
+	return std::string_view{line.data() + col, static_cast<size_t>(n)};
 }
 
-void Cursor::setY(const int y) {
-	y_ = y;
-	visible_ = true;
-	absent_ = framesToSkip;
+std::string_view Matrix::getLineSubstr(const int row, const int col) const {
+	const auto& line = lines_.at(row);
+	return std::string_view{line.data() + col};
 }
 
-bool Cursor::isVisible() const {
-	return visible_;
+int Matrix::getLineLength(const int row) const {
+	return lines_.at(row).length();
 }
 
-void Cursor::setVisible(const bool visible) {
-	visible_ = visible;
+int Matrix::getLinesCount() const {
+	return lines_.size();
 }
 
-File::File(std::unique_ptr<ITextBuffer> text_t, std::filesystem::path path_t, const FileId t_fileId)
-    : textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{t_fileId} {}
+int Matrix::getCharCount() const {
+    return charsCount_;
+}
 
-FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char** argv) {
+void Matrix::deleteLine(const int row) {
+	lines_.erase(lines_.begin() + row);
+
+	if (lines_.empty()) {
+		lines_.emplace_back("");
+	}
+}
+
+void Matrix::insertLine(const int row, const std::string line) {
+	lines_.insert(lines_.begin() + row, line);
+}
+
+void Matrix::deleteCharacter(const int row, const int col) {
+	lines_.at(row).erase(col, 1);
+}
+
+void Matrix::insertCharacter(const int row, const int col, const char c) {
+	lines_.at(row).insert(col, 1, c);
+}
+
+void Matrix::deleteRange(const int row, const int startCol, const int len) {
+	auto& line = lines_.at(row);
+	line.erase(startCol, len);
+}
+
+void Matrix::insertRange(const int row, const int startCol, const std::string_view range) {
+	auto& line = lines_.at(row);
+	line.insert(startCol, std::string(range));
+}
+MatrixIterator Matrix::forwardIterator(const size_t startCount_t) const {
+	return MatrixIterator(this->lines_, startCount_t, true);
+}
+
+MatrixIterator Matrix::backwardIterator(const size_t startCount_t) const {
+	return MatrixIterator(this->lines_, startCount_t, false);
+}
+
+File::File(const Matrix& text_t, std::filesystem::path path_t, const FileId t_fileId)
+    : textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_ {t_fileId} {}
+
+FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char** argv): activeFileId_{} {
 	if (argc < 1 || argv == nullptr) {
 		return;
 	}
@@ -63,43 +116,28 @@ FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char*
 	const std::vector<std::string_view> filePaths(argv + 1, argv + argc);
 
 	if (filePaths.empty()) {
-		auto ptr = std::make_unique<Matrix>();
-
+		auto ptr = Matrix({});
 		this->addFile(std::move(ptr), "Untitled");
 	} else {
 		for (const auto& path : filePaths) {
 			const auto lines = fileHandler.getContent(path.data());
-
-			auto ptr = std::make_unique<Matrix>();
-			ptr->init(lines);
+			auto ptr = Matrix(lines);
 
 			this->addFile(std::move(ptr), path);
 		}
 	}
 }
 
-void FilesManager::addFile(std::unique_ptr<ITextBuffer> textBuffer, std::filesystem::path filePath_t) {
-    files_.emplace_back(std::move(textBuffer), std::move(filePath_t), fileIdCounter_);
-    fileIdCounter_++;
+void FilesManager::addFile(const Matrix& textBuffer, const std::filesystem::path& filePath_t) {
+	const auto file = File{std::move(textBuffer), filePath_t, fileIdCounter_};
+	files_.insert({fileIdCounter_, file});
+	fileIdCounter_++;
 }
 
-std::reference_wrapper<File> FilesManager::getFile(const FileId fileId_t) {
-    const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
-    const auto it = std::ranges::find_if(files_, predicate);
-
-    if (it == files_.end()) {
-        throw std::out_of_range("File not found");
-    }
-
-    return *it;
+File& FilesManager::getFile(const FileId t_fileId) {
+	return files_.at(t_fileId);
 }
 
-void FilesManager::removeFile(const size_t fileId_t) {
-    const auto predicate = [fileId_t](const File& file) { return file.fileId_ == fileId_t; };
-    const auto it = std::ranges::find_if(files_, predicate);
-
-    if (it == files_.end()) {
-        throw std::out_of_range("File not found when  removing");
-    }
-    files_.erase(it);
+File& FilesManager::getFile() {
+	return  files_.at(activeFileId_);
 }
