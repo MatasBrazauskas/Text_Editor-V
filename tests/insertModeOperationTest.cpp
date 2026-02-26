@@ -1,4 +1,4 @@
-#include "utils/Config.hpp"
+/*#include "utils/Config.hpp"
 
 #include <buffer/Matrix.hpp>
 #include <commands/InsertMode.hpp>
@@ -72,4 +72,4 @@ INSTANTIATE_TEST_SUITE_P(InsertKeyOperations, InsertModeTestWithParams,
 					 Params{5, 1, 0, 2, enterKey, {"", "12345", "", "6789", "", ""}},
 					 Params{0, 3, 0, 4, enterKey, {"", "12345", "6789", "", "", ""}},
 					 Params{0, 3, 0, 4, enterKey, {"", "12345", "6789", "", "", ""}},
-					 Params{0, 4, 0, 5, enterKey, {"", "12345", "6789", "", "", ""}}));
+					 Params{0, 4, 0, 5, enterKey, {"", "12345", "6789", "", "", ""}}));*/

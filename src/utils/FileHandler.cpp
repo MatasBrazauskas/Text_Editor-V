@@ -17,7 +17,7 @@ std::vector<std::string> FileHandler::getContent(std::filesystem::path filesPath
 }
 
 void FileHandler::writeToFile(const File& doc) const {
-    auto& [text, stack, cursor, path, id] = doc;
+    auto& [text, stack, path, id] = doc;
     auto tempFilesPath = doc.filesPath_;
     tempFilesPath += ".tmp";
 
@@ -27,8 +27,8 @@ void FileHandler::writeToFile(const File& doc) const {
             throw std::runtime_error("Failed to open file for writing");
         }
 
-        for (int i = 0; i < text->getLinesCount(); i++) {
-            tempFile_.write(text->getLine(i).data(), text->getLineLength(i));
+        for (int i = 0; i < text.getLinesCount(); i++) {
+            tempFile_.write(text.getLine(i).data(), text.getLineLength(i));
             tempFile_.put('\n');
         }
 

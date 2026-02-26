@@ -54,6 +54,7 @@ public:
     [[nodiscard]] MatrixIterator forwardIterator(size_t) const;
     [[nodiscard]] MatrixIterator backwardIterator(size_t) const;
 
+	static constexpr std::string separators_ = "<>?/";
 private:
     std::vector<std::string> lines_;
     int charsCount_;

@@ -10,10 +10,11 @@ class File;
 class ITextBuffer;
 class TextBufferView;
 class Cursor;
+class Matrix;
 
 using namespace std::string_view_literals;
 
-#define FUNC_TYPES std::unique_ptr<ITextBuffer>&text, Cursor &cursor, EditorState &state
+#define FUNC_TYPES Matrix &text, Cursor &cursor, EditorState &state
 constexpr char lineChar = static_cast<char>(128);
 
 struct MotionRange {
@@ -128,8 +129,7 @@ class NormalModeExecutor {
 	explicit NormalModeExecutor(const NormalModeTable& table);
 	~NormalModeExecutor() noexcept = default;
 
-	void executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state,
-				      const NormalModeCommand command);
+	void executeNormalModeCommand(Matrix& text, Cursor& t_cursor, EditorState& state, const NormalModeCommand command);
 
       private:
 	const NormalModeTable& table;
@@ -139,7 +139,7 @@ class NormalMode {
       public:
 	NormalMode();
 	~NormalMode() noexcept = default;
-	void HandleKeyboardInput(std::reference_wrapper<File>, EditorState&, EditorInputAndOutput&);
+	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&);
 
       private:
 	NormalModeTable table;

@@ -161,8 +161,8 @@ NormalModeCommand NormalModeParser::getCommand() const {
 	return command;
 }
 
-void NormalMode::HandleKeyboardInput(std::reference_wrapper<File> file_t, EditorState& state, EditorInputAndOutput& inOut) {
-	auto& [text, stack, cursor, path, id] = file_t.get();
+void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState& state, EditorInputAndOutput& inOut) {
+	auto& [text, stack, path, id] = file_t;
 
 	parser.parseCommand(inOut.input_);
 
@@ -174,7 +174,7 @@ void NormalMode::HandleKeyboardInput(std::reference_wrapper<File> file_t, Editor
 		  << ", target char: " << command.targetChar << '\n';
 
 	if (parser.executeCommand()) {
-		executor.executeNormalModeCommand(text, cursor, state, command);
+		executor.executeNormalModeCommand(text, t_cursor, state, command);
 		parser.clear();
 		inOut.input_.clear();
 		//updateView(view, cursor);
@@ -185,7 +185,7 @@ NormalMode::NormalMode() : parser{table}, executor{table} {}
 
 NormalModeExecutor::NormalModeExecutor(const NormalModeTable& table) : table{table} {}
 
-void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& text, Cursor& cursor, EditorState& state,
+void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& cursor, EditorState& state,
 						  const NormalModeCommand command) {
 	const auto action = table.actions.find(command.operation);
 	const auto operation = table.operations.find(command.operation);
@@ -199,12 +199,12 @@ void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& 
 
 	for (auto i{0zu}; i < loopCount; ++i) {
 		if (action != table.actions.end()) {
-			(&table->*action->second)(text, cursor, state);
+			(&table.*action.second)(text, cursor, state);
 		}
 		if (motion != table.motions.end()) {
-			(&table->*motion->second)(text, cursor, state);
+			(&table.*motion.second)(text, cursor, state);
 		} else if (textObject != table.textObjects.end()) {
-			(&table->*textObject->second)(text, cursor, state, command.targetChar);
+			(&table.*textObject.second)(text, cursor, state, command.targetChar);
 		}
 	}
 
@@ -216,7 +216,7 @@ void NormalModeExecutor::executeNormalModeCommand(std::unique_ptr<ITextBuffer>& 
 	    MotionRange{.x = std::max(startRange.x, endRange.x), .y = std::max(startRange.y, endRange.y)};
 
 	if (operation != table.operations.end()) {
-		(&table->*operation->second)(text, cursor, state, trueStart, trueEnd);
+		(&table.*operation.second)(text, cursor, state, trueStart, trueEnd);
 
 		if (command.operation == 'd') {
 			cursor.setX(trueStart.x);
@@ -257,18 +257,18 @@ NormalModeTable::NormalModeTable() {
 
 void NormalModeTable::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
 	if (start.y == end.y) {
-		text->deleteRange(start.y, start.x, end.x - start.x);
+		text.deleteRange(start.y, start.x, end.x - start.x);
 	} else {
-		const auto endLineSuffix = std::string{text->getLine(end.y).substr(end.x)};
+		const auto endLineSuffix = std::string{text.getLine(end.y).substr(end.x)};
 
-		const int startLineLen = text->getLineLength(start.y);
-		text->deleteRange(start.y, start.x, startLineLen - start.x);
+		const int startLineLen = text.getLineLength(start.y);
+		text.deleteRange(start.y, start.x, startLineLen - start.x);
 
 		for (int i = end.y; i > start.y; --i) {
-			text->deleteLine(i);
+			text.deleteLine(i);
 		}
 
-		text->insertRange(start.y, start.x, endLineSuffix);
+		text.insertRange(start.y, start.x, endLineSuffix);
 	}
 }
 
@@ -277,16 +277,16 @@ void NormalModeTable::operationCopyText(FUNC_TYPES, const MotionRange& start, co
 	std::string clipboardBuffer;
 
 	if (start.y == end.y) {
-		const auto subView = text->getLineSubstr(start.y, start.x, end.x - start.x);
+		const auto subView = text.getLineSubstr(start.y, start.x, end.x - start.x);
 		clipboardBuffer = std::string{subView};
 	} else {
-		clipboardBuffer += std::string(text->getLineSubstr(start.y, start.x)) + "\n";
+		clipboardBuffer += std::string(text.getLineSubstr(start.y, start.x)) + "\n";
 
 		for (int y = start.y + 1; y < end.y; ++y) {
-			clipboardBuffer += std::string(text->getLineSubstr(y, 0)) + "\n";
+			clipboardBuffer += std::string(text.getLineSubstr(y, 0)) + "\n";
 		}
 
-		clipboardBuffer += std::string(text->getLineSubstr(end.y, 0, end.x));
+		clipboardBuffer += std::string(text.getLineSubstr(end.y, 0, end.x));
 	}
 
 	if (SDL_SetClipboardText(clipboardBuffer.c_str()) != 0) {
@@ -295,7 +295,7 @@ void NormalModeTable::operationCopyText(FUNC_TYPES, const MotionRange& start, co
 }
 
 void NormalModeTable::motionStartOfNextWord(FUNC_TYPES) const {
-	const auto currLine = text->getLine(cursor.getY());
+	const auto currLine = text.getLine(cursor.getY());
 	const size_t startX = cursor.getX();
 
 	if (startX >= currLine.length())
@@ -310,7 +310,7 @@ void NormalModeTable::motionStartOfNextWord(FUNC_TYPES) const {
 	if (isspace(currentCh)) {
 		nextPos = currLine.find_first_not_of(space, startX);
 	} else {
-		std::string currentGroup = alphabet.contains(currentCh) ? alphabet : text->separators;
+		std::string currentGroup = alphabet.contains(currentCh) ? alphabet : text.separators_;
 
 		nextPos = currLine.find_first_not_of(currentGroup, startX);
 
@@ -320,10 +320,10 @@ void NormalModeTable::motionStartOfNextWord(FUNC_TYPES) const {
 	}
 
 	if (nextPos == std::string_view::npos) {
-		if (cursor.getY() + 1 < text->getLinesCount()) {
+		if (cursor.getY() + 1 < text.getLinesCount()) {
 			cursor.incrementY();
 
-			const auto nextLine = text->getLine(cursor.getY());
+			const auto nextLine = text.getLine(cursor.getY());
 			size_t firstChar = nextLine.find_first_not_of(space);
 
 			cursor.setX(firstChar == std::string_view::npos ? 0 : firstChar);
@@ -338,7 +338,7 @@ void NormalModeTable::motionStartOfNextWord(FUNC_TYPES) const {
 
 void NormalModeTable::motionStartOfNextWORD(FUNC_TYPES) const {
 	const auto spaceSeparator = " "s;
-	const auto currLine = text->getLine(cursor.getY());
+	const auto currLine = text.getLine(cursor.getY());
 
 	const std::size_t indexPunctuation = currLine.find_first_of(spaceSeparator, cursor.getX());
 
@@ -351,14 +351,14 @@ void NormalModeTable::motionStartOfNextWORD(FUNC_TYPES) const {
 		}
 	}
 
-	if (cursor.getY() + 1 >= text->getLinesCount()) { // second line check
+	if (cursor.getY() + 1 >= text.getLinesCount()) { // second line check
 		const int x = std::max(0, static_cast<int>(currLine.length()) - 1);
 		cursor.setX(x);
 		return;
 	}
 
 	cursor.incrementY();
-	const auto nextLine = text->getLine(cursor.getY());
+	const auto nextLine = text.getLine(cursor.getY());
 	const std::size_t index = nextLine.find_first_not_of(spaceSeparator, 0);
 
 	if (index != std::string_view::npos) {
@@ -380,11 +380,11 @@ void NormalModeTable::motionStartOfPrevWord(FUNC_TYPES) const {
 		x--;
 	else if (y > 0) {
 		y--;
-		x = text->getLine(y).empty() ? 0 : text->getLine(y).length() - 1;
+		x = text.getLine(y).empty() ? 0 : text.getLine(y).length() - 1;
 	} else
 		return;
 
-	auto currLine = text->getLine(y);
+	auto currLine = text.getLine(y);
 
 	while (y >= 0 && (currLine.empty() || isspace(currLine[x]))) {
 		if (currLine.empty()) {
@@ -405,12 +405,12 @@ void NormalModeTable::motionStartOfPrevWord(FUNC_TYPES) const {
 		}
 
 		y--;
-		currLine = text->getLine(y);
+		currLine = text.getLine(y);
 		x = currLine.empty() ? 0 : currLine.length() - 1;
 	}
 
 	char c = currLine[x];
-	std::string currentGroup = alphabet.contains(c) ? alphabet : text->separators;
+	std::string currentGroup = alphabet.contains(c) ? alphabet : text.separators_;
 
 	while (x > 0 && currentGroup.contains(currLine[x - 1])) {
 		x--;
@@ -423,33 +423,33 @@ void NormalModeTable::motionStartOfPrevWord(FUNC_TYPES) const {
 void NormalModeTable::motionEndOfWord(FUNC_TYPES) const {
 	int y = cursor.getY();
 	int x = cursor.getX();
-	auto currLine = text->getLine(y);
+	auto currLine = text.getLine(y);
 	const std::string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 	const std::string space = " \t\r\n";
 
 	if (x + 1 < currLine.length()) {
 		x++;
-	} else if (y + 1 < text->getLinesCount()) {
+	} else if (y + 1 < text.getLinesCount()) {
 		y++;
 		x = 0;
-		currLine = text->getLine(y);
+		currLine = text.getLine(y);
 	} else
 		return;
 
-	while (y < text->getLinesCount() && (currLine.empty() || isspace(currLine[x]))) {
+	while (y < text.getLinesCount() && (currLine.empty() || isspace(currLine[x]))) {
 		size_t firstVisible = currLine.find_first_not_of(space, x);
 		if (firstVisible != std::string_view::npos) {
 			x = static_cast<int>(firstVisible);
 			break;
 		}
-		if (++y >= text->getLinesCount())
+		if (++y >= text.getLinesCount())
 			return;
-		currLine = text->getLine(y);
+		currLine = text.getLine(y);
 		x = 0;
 	}
 
 	char c = currLine[x];
-	std::string currentGroup = alphabet.contains(c) ? alphabet : text->separators;
+	std::string currentGroup = alphabet.contains(c) ? alphabet : text.separators_;
 
 	size_t endOfGroup = currLine.find_first_not_of(currentGroup, x);
 
@@ -465,27 +465,27 @@ void NormalModeTable::motionEndOfWord(FUNC_TYPES) const {
 void NormalModeTable::motionEndOfWORD(FUNC_TYPES) const {
 	int y = cursor.getY();
 	int x = cursor.getX();
-	auto currLine = text->getLine(y);
+	auto currLine = text.getLine(y);
 	const std::string space = " \t\r\n";
 
 	if (x + 1 < currLine.length())
 		x++;
-	else if (y + 1 < text->getLinesCount()) {
+	else if (y + 1 < text.getLinesCount()) {
 		y++;
 		x = 0;
-		currLine = text->getLine(y);
+		currLine = text.getLine(y);
 	} else
 		return;
 
-	while (y < text->getLinesCount() && (currLine.empty() || isspace(currLine[x]))) {
+	while (y < text.getLinesCount() && (currLine.empty() || isspace(currLine[x]))) {
 		size_t firstVisible = currLine.find_first_not_of(space, x);
 		if (firstVisible != std::string_view::npos) {
 			x = static_cast<int>(firstVisible);
 			break;
 		}
-		if (++y >= text->getLinesCount())
+		if (++y >= text.getLinesCount())
 			return;
-		currLine = text->getLine(y);
+		currLine = text.getLine(y);
 		x = 0;
 	}
 
@@ -505,14 +505,14 @@ void NormalModeTable::motionStartOfPrevWORD(FUNC_TYPES) const {
 	int y = cursor.getY();
 	int x = cursor.getX();
 
-	auto currLine = text->getLine(y);
+	auto currLine = text.getLine(y);
 
 	if (x == 0 || isspace(currLine[x]) || (!isspace(currLine[x]) && isspace(currLine[x - 1]))) {
 		if (x == 0) {
 			if (y == 0)
 				return;
 			y--;
-			currLine = text->getLine(y);
+			currLine = text.getLine(y);
 			x = currLine.empty() ? 0 : currLine.length() - 1;
 		} else {
 			x--;
@@ -520,7 +520,7 @@ void NormalModeTable::motionStartOfPrevWORD(FUNC_TYPES) const {
 	}
 
 	while (y >= 0) {
-		currLine = text->getLine(y);
+		currLine = text.getLine(y);
 		if (currLine.empty()) {
 			cursor.setY(y);
 			cursor.setX(0);
@@ -540,7 +540,7 @@ void NormalModeTable::motionStartOfPrevWORD(FUNC_TYPES) const {
 		}
 
 		y--;
-		currLine = text->getLine(y);
+		currLine = text.getLine(y);
 		x = currLine.empty() ? 0 : currLine.length() - 1;
 	}
 
@@ -551,7 +551,7 @@ void NormalModeTable::motionStartOfPrevWORD(FUNC_TYPES) const {
 
 void NormalModeTable::motionLine(FUNC_TYPES, MotionRange& start, MotionRange& end) const {
 	start.x = 0;
-	end.x = text->getLineLength(cursor.getY()) - 1;
+	end.x = text.getLineLength(cursor.getY()) - 1;
 }
 
 /*void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {
@@ -575,16 +575,16 @@ void NormalModeTable::motionMoveCursorLeft(FUNC_TYPES) const {
 }
 
 void NormalModeTable::motionMoveCursorRight(FUNC_TYPES) const {
-	if (text->getLineLength(cursor.getY()) - 1 > cursor.getX()) {
+	if (text.getLineLength(cursor.getY()) - 1 > cursor.getX()) {
 		cursor.incrementX();
 	}
 }
 
 void NormalModeTable::motionMoveCursorUp(FUNC_TYPES) const {
 	if (cursor.getY() > 0) {
-		const auto currRowLength = text->getLineLength(cursor.getY());
+		const auto currRowLength = text.getLineLength(cursor.getY());
 		cursor.decrementY();
-		const auto nextRowLength = text->getLineLength(cursor.getY());
+		const auto nextRowLength = text.getLineLength(cursor.getY());
 
 		if (nextRowLength == 0) {
 			cursor.setX(0);
@@ -595,12 +595,12 @@ void NormalModeTable::motionMoveCursorUp(FUNC_TYPES) const {
 }
 
 void NormalModeTable::motionMoveCursorDown(FUNC_TYPES) const {
-	if (text->getLinesCount() - 1 > cursor.getY()) {
+	if (text.getLinesCount() - 1 > cursor.getY()) {
 
-		const size_t currRowLength = text->getLineLength(cursor.getY());
+		const size_t currRowLength = text.getLineLength(cursor.getY());
 
 		cursor.incrementY();
-		const std::size_t nextRowLength = text->getLineLength(cursor.getY());
+		const std::size_t nextRowLength = text.getLineLength(cursor.getY());
 
 		if (nextRowLength == 0) {
 			cursor.setX(0);
@@ -611,18 +611,18 @@ void NormalModeTable::motionMoveCursorDown(FUNC_TYPES) const {
 }
 
 void NormalModeTable::motionMoveCursorBottomFile(FUNC_TYPES) const {
-	cursor.setY(text->getLinesCount() - 1);
-	cursor.setX(std::min(text->getLineLength(cursor.getY()) - 1, cursor.getX()));
+	cursor.setY(text.getLinesCount() - 1);
+	cursor.setX(std::min(text.getLineLength(cursor.getY()) - 1, cursor.getX()));
 }
 
 void NormalModeTable::motionMoveRightMost(FUNC_TYPES) const {
-	if (text->getLineLength(cursor.getY()) > 0) {
-		cursor.setX(text->getLineLength(cursor.getY()) - 1);
+	if (text.getLineLength(cursor.getY()) > 0) {
+		cursor.setX(text.getLineLength(cursor.getY()) - 1);
 	}
 }
 
 void NormalModeTable::motionMoveLeftMostChar(FUNC_TYPES) const {
-	const auto line = text->getLine(cursor.getY());
+	const auto line = text.getLine(cursor.getY());
 
 	const size_t index = line.find_first_not_of(" \t");
 
@@ -636,26 +636,25 @@ void NormalModeTable::motionMoveLeftMost(FUNC_TYPES) const {
 }
 
 void NormalModeTable::actionDeleteChar(FUNC_TYPES) const {
-	if (text->getLineLength(cursor.getY()) == 0) {
+	if (text.getLineLength(cursor.getY()) == 0) {
 		return;
 	}
 
-	text->deleteCharacter(cursor.getY(), cursor.getX());
+	text.deleteCharacter(cursor.getY(), cursor.getX());
 
-	if (text->getLineLength(cursor.getY()) == 0) {
+	if (text.getLineLength(cursor.getY()) == 0) {
 		cursor.setX(0);
 		return;
 	}
 
-	const std::size_t newIndex = std::min(cursor.getX(), text->getLineLength(cursor.getY()) - 1);
+	const std::size_t newIndex = std::min(cursor.getX(), text.getLineLength(cursor.getY()) - 1);
 	cursor.setX(newIndex);
 }
 
 // TODO fix the insert lines tho with count
-void NormalModeTable::actionInsertLineAbove(std::unique_ptr<ITextBuffer>& text, Cursor& cursor,
-					    EditorState& state) const {
+void NormalModeTable::actionInsertLineAbove(Matrix& text, Cursor& cursor, EditorState& state) const {
 
-	text->insertLine(cursor.getY(), "");
+	text.insertLine(cursor.getY(), "");
 	motionMoveCursorUp(text, cursor, state);
 
 	cursor.setX(0);
@@ -664,14 +663,14 @@ void NormalModeTable::actionInsertLineAbove(std::unique_ptr<ITextBuffer>& text, 
 
 void NormalModeTable::actionInsertLineBelow(FUNC_TYPES) const {
 	motionMoveCursorDown(text, cursor, state);
-	text->insertLine(cursor.getY(), "");
+	text.insertLine(cursor.getY(), "");
 
 	cursor.setX(0);
 	state.currentMode_ = Modes::Insert;
 }
 
 void NormalModeTable::findFirstCharRight(FUNC_TYPES, const char newChar) const {
-	const auto reversedView = text->getLineSubstr(cursor.getY(), 0, cursor.getX()) | std::views::reverse;
+	const auto reversedView = text.getLineSubstr(cursor.getY(), 0, cursor.getX()) | std::views::reverse;
 	const auto it = std::ranges::find(reversedView, newChar);
 
 	if (it != reversedView.end()) {
@@ -681,7 +680,7 @@ void NormalModeTable::findFirstCharRight(FUNC_TYPES, const char newChar) const {
 }
 
 void NormalModeTable::findFirstCharLeft(FUNC_TYPES, const char newChar) const {
-	const auto subView = text->getLineSubstr(cursor.getY(), cursor.getX() + 1);
+	const auto subView = text.getLineSubstr(cursor.getY(), cursor.getX() + 1);
 	const auto it = std::ranges::find(subView, newChar);
 
 	if (it != subView.end()) {
@@ -690,9 +689,9 @@ void NormalModeTable::findFirstCharLeft(FUNC_TYPES, const char newChar) const {
 }
 
 void NormalModeTable::replaceChar(FUNC_TYPES, const char newChar) const {
-	if (text->getLineLength(cursor.getY())) {
-		text->deleteCharacter(cursor.getY(), cursor.getX());
-		text->insertCharacter(cursor.getY(), cursor.getX(), newChar);
+	if (text.getLineLength(cursor.getY())) {
+		text.deleteCharacter(cursor.getY(), cursor.getX());
+		text.insertCharacter(cursor.getY(), cursor.getX(), newChar);
 	}
 }
 

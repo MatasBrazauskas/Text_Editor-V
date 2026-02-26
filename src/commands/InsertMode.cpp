@@ -1,8 +1,6 @@
 #include "commands/InsertMode.hpp"
 
-#include "core/Editor.hpp"
-
-#include <iostream>
+#include "core/EditorCore.hpp"
 
 InsertMode::InsertMode() {
 	const auto enterKey = std::string(1, static_cast<char>(SpecialKeys::Enter));

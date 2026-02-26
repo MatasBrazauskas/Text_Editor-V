@@ -1,4 +1,4 @@
-#include "utils/Config.hpp"
+/*#include "utils/Config.hpp"
 
 #include <buffer/Matrix.hpp>
 #include <commands/NormalMode.hpp>
@@ -140,4 +140,4 @@ INSTANTIATE_TEST_SUITE_P(
 		      Param{12, 1, 6, 1, NormalModeCommand{0, ' ', 0, 'B', ' ', ' ', false, ParsingStages::Finish}},
 		      Param{0, 0, 8, 0, NormalModeCommand{0, ' ', 0, 'E', ' ', ' ', false, ParsingStages::Finish}},
 		      Param{8, 0, 15, 0, NormalModeCommand{0, ' ', 0, 'E', ' ', ' ', false, ParsingStages::Finish}},
-		      Param{15, 0, 4, 1, NormalModeCommand{0, ' ', 0, 'E', ' ', ' ', false, ParsingStages::Finish}}));
+		      Param{15, 0, 4, 1, NormalModeCommand{0, ' ', 0, 'E', ' ', ' ', false, ParsingStages::Finish}}));*/

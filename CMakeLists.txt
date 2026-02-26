@@ -27,6 +27,8 @@ file(GLOB_RECURSE LIB_SOURCES
         "src/utils/*.cpp"
 )
 
+
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 # 4. Define Logic Library
 add_library(EditorLogic STATIC ${LIB_SOURCES}
         src/buffer/PanesAndLayers.cpp

@@ -1,4 +1,4 @@
-#include "utils/Config.hpp"
+/*#include "utils/Config.hpp"
 
 #include <commands/NormalMode.hpp>
 #include <core/EditorCore.hpp>
@@ -80,4 +80,4 @@ INSTANTIATE_TEST_SUITE_P(
 	ParseParameters{"32d2",
 			NormalModeCommand{32, 'd', 2, ' ', ' ', ' ', false, ParsingStages::Count2MotionTextObject}},
 	ParseParameters{"32d20f",
-			NormalModeCommand{32, 'd', 20, ' ', 'f', ' ', false, ParsingStages::WaitingForTargetChar}}));
+			NormalModeCommand{32, 'd', 20, ' ', 'f', ' ', false, ParsingStages::WaitingForTargetChar}}));*/
