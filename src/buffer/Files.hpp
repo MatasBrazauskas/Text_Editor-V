@@ -1,17 +1,17 @@
 #pragma once
 
-#include "core/EditorCore.hpp"
-
-
 #include <filesystem>
 #include <stack>
 #include <vector>
+#include <unordered_map>
 
 using namespace std::string_literals;
 
 class FileHandler;
 
 inline constexpr int framesToSkip = 4;
+
+using FileId = uint_fast64_t;
 
 class MatrixIterator final {
 public:

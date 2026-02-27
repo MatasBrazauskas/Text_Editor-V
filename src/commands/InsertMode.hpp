@@ -6,18 +6,19 @@
 class EditorState;
 class EditorInputAndOutput;
 class File;
+class Cursor;
 
 class InsertMode final {
       public:
 	InsertMode();
 	~InsertMode() = default;
 
-	void HandleKeyboardInput(EditorState&, EditorInputAndOutput& , std::reference_wrapper<File>) const;
-	using Func = void (InsertMode::*)(File&) const;
+	void HandleKeyboardInput(EditorState&, EditorInputAndOutput& , File&, Cursor&) const;
+	using Func = void (InsertMode::*)(File&, Cursor&) const;
 
-      private:
-	void handleEnter(File&) const;
-	void handleBackspace(File&) const;
+private:
+	void handleEnter(File&, Cursor&) const;
+	void handleBackspace(File&, Cursor&) const;
 
 	std::unordered_map<char, Func> commands_;
 };

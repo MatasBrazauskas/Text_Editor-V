@@ -41,8 +41,7 @@ Renderer::Renderer(Config& t_config): config_{t_config} {
         throw std::runtime_error("Failed to open font.");
     }
 
-    ConstantsConfig constConfig{};
-    auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = constConfig;
+    auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = config_.constantConfig_;
 
     TTF_SetFontHinting(codeFont_, TTF_HINTING_MONO);
     TTF_SetFontKerning(codeFont_, 0);

@@ -25,7 +25,7 @@ private:
     TTF_Font* codeFont_;
     TTF_Font* uiFont_;
 
-    const Config& config_;
+    Config& config_;
 
     void RenderTabs(const TabLayout&, int windowHeight, int windowWidth) const;
     void RenderPanes(const std::vector<PanesLayout>&) const;

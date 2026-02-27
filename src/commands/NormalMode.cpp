@@ -185,30 +185,30 @@ NormalMode::NormalMode() : parser{table}, executor{table} {}
 
 NormalModeExecutor::NormalModeExecutor(const NormalModeTable& table) : table{table} {}
 
-void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& cursor, EditorState& state,
+void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& t_cursor, EditorState& state,
 						  const NormalModeCommand command) {
 	const auto action = table.actions.find(command.operation);
 	const auto operation = table.operations.find(command.operation);
 	const auto motion = table.motions.find(command.motion);
 	const auto textObject = table.textObjects.find(command.textObject);
 
-	const auto startRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
+	const auto startRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
 
 	const std::size_t loopCount =
 	    command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
 
 	for (auto i{0zu}; i < loopCount; ++i) {
 		if (action != table.actions.end()) {
-			(&table.*action.second)(text, cursor, state);
+			(table.*action->second)(text, t_cursor, state);
 		}
 		if (motion != table.motions.end()) {
-			(&table.*motion.second)(text, cursor, state);
+			(table.*motion->second)(text, t_cursor, state);
 		} else if (textObject != table.textObjects.end()) {
-			(&table.*textObject.second)(text, cursor, state, command.targetChar);
+			(table.*textObject->second)(text, t_cursor, state, command.targetChar);
 		}
 	}
 
-	const auto endRange = MotionRange{.x = cursor.getX(), .y = cursor.getY()};
+	const auto endRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
 
 	const auto trueStart =
 	    MotionRange{.x = std::min(startRange.x, endRange.x), .y = std::min(startRange.y, endRange.y)};
@@ -216,11 +216,11 @@ void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& cursor, 
 	    MotionRange{.x = std::max(startRange.x, endRange.x), .y = std::max(startRange.y, endRange.y)};
 
 	if (operation != table.operations.end()) {
-		(&table.*operation.second)(text, cursor, state, trueStart, trueEnd);
+		(table.*operation->second)(text, t_cursor, state, trueStart, trueEnd);
 
 		if (command.operation == 'd') {
-			cursor.setX(trueStart.x);
-			cursor.setY(trueStart.y);
+			t_cursor.setX(trueStart.x);
+			t_cursor.setY(trueStart.y);
 		}
 	}
 }

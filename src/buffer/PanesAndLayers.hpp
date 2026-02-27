@@ -18,9 +18,9 @@ enum class Modes: uint8_t;
 enum class SplitType: char {Vertical, Horizontal, None};
 
 struct PaneView final {
-    int startX, startY;
-    int endX_, endY_;
-    int indexX, indexY;
+	int startX{}, startY{};
+    int endX_{}, endY_{};
+    int indexX{}, indexY{};
 };
 
 class Cursor final {
@@ -79,10 +79,11 @@ public:
 
 class PanesManager final {
 public:
-    PanesManager(const Pane&);
+    PanesManager(const PaneView& t_view, FileId);
     ~PanesManager() noexcept = default;
 
     Pane getPane(PaneId);
+	Pane getCurrPane();
 
 	PaneId activePaneId_;
     std::unordered_map<PaneId, Pane*> paneMap_;

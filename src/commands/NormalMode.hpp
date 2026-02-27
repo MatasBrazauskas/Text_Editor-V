@@ -14,7 +14,7 @@ class Matrix;
 
 using namespace std::string_view_literals;
 
-#define FUNC_TYPES Matrix &text, Cursor &cursor, EditorState &state
+#define FUNC_TYPES Matrix &text, Cursor & cursor, EditorState &state
 constexpr char lineChar = static_cast<char>(128);
 
 struct MotionRange {
@@ -27,7 +27,7 @@ class NormalModeTable {
 	~NormalModeTable() noexcept = default;
 	using Func = void (NormalModeTable::*)(FUNC_TYPES) const;
 	using Func2 = void (NormalModeTable::*)(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
-	using Func3 = void (NormalModeTable::*)(FUNC_TYPES, const char newChar) const;
+	using Func3 = void (NormalModeTable::*)(FUNC_TYPES, char newChar) const;
 
 	std::unordered_map<char, Func2> operations;
 	std::unordered_map<char, Func> actions;

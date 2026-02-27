@@ -78,6 +78,10 @@ ColorsConfig ColorsConfig::getColorConfig(const Json& json) {
 			    getColorFromHex(crFrColorStr), getColorFromHex(vrColorStr)};
 }
 
+ConstantsConfig::ConstantsConfig(){
+
+}
+
 static Json loadJson(const std::string& configPath) {
 	if (configPath.empty()) {
 		throw std::runtime_error("Config path must be non-empty.");
@@ -95,6 +99,6 @@ Config::Config(const std::filesystem::path& configPath) : Config(loadJson(config
 
 Config::Config(const Json& json)
     : editor_(EditorConfig::getEditorConfig(json)), font_(FontConfig::getFontConfig(json)),
-      colors_(ColorsConfig::getColorConfig(json)) {}
+      colors_(ColorsConfig::getColorConfig(json)), constantConfig_{} {}
 
 Config::~Config() noexcept = default;

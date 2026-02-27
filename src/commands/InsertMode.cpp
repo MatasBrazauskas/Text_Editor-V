@@ -1,56 +1,54 @@
 #include "commands/InsertMode.hpp"
 
 #include "core/EditorCore.hpp"
+#include <utility>
 
 InsertMode::InsertMode() {
-	const auto enterKey = std::string(1, static_cast<char>(SpecialKeys::Enter));
-	const auto backSpaceKey = std::string(1, static_cast<char>(SpecialKeys::Backspace));
-
-	commands_ = {{enterKey, &InsertMode::handleEnter}, {backSpaceKey, &InsertMode::handleBackspace}};
+	commands_ = {{std::to_underlying(SpecialKeys::Enter), &InsertMode::handleEnter}, {std::to_underlying(SpecialKeys::Backspace), &InsertMode::handleBackspace}};
 }
 
-void InsertMode::handleEnter(EditorState&, Document& doc) const {
-	const auto subRange = doc.textBuffer_->rowSubstr(doc.cursor_.getY(), doc.cursor_.getX());
+void InsertMode::handleEnter(File& t_file, Cursor& t_cursor) const {
+	auto& [text, stack, path, fileId] = t_file;
+	const auto subRange = text.getLineSubstr(t_cursor.getY(), t_cursor.getX());
 
-	doc.textBuffer_->insertLine(doc.cursor_.getY() + 1, "");
-	doc.textBuffer_->insertRange(doc.cursor_.getY() + 1, 0, subRange);
+	text.insertLine(t_cursor.getY() + 1, "");
+	text.insertRange(t_cursor.getY() + 1, 0, subRange);
 
-	doc.textBuffer_->deleteRange(doc.cursor_.getY(), doc.cursor_.getX(),
-				     doc.textBuffer_->rowsLength(doc.cursor_.getY()) - doc.cursor_.getX());
+	text.deleteRange(t_cursor.getY(), t_cursor.getX(),text.getLineLength(t_cursor.getY()) - t_cursor.getX());
 					 
-	doc.cursor_.incrementY();
-	doc.cursor_.setX(0);
+	t_cursor.incrementY();
+	t_cursor.setX(0);
 }
-void InsertMode::handleBackspace(EditorState&, Document& doc) const {
-	if (doc.cursor_.getX() == 0 && doc.cursor_.getY() > 0) {
-		const auto movedLine = doc.textBuffer_->rowsView(doc.cursor_.getY());
+void InsertMode::handleBackspace(File& t_file, Cursor& t_cursor) const {
+	auto& [text, stack, path, fileId] = t_file;
+
+	if (t_cursor.getX() == 0 && t_cursor.getY() > 0) {
+		const auto movedLine = text.getLineSubstr(t_cursor.getY(),0);
 		const size_t linesLength = movedLine.length();
 
-		doc.textBuffer_->insertRange(doc.cursor_.getY() - 1, doc.textBuffer_->rowsLength(doc.cursor_.getY() - 1),
-					     movedLine);
-		doc.textBuffer_->deleteLine(doc.cursor_.getY() - 1);
+		text.insertRange(t_cursor.getY() - 1, text.getLineLength(t_cursor.getY() - 1), movedLine);
+		text.deleteLine(t_cursor.getY() - 1);
 
-		doc.cursor_.decrementY();
-		doc.cursor_.setX(doc.textBuffer_->rowsLength(doc.cursor_.getY()) - linesLength);
-	} else if (doc.cursor_.getX() > 0 && doc.cursor_.getY() >= 0) {
-		doc.textBuffer_->deleteCharacter(doc.cursor_.getY(), doc.cursor_.getX() - 1);
-		doc.cursor_.decrementX();
+		t_cursor.decrementY();
+		t_cursor.setX(text.getLineLength(t_cursor.getY()) - linesLength);
+	} else if (t_cursor.getX() > 0 && t_cursor.getY() >= 0) {
+		text.deleteCharacter(t_cursor.getY(), t_cursor.getX() - 1);
+		t_cursor.decrementX();
 	}
 }
 
-void InsertMode::HandleKeyboardInput(EditorState& editorState, std::reference_wrapper<Document> doc) const {
-	if (editorState.input_.empty())
+void InsertMode::HandleKeyboardInput(EditorState& t_state, EditorInputAndOutput& t_io , File& t_file, Cursor& t_cursor) const {
+	if (t_io.input_.empty())
 		return;
 
-	auto& [text, _, cursor, idk] = doc.get();
 
-	if (const auto it = commands_.find(editorState.input_); it != commands_.end()) {
+	if (const auto it = commands_.find(t_io.input_.back()); it != commands_.end()) {
 		const auto func = it->second;
-		(this->*func)(editorState, doc);
+		(this->*func)(t_file, t_cursor);
 	} else {
-		text->insertCharacter(cursor.getY(), cursor.getX(), editorState.input_.at(0));
-		cursor.incrementX();
+		t_file.textBuffer_.insertCharacter(t_cursor.getY(), t_cursor.getX(), t_io.input_.at(0));
+		t_cursor.incrementX();
 	}
 
-	editorState.input_.clear();
+	t_io.input_.clear();
 }

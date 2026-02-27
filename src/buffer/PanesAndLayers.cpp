@@ -61,7 +61,7 @@ SplitNode::SplitNode(const SplitType t_splitType, const bool t_isLeaf, const Pan
     pane = std::make_unique<Pane>(t_pane.paneView_, t_pane.fileId_, t_pane.paneId_);
 }
 
-PanesManager::PanesManager(const Pane& t_pane): activePaneId_{}, head_{SplitType::None, false, t_pane} {
+PanesManager::PanesManager(const PaneView& t_view, FileId t_fileId): activePaneId_{}, head_{SplitType::None, false, Pane(t_view, paneIdCounter_, t_fileId)} {
     paneMap_.insert(std::pair{paneIdCounter_, head_.pane.get()});
     paneIdCounter_++;
 }
@@ -69,6 +69,10 @@ PanesManager::PanesManager(const Pane& t_pane): activePaneId_{}, head_{SplitType
 Pane PanesManager::getPane(const PaneId t_paneId) {
     const auto pane = paneMap_[t_paneId];
     return Pane{*pane};
+}
+
+Pane PanesManager::getCurrPane() {
+	return getPane(paneIdCounter_);
 }
 
 TabLayout::TabLayout(const int activeTab_t, const int t_tabCapLines,  const std::vector<std::string>& tabs_t)

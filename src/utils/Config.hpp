@@ -106,7 +106,7 @@ public:
     int uiCharWidth{}, uiCharHeight{};
 
     int tabHeight{};
-    const int paddingX = 25;
+    int paddingX = 25;
 };
 
 class Config final {
@@ -118,7 +118,7 @@ class Config final {
 	EditorConfig editor_;
 	FontConfig font_;
 	ColorsConfig colors_;
-    ConstantsConfig constantConfig_;
+    ConstantsConfig constantConfig_{};
 
 	explicit Config(const Json&);
 };

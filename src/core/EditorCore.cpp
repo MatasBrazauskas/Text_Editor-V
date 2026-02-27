@@ -6,7 +6,7 @@
 EditorState::EditorState(const FileId activeFileId_t)
     : currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
-EditorCore::EditorCore(const int argc, char** argv) : filesManager_{fileHandler_, argc, argv}, panesManager_{}, editorState_{0} {}
+EditorCore::EditorCore(const int argc, char** argv) :dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{PaneView(), filesManager_.fileIdCounter_}, editorState_{0} {}
 
 std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	if (event.type == SDL_QUIT) {
@@ -52,14 +52,16 @@ void EditorCore::HandleKeyboardInput() {
 		editorInputAndOutput_.input_.append(input);
 		std::cout << "Input state: " << editorInputAndOutput_.input_ << '\n';
 
-		const auto file = filesManager_.getFile(this->editorState_.activeFileId_);
+		auto file = filesManager_.getFile(this->editorState_.activeFileId_);
+
+		auto cursor = panesManager_.getCurrPane().cursor_;
 
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
-			normalMode_.HandleKeyboardInput(file, editorState_, editorInputAndOutput_);
+			normalMode_.HandleKeyboardInput(file, cursor, editorState_, editorInputAndOutput_);
 			break;
 		case Modes::Insert:
-			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file);
+			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);
 			break;
 		case Modes::Command:
 			commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_);

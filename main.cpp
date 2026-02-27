@@ -27,7 +27,7 @@ int main(const int argc, char** argv) {
 		if (renderTime >= ticksPerFrame) {
 			renderStart = end;
 
-		    if (editorCore.dirty) {
+		    if (true) {
 		        const LayoutManager layouts{editorCore, config};
 			    renderer.Render(layouts);
 		    }
