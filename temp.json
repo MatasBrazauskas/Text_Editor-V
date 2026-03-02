@@ -1,0 +1,53 @@
+{
+  "window": 
+  {
+    "title": "Text Editor",
+    "width": 1280,
+    "height": 720,
+    "centered": true,
+    "fps_limit": 60
+  },
+  "editor": 
+  {
+    "feel": 
+    {
+      "tab_size": 8,
+      "auto_save": 
+      {
+        "enabled": false, 
+        "interval_s": 30 
+      },
+      "cursor_blink_ms": 1000,
+      "wrap_text": false
+    },
+    "view": 
+    {
+      "vertical_ruler": 
+      { 
+        "enabled": true,
+        "column": 80 
+      },
+      "line_numbers": "relative"
+    }
+  },
+  "fonts": 
+  {
+    "code": 
+    {
+      "path": "fonts/JetBrainsMono-ExtraLight.ttf",
+      "size": 19
+    },
+    "ui": 
+    {
+      "path": "fonts/JetBrainsMono-Medium.ttf",
+      "size": 17
+    }
+  },
+  "theme": 
+  {
+    "background_color": "1a1b26",
+    "foreground_color": "c0caf5",
+    "cursor_color": "ffffff",
+    "selection_color": "000000"
+  }
+}

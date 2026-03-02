@@ -57,6 +57,10 @@ Renderer::Renderer(Config& t_config): config_{t_config} {
 }
 
 Renderer::~Renderer() noexcept {
+	if (renderer_) {
+		SDL_DestroyRenderer(renderer_);
+	}
+
     if (window_ != nullptr) {
         SDL_DestroyWindow(window_);
     }
@@ -73,10 +77,16 @@ Renderer::~Renderer() noexcept {
 }
 
 void Renderer::Render(const LayoutManager & t_layoutManage) const {
+
+	SDL_RenderClear(renderer_);
+	SDL_SetRenderDrawColor(renderer_, 255,255,255,125);
+
     RenderTabs(t_layoutManage.tabLayout, t_layoutManage.windowHeight, t_layoutManage.windowWidth);
-    RenderPanes(t_layoutManage.panesLayout);
-    RenderCursor(t_layoutManage.cursorLayout);
+    //RenderPanes(t_layoutManage.panesLayout);
+    //RenderCursor(t_layoutManage.cursorLayout);
     RenderCommandLine(t_layoutManage.commandLineLayout, t_layoutManage.windowHeight, t_layoutManage.windowWidth);
+
+	SDL_RenderPresent(renderer_);
 }
 
 
@@ -109,7 +119,6 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, 
 
 		SDL_Rect tabRect = {currentX, currentY, tabWidth, constConfig.uiCharHeight};
 
-		// A. Draw Tab Background
 		SDL_Color bg = isActive ? colTabAct : colTabInact;
 		SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
 		SDL_RenderFillRect(renderer_, &tabRect);
@@ -214,6 +223,7 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, c
         case Modes::Normal:
             line = "Normal";
             bg = {137, 180, 250};
+    		break;
         case Modes::Insert:
             line = "Insert";
             bg ={195, 232, 141};
@@ -225,7 +235,13 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, c
         default:
             abort();
     }
-    const auto topLRect = SDL_Rect{0, windowHeight - uiCharHeight - uiCharHeight, windowWidth, uiCharHeight};
+
+	const int size = 9;
+	const float offset = (size - line.length()) / 2.0f;
+	const int modeOffset = offset * uiCharWidth;
+
+
+    const auto topLRect = SDL_Rect{0, windowHeight - 2 * uiCharHeight, windowWidth, uiCharHeight};
 
     SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
     SDL_RenderFillRect(renderer_, &topLRect);
@@ -233,10 +249,10 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, c
     SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, line.c_str(), config_.colors_.selection_color);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-    const SDL_Rect dst{0, windowHeight - uiCharHeight - uiCharHeight, surface->w, surface->h};
+    const SDL_Rect dst{modeOffset, windowHeight - 2 * uiCharHeight, surface->w, surface->h};
     SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
-    if (mode == Modes::Command) {
+    /*if (mode == Modes::Command) {
         const auto& temp = std::string{args};
         surface = TTF_RenderText_Blended(uiFont_, temp.c_str(), config_.colors_.cursor_color);
 
@@ -255,7 +271,7 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, c
 
             SDL_RenderCopy(renderer_, texture, nullptr, &dst2);
         }
-    }
+    }*/
 
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);

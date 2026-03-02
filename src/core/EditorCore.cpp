@@ -40,7 +40,7 @@ std::string EditorCore::EncodeInput(const SDL_Event& event) {
 
 void EditorCore::HandleKeyboardInput() {
 	SDL_Event event;
-    dirty = false;
+    //dirty = false;
 
 	while (SDL_PollEvent(&event)) {
 

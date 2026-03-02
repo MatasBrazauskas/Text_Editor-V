@@ -94,7 +94,7 @@ CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int 
     : visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letter}, cursorType{t_cursorType} {}
 
 
-LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config) {
+LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config): windowHeight{800}, windowWidth{1000} {
     auto& fileManager = t_editorCore.getFilesManager();
     auto& paneManager = t_editorCore.getPanesManager();
     const auto& editorState = t_editorCore.getEditorState();

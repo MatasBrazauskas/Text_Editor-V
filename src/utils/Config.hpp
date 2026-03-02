@@ -6,6 +6,40 @@
 #include <string>
 
 using namespace std::string_view_literals;
+using Json = nlohmann::json;
+
+class Window final {
+public:
+	Window() = delete;
+	explicit Window(const Json&);
+	~Window() noexcept = default;
+
+	std::string title;
+	int width;
+	int height;
+	bool centered;
+	int fps_limit;
+private:
+	constexpr static auto Title = "title"sv;
+	constexpr static auto Width = "Width"sv;
+	constexpr static auto Height = "Height"sv;
+	constexpr static auto Centered = "centered"sv;
+	constexpr static auto FpsLimit = "fps_limit"sv;
+};
+
+class Editor final {
+
+};
+
+class Fonts final {
+
+};
+
+class Theme final {
+
+};
+
+/*using namespace std::string_view_literals;
 
 namespace Tabs {
 constexpr auto editor = "editor"sv;
@@ -121,4 +155,4 @@ class Config final {
     ConstantsConfig constantConfig_{};
 
 	explicit Config(const Json&);
-};
+};*/
