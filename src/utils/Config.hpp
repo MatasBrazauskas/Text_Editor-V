@@ -9,8 +9,8 @@ using namespace std::string_view_literals;
 using Json = nlohmann::json;
 
 class Window final {
-public:
-	Window() = delete;
+  public:
+	Window() = default;
 	explicit Window(const Json&);
 	~Window() noexcept = default;
 
@@ -19,140 +19,151 @@ public:
 	int height;
 	bool centered;
 	int fps_limit;
-private:
+
+  private:
 	constexpr static auto Title = "title"sv;
-	constexpr static auto Width = "Width"sv;
-	constexpr static auto Height = "Height"sv;
+	constexpr static auto Width = "width"sv;
+	constexpr static auto Height = "height"sv;
 	constexpr static auto Centered = "centered"sv;
 	constexpr static auto FpsLimit = "fps_limit"sv;
 };
 
-class Editor final {
+class AutoSave final {
+public:
+	AutoSave() = default;
+	explicit AutoSave(const Json&);
+	~AutoSave() noexcept = default;
 
+	bool enabled;
+	int interval_s;
+private:
+	constexpr static auto Enable = "enable"sv;
+	constexpr static auto Interval_s = "interval_s"sv;
+};
+
+class Feel final {
+public:
+	Feel() = default;
+	explicit Feel(const Json&);
+	~Feel() noexcept = default;
+
+	int tabSize;
+	AutoSave autoSave;
+	int cursorBlinkMs;
+	bool wrapText;
+private:
+	constexpr static auto TabSize = "tab_size"sv;
+	constexpr static auto KeyAutoSave = "auto_save"sv;
+	constexpr static auto CursorBlinkMs = "cursor_blink_ms"sv;
+	constexpr static auto WrapText = "wrap_text"sv;
+};
+
+class VerticalRuler final {
+public:
+	VerticalRuler() = default;
+	explicit VerticalRuler(const Json&);
+	~VerticalRuler() noexcept = default;
+
+	bool enabled;
+	int column;
+private:
+	constexpr static auto Enabled = "enabled"sv;
+	constexpr static auto Column = "column"sv;
+};
+
+enum class LineNumberModes {None, Relative, Number};
+
+class View final {
+public:
+	View() = default;
+	explicit View(const Json&);
+	~View() noexcept = default;
+
+	VerticalRuler verticalRuler;
+	LineNumberModes lineNumberMode;
+private:
+	constexpr static auto KeyVerticalRuler = "vertical_ruler"sv;
+	constexpr static auto KeyLineNumberMode = "line_number_mode"sv;
+};
+
+class Editor final {
+public:
+	Editor() = default;
+	explicit Editor(const Json&);
+	~Editor() noexcept = default;
+
+	Feel feel;
+	View view;
+private:
+	constexpr static auto KeyFeel = "feel"sv;
+	constexpr static auto KeyView = "view"sv;
+};
+
+class TextFonts final {
+public:
+	TextFonts() = default;
+	explicit TextFonts(const Json&);
+	~TextFonts() noexcept = default;
+
+	std::string path;
+	int size;
+private:
+	constexpr static auto Path = "path"sv;
+	constexpr static auto Size = "size"sv;
 };
 
 class Fonts final {
+public:
+	Fonts() = default;
+	explicit Fonts(const Json&);
+	~Fonts() noexcept = default;
 
+	TextFonts code;
+	TextFonts ui;
+private:
+	constexpr static auto Code = "code"sv;
+	constexpr static auto Ui = "ui"sv;
 };
 
 class Theme final {
-
-};
-
-/*using namespace std::string_view_literals;
-
-namespace Tabs {
-constexpr auto editor = "editor"sv;
-constexpr auto font = "font"sv;
-constexpr auto color = "colors"sv;
-} // namespace Tabs
-
-namespace EditorFields {
-constexpr auto title = "title"sv;
-constexpr auto tabSize = "tab_size"sv;
-constexpr auto autoSave = "auto_save"sv;
-constexpr auto autoSaveIntervalMs = "auto_save_interval_s"sv;
-constexpr auto cursorBlinkMs = "cursor_blink_ms"sv;
-constexpr auto wrapText = "wrap_text"sv;
-constexpr auto fps = "fps"sv;
-constexpr auto verticalRuler = "vertical_ruler"sv;
-constexpr auto verticalRulerCount = "vertical_ruler_count"sv;
-} // namespace EditorFields
-
-namespace FontFields {
-constexpr auto codeFontPath = "code_font_path"sv;
-constexpr auto codeFontSize = "code_font_size"sv;
-constexpr auto uiFontPath = "ui_font_path"sv;
-constexpr auto uiFontSize = "ui_font_size"sv;
-} // namespace FontFields
-
-namespace ColorFields {
-constexpr auto backgroundColor = "background_color"sv;
-constexpr auto foregroundColor = "foreground_color"sv;
-constexpr auto cursorColor = "cursor_color"sv;
-constexpr auto selectionColor = "selection_color"sv;
-constexpr auto verticalRulerColor = "vertical_ruler_color"sv;
-} // namespace ColorFields
-
-using Json = nlohmann::json;
-
-class EditorConfig final {
-      public:
-	static EditorConfig getEditorConfig(const Json&);
-
-	EditorConfig() = delete;
-	EditorConfig(std::string title_t, int tabSize_t, bool autoSave_t, int autoSaveIntervalsMs_t, int cursorBlinkMs_t,
-		     bool wrapText_t, int fps_t, bool verticalRuler_t, int verticalRulerCount_t);
-	~EditorConfig() noexcept = default;
-
-	std::string title;
-	int tab_size;
-	bool auto_save;
-	int auto_save_intervals_ms;
-	int cursor_blink_ms;
-	bool wrap_text;
-	int fps;
-
-	bool vertical_ruler;
-	int vertical_ruler_count;
-};
-
-class FontConfig final {
-      public:
-	static FontConfig getFontConfig(const Json&);
-
-	FontConfig() = delete;
-	FontConfig(std::filesystem::path codeFontPath_t, int codeFontSize_t, std::filesystem::path uiFontPath_t,
-		   int uiFontSize_t);
-	~FontConfig() noexcept = default;
-
-	std::filesystem::path code_font_path;
-	int code_font_size;
-
-	std::filesystem::path ui_font_path;
-	int ui_font_size;
-};
-
-class ColorsConfig final {
-      public:
-	static ColorsConfig getColorConfig(const Json&);
-
-	ColorsConfig() = delete;
-	ColorsConfig(const SDL_Color&, const SDL_Color&, const SDL_Color&, const SDL_Color&, const SDL_Color&);
-	~ColorsConfig() noexcept = default;
-
-	SDL_Color background_color;
-	SDL_Color foreground_color;
-	SDL_Color cursor_color;
-	SDL_Color selection_color;
-	SDL_Color vertical_ruler_color;
-
-private:
-	static SDL_Color getColorFromHex(std::string&);
-};
-
-class ConstantsConfig final {
 public:
-    ConstantsConfig();
-    ~ConstantsConfig() noexcept = default;
+	Theme() = default;
+	explicit Theme(const Json&);
+	~Theme() noexcept = default;
 
-    int codeCharWidth{}, codeCharHeight{};
-    int uiCharWidth{}, uiCharHeight{};
-
-    int tabHeight{};
-    int paddingX = 25;
+	SDL_Color codeText;
+	SDL_Color background;
+	SDL_Color foreground;
+	SDL_Color uiText;
+	SDL_Color main;
+	SDL_Color secondary;
+	SDL_Color cursor;
+	SDL_Color highlight;
+private:
+	constexpr static auto CodeText = "code_text"sv;
+	constexpr static auto Background = "background"sv;
+	constexpr static auto Foreground = "foreground"sv;
+	constexpr static auto UiText = "ui_text"sv;
+	constexpr static auto Main = "main"sv;
+	constexpr static auto Secondary = "secondary"sv;
+	constexpr static auto Cursor = "cursor"sv;
+	constexpr static auto Highlight = "highlight"sv;
 };
 
 class Config final {
-      public:
+public:
 	Config() = delete;
 	explicit Config(const std::filesystem::path&);
-	~Config() noexcept;
+	~Config() noexcept = default;
 
-	EditorConfig editor_;
-	FontConfig font_;
-	ColorsConfig colors_;
-    ConstantsConfig constantConfig_{};
+	Window window;
+	Editor editor;
+	Fonts fonts;
+	Theme theme;
 
-	explicit Config(const Json&);
-};*/
+private:
+	constexpr static auto KeyWindow = "window"sv;
+	constexpr static auto KeyEditor = "editor"sv;
+	constexpr static auto KeyFonts = "fonts"sv;
+	constexpr static auto KeyTheme = "theme"sv;
+};

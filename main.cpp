@@ -8,7 +8,7 @@ const std::filesystem::path configPath = "config.json";
 
 int main(const int argc, char** argv) {
 
-    Config config{configPath};
+	Config config{configPath};
 	const auto ticksPerFrame = 1.0 / static_cast<double>(config.editor_.fps);
 
 	EditorCore editorCore{argc, argv};
@@ -27,10 +27,10 @@ int main(const int argc, char** argv) {
 		if (renderTime >= ticksPerFrame) {
 			renderStart = end;
 
-		    if (editorCore.dirty) {
-		        const LayoutManager layouts{editorCore, config};
-			    renderer.Render(layouts);
-		    }
+			if (editorCore.dirty) {
+				const LayoutManager layouts{editorCore, config};
+				renderer.Render(layouts);
+			}
 		}
 	}
 }

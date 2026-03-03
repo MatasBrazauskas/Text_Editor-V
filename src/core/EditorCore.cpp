@@ -4,9 +4,11 @@
 #include <iostream>
 
 EditorState::EditorState(const FileId activeFileId_t)
-    : currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
+	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
-EditorCore::EditorCore(const int argc, char** argv) :dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{PaneView(), filesManager_.fileIdCounter_}, editorState_{0} {}
+EditorCore::EditorCore(const int argc, char** argv)
+	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{PaneView(), filesManager_.fileIdCounter_},
+	  editorState_{0} {}
 
 std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	if (event.type == SDL_QUIT) {
@@ -40,7 +42,7 @@ std::string EditorCore::EncodeInput(const SDL_Event& event) {
 
 void EditorCore::HandleKeyboardInput() {
 	SDL_Event event;
-    //dirty = false;
+	// dirty = false;
 
 	while (SDL_PollEvent(&event)) {
 
@@ -68,22 +70,22 @@ void EditorCore::HandleKeyboardInput() {
 			break;
 		}
 
-	    dirty = true;
+		dirty = true;
 	}
 }
 
 FilesManager& EditorCore::getFilesManager() {
-    return filesManager_;
+	return filesManager_;
 }
 
 PanesManager& EditorCore::getPanesManager() {
-    return panesManager_;
+	return panesManager_;
 }
 
 const EditorState& EditorCore::getEditorState() const {
-    return editorState_;
+	return editorState_;
 }
 
 const EditorInputAndOutput& EditorCore::getEditorInputAndOutput() const {
-    return editorInputAndOutput_;
+	return editorInputAndOutput_;
 }

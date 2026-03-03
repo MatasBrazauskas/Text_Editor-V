@@ -1,104 +1,164 @@
 #include "Config.hpp"
 
-#include <algorithm>
 #include <fstream>
 #include <stdexcept>
 
-EditorConfig::EditorConfig(std::string title_t, const int tabSize_t, const bool autoSave_t,
-			   const int autoSaveIntervalsMs_t, const int cursorBlinkMs_t, const bool wrapText_t,
-			   const int fps_t, const bool verticalRuler_t, const int verticalRulerCount_t)
-    : title{std::move(title_t)}, tab_size{tabSize_t}, auto_save{autoSave_t},
-      auto_save_intervals_ms(autoSaveIntervalsMs_t), cursor_blink_ms{cursorBlinkMs_t}, wrap_text{wrapText_t}, fps{fps_t},
-      vertical_ruler{verticalRuler_t}, vertical_ruler_count{verticalRulerCount_t} {}
+template<typename T>
+static T getJsonObject(const Json& t_jsonObject, std::string_view t_name) {
+	if (const auto it = t_jsonObject.find(t_name); it != t_jsonObject.end() && !it.value().is_null()) {
+		return it.value().get<T>();
+	}
 
-EditorConfig EditorConfig::getEditorConfig(const Json& json) {
-	const auto& e = json.at(Tabs::editor);
+	throw std::runtime_error("\nCan't read the field: " + std::string{t_name});
+}
 
-	return EditorConfig{
-	    e.at(EditorFields::title).get<std::string>(),
-	    e.at(EditorFields::tabSize).get<int>(),
-	    e.at(EditorFields::autoSave).get<bool>(),
-	    e.at(EditorFields::autoSaveIntervalMs).get<int>(),
-	    e.at(EditorFields::cursorBlinkMs).get<int>(),
-	    e.at(EditorFields::wrapText).get<bool>(),
-	    e.at(EditorFields::fps).get<int>(),
-	    e.at(EditorFields::verticalRuler).get<bool>(),
-	    e.at(EditorFields::verticalRulerCount).get<int>(),
+static SDL_Color HexToSDL(std::string hex) {
+	if (hex[0] == '#')
+		hex.erase(0, 1);
+
+	const uint32_t v = std::stoul(hex, nullptr, 16);
+	return {
+		static_cast<Uint8>((v >> 16) & 0xFF),
+		static_cast<Uint8>((v >> 8) & 0xFF),
+		static_cast<Uint8>(v & 0xFF),
+		255
 	};
 }
 
-FontConfig::FontConfig(std::filesystem::path fontPath_t, const int fontSize_t, std::filesystem::path uiFondPath_t,
-		       const int uiFontSize)
-    : code_font_path{std::move(fontPath_t)}, code_font_size{fontSize_t}, ui_font_path{std::move(uiFondPath_t)},
-      ui_font_size{uiFontSize} {}
+static LineNumberModes getLineNumber(const std::string& t_lineNumber) {
+	static std::unordered_map<std::string, LineNumberModes> lineNumberModes = {
+		{"none", LineNumberModes::None},
+		{"relative", LineNumberModes::Relative},
+		{"number", LineNumberModes::Number}
+	};
 
-FontConfig FontConfig::getFontConfig(const Json& json) {
-	const auto& e = json.at(Tabs::font);
-
-	return FontConfig{
-	    e.at(FontFields::codeFontPath).get<std::filesystem::path>(), e.at(FontFields::codeFontSize).get<int>(),
-	    e.at(FontFields::uiFontPath).get<std::filesystem::path>(), e.at(FontFields::uiFontSize).get<int>()};
-}
-
-ColorsConfig::ColorsConfig(const SDL_Color& backgroundColor_t, const SDL_Color& foregroundColor_t,
-			   const SDL_Color& cursorColor_t, const SDL_Color& selectionColor_t,
-			   const SDL_Color& verticalRulerColor_t)
-    : background_color{backgroundColor_t}, foreground_color{foregroundColor_t}, cursor_color{cursorColor_t},
-      selection_color{selectionColor_t}, vertical_ruler_color{verticalRulerColor_t} {}
-
-SDL_Color ColorsConfig::getColorFromHex(std::string& hexStr) {
-	if (hexStr.empty() || hexStr.length() != 6) {
-		throw std::runtime_error("Invalid hex string.");
+	if (const auto it = lineNumberModes.find(t_lineNumber); it != lineNumberModes.end()) {
+		return it->second;
 	}
 
-	const bool allHexValues = std::ranges::all_of(hexStr, [](char i) { return i >= '0' && i <= 'f'; });
-	if (!allHexValues) {
-		throw std::runtime_error("Invalid hex string.");
-	}
-
-	uint8_t rgbColors[3];
-	for (auto i{0zu}; i < 3; i++) {
-		const auto rgbColor = hexStr.substr(i * 2, 2);
-		rgbColors[i] = static_cast<uint8_t>(std::stoi(rgbColor, nullptr, 16));
-	}
-
-	return {rgbColors[0], rgbColors[1], rgbColors[2]};
+	throw std::runtime_error("\nCan't read the field: line_number_modes");
 }
 
-ColorsConfig ColorsConfig::getColorConfig(const Json& json) {
-	const auto& e = json.at(Tabs::color);
-
-	auto bgColorStr = e.at(ColorFields::backgroundColor).get<std::string>();
-	auto frColorStr = e.at(ColorFields::foregroundColor).get<std::string>();
-	auto crColorStr = e.at(ColorFields::cursorColor).get<std::string>();
-	auto crFrColorStr = e.at(ColorFields::selectionColor).get<std::string>();
-	auto vrColorStr = e.at(ColorFields::verticalRulerColor).get<std::string>();
-
-	return ColorsConfig{getColorFromHex(bgColorStr), getColorFromHex(frColorStr), getColorFromHex(crColorStr),
-			    getColorFromHex(crFrColorStr), getColorFromHex(vrColorStr)};
+Window::Window(const Json& t_json) {
+	try {
+		title = getJsonObject<std::string>(t_json, Title);
+		width = getJsonObject<int>(t_json, Width);
+		height = getJsonObject<int>(t_json, Height);
+		centered = getJsonObject<bool>(t_json, Centered);
+		fps_limit = getJsonObject<int>(t_json, FpsLimit);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing Window tab: " + std::string{e.what()});
+	}
 }
 
-ConstantsConfig::ConstantsConfig(){
-
+AutoSave::AutoSave(const Json& t_json) {
+	try {
+		enabled = getJsonObject<bool>(t_json, Enable);
+		interval_s = getJsonObject<int>(t_json, Interval_s);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing AutoSave tab: " + std::string{e.what()});
+	}
 }
 
-static Json loadJson(const std::string& configPath) {
-	if (configPath.empty()) {
-		throw std::runtime_error("Config path must be non-empty.");
+Feel::Feel(const Json& t_json) {
+	try {
+		tabSize = getJsonObject<int>(t_json, TabSize);
+		autoSave = AutoSave(getJsonObject<Json>(t_json, KeyAutoSave));
+		cursorBlinkMs = getJsonObject<int>(t_json, CursorBlinkMs);
+		wrapText = getJsonObject<bool>(t_json, WrapText);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing Feel tab: " + std::string{e.what()});
+	}
+}
+
+VerticalRuler::VerticalRuler(const Json& t_json) {
+	try {
+		enabled = getJsonObject<int>(t_json, Enabled);
+		column = getJsonObject<int>(t_json, Column);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing VerticalRuler tab: " + std::string{e.what()});
+	}
+}
+
+View::View(const Json& t_json) {
+	try {
+		verticalRuler = VerticalRuler{getJsonObject<Json>(t_json, KeyVerticalRuler)};
+		const auto lineModeStr = getJsonObject<std::string>(t_json, KeyLineNumberMode);
+		lineNumberMode = getLineNumber(lineModeStr);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing View tab: " + std::string{e.what()});
+	}
+}
+
+Editor::Editor(const Json& t_json) {
+	try {
+		feel = Feel{getJsonObject<Json>(t_json, KeyFeel)};
+		view = View{getJsonObject<Json>(t_json, KeyView)};
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing Editor tab: " + std::string{e.what()});
+	}
+}
+
+TextFonts::TextFonts(const Json& t_json) {
+	try {
+		path = getJsonObject<std::string>(t_json, Path);
+		size = getJsonObject<int>(t_json, Size);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing TextFonts tab: " + std::string{e.what()});
+	}
+}
+
+Fonts::Fonts(const Json& t_json) {
+	try {
+		const Json code_Json = getJsonObject<Json>(t_json, Code);
+		const Json ui_Json = getJsonObject<Json>(t_json, Ui);
+
+		code = TextFonts(code_Json);
+		ui = TextFonts(ui_Json);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing TextFonts tab: " + std::string{e.what()});
+	}
+}
+
+Theme::Theme(const Json& t_json) {
+	try {
+		const auto codeTextObj = getJsonObject<std::string>(t_json, CodeText);
+		const auto backgroundObj = getJsonObject<std::string>(t_json,Background);
+		const auto foregroundObj = getJsonObject<std::string>(t_json, Foreground);
+		const auto uiTextObj = getJsonObject<std::string>(t_json, UiText);
+		const auto mainObj = getJsonObject<std::string>(t_json, Main);
+		const auto secondaryObj = getJsonObject<std::string>(t_json, Secondary);
+		const auto cursorObj = getJsonObject<std::string>(t_json, Cursor);
+		const auto highlightObj = getJsonObject<std::string>(t_json, Highlight);
+
+		codeText = HexToSDL(codeTextObj);
+		background = HexToSDL(backgroundObj);
+		foreground = HexToSDL(foregroundObj);
+		uiText = HexToSDL(uiTextObj);
+		main = HexToSDL(mainObj);
+		secondary = HexToSDL(secondaryObj);
+		cursor = HexToSDL(cursorObj);
+		highlight = HexToSDL(highlightObj);
+	} catch (std::exception& e) {
+		throw std::runtime_error("\nJSON error parsing Theme tab: " + std::string{e.what()});
+	}
+}
+
+Config::Config(const std::filesystem::path& t_path):window{},editor{},fonts{}, theme{} {
+	if (!std::filesystem::exists(t_path)) {
+		throw std::runtime_error("Config path must be present.");
 	}
 
-	std::ifstream configFile(configPath);
-
+	std::ifstream configFile(t_path);
 	Json json;
 	configFile >> json;
-	return json;
+
+	try {
+		window = Window{getJsonObject<Json>(json, KeyWindow)};
+		editor = Editor{getJsonObject<Json>(json, KeyEditor)};
+		fonts = Fonts{getJsonObject<Json>(json, KeyFonts)};
+		theme = Theme{getJsonObject<Json>(json, KeyTheme)};
+	} catch (const std::exception& e) {
+		throw std::runtime_error("JSON Parse Failure: " + std::string{e.what()});
+	}
 }
-
-
-Config::Config(const std::filesystem::path& configPath) : Config(loadJson(configPath)) {}
-
-Config::Config(const Json& json)
-    : editor_(EditorConfig::getEditorConfig(json)), font_(FontConfig::getFontConfig(json)),
-      colors_(ColorsConfig::getColorConfig(json)), constantConfig_{} {}
-
-Config::~Config() noexcept = default;

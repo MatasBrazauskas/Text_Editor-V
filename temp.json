@@ -27,7 +27,7 @@
         "enabled": true,
         "column": 80 
       },
-      "line_numbers": "relative"
+      "line_number_mode": "relative"
     }
   },
   "fonts": 
@@ -42,12 +42,16 @@
       "path": "fonts/JetBrainsMono-Medium.ttf",
       "size": 17
     }
-  },
+    },
   "theme": 
   {
-    "background_color": "1a1b26",
-    "foreground_color": "c0caf5",
-    "cursor_color": "ffffff",
-    "selection_color": "000000"
+    "code_text" : "00000",
+    "background": "1a1b26",
+    "foreground": "c0caf5",
+    "ui_text": "000000",
+    "main": "1a1b26",
+    "secondary": "c0caf5",
+    "cursor": "ffffff",
+    "highlight": "000000"
   }
 }
