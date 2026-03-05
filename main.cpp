@@ -1,18 +1,18 @@
 #include "core/EditorCore.hpp"
 #include "core/Renderer.hpp"
-#include "utils/Config.hpp"
+#include "utils/ConfigAndSettings.hpp"
 
 using namespace std::string_literals;
 
-const std::filesystem::path configPath = "config.json";
-
 int main(const int argc, char** argv) {
 
-	Config config{configPath};
-	const auto ticksPerFrame = 1.0 / static_cast<double>(config.editor_.fps);
+	Config config{};
+	Settings settings{config};
+
+	const auto ticksPerFrame = 1.0 / static_cast<double>(config.window.fps_limit);
 
 	EditorCore editorCore{argc, argv};
-	Renderer renderer{config};
+	Renderer renderer{config, settings};
 
 	const Uint64 freq = SDL_GetPerformanceFrequency();
 	Uint64 renderStart = SDL_GetPerformanceCounter();
@@ -22,13 +22,13 @@ int main(const int argc, char** argv) {
 		const Uint64 end = SDL_GetPerformanceCounter();
 		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
-		editorCore.HandleKeyboardInput();
+		editorCore.HandleKeyboardInput(config);
 
 		if (renderTime >= ticksPerFrame) {
 			renderStart = end;
 
 			if (editorCore.dirty) {
-				const LayoutManager layouts{editorCore, config};
+				const LayoutManager layouts{editorCore, config, settings};
 				renderer.Render(layouts);
 			}
 		}

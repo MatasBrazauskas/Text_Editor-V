@@ -2,16 +2,19 @@
 
 #include "EditorCore.hpp"
 #include "buffer/PanesAndLayers.hpp"
-#include "utils/Config.hpp"
+#include "utils/ConfigAndSettings.hpp"
 
 #include <iostream>
+#include <format>
 
-Renderer::Renderer(Config& t_config) : config_{t_config} {
+Renderer::Renderer(const Config& t_config, const Settings& t_settings):
+	normalModeColor_{137, 180, 250}, insertModeColor_{195, 232, 141}, commandModeColor_{254, 198, 118},
+	config_{t_config}, settings_{t_settings}{
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
 		throw std::runtime_error(SDL_GetError());
 	}
 
-	window_ = SDL_CreateWindow(config_.editor_.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800,
+	window_ = SDL_CreateWindow(config_.window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, config_.window.width, config_.window.height,
 							   SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE //| SDL_WINDOW_BORDERLESS
 	);
 
@@ -29,30 +32,19 @@ Renderer::Renderer(Config& t_config) : config_{t_config} {
 
 	SDL_StartTextInput();
 
-	if (TTF_Init() == -1) {
+	/*if (TTF_Init() == -1) {
 		throw std::runtime_error("Failed to initialize TTF.");
-	}
+	}*/
 
-	codeFont_ = TTF_OpenFont(config_.font_.code_font_path.c_str(), config_.font_.code_font_size);
-	uiFont_ = TTF_OpenFont(config_.font_.ui_font_path.c_str(), config_.font_.ui_font_size);
+	const auto& codeFont = t_config.fonts.code;
+	const auto& uiFont = t_config.fonts.ui;
+
+	codeFont_ = TTF_OpenFont(codeFont.path.c_str(), codeFont.size);
+	uiFont_ = TTF_OpenFont(uiFont.path.c_str(), uiFont.size);
 
 	if (!codeFont_ || !uiFont_) {
 		throw std::runtime_error("Failed to open font.");
 	}
-
-	auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = config_.constantConfig_;
-
-	TTF_SetFontHinting(codeFont_, TTF_HINTING_MONO);
-	TTF_SetFontKerning(codeFont_, 0);
-
-	TTF_SizeText(codeFont_, "A", &codeCharWidth, &codeCharHeight);
-
-	TTF_SetFontHinting(uiFont_, TTF_HINTING_MONO);
-	TTF_SetFontKerning(uiFont_, 0);
-
-	TTF_SizeText(uiFont_, "A", &uiCharWidth, &uiCharHeight);
-
-	tabHeight = uiCharHeight + 5;
 }
 
 Renderer::~Renderer() noexcept {
@@ -77,67 +69,72 @@ Renderer::~Renderer() noexcept {
 
 void Renderer::Render(const LayoutManager& t_layoutManage) const {
 
-	SDL_RenderClear(renderer_);
 	SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 125);
+	SDL_RenderClear(renderer_);
 
-	RenderTabs(t_layoutManage.tabLayout, t_layoutManage.windowHeight, t_layoutManage.windowWidth);
-	// RenderPanes(t_layoutManage.panesLayout);
+	RenderTabs(t_layoutManage.tabLayout, t_layoutManage.windowWidth);
+	//RenderPanes(t_layoutManage.panesLayout);
 	// RenderCursor(t_layoutManage.cursorLayout);
 	RenderCommandLine(t_layoutManage.commandLineLayout, t_layoutManage.windowHeight, t_layoutManage.windowWidth);
 
 	SDL_RenderPresent(renderer_);
 }
 
-void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, const int windowWidth) const {
+void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowWidth) const {
 	const auto& [activeTab, tabCapLines, tabs] = t_tabLayout;
-	const auto constConfig = config_.constantConfig_;
 
-	constexpr SDL_Color colBarBg = {30, 30, 30, 255};
-	constexpr SDL_Color colTabInact = {45, 45, 45, 255};
-	constexpr SDL_Color colTabAct = {30, 32, 40, 255};
-	constexpr SDL_Color colAccent = {0, 122, 204, 255};
-	constexpr SDL_Color colTextAct = {255, 255, 255, 255};
-	constexpr SDL_Color colTextInact = {150, 150, 150, 255};
+	const auto& main = config_.theme.main;
+	const auto& secondary = config_.theme.secondary;
+
+	const auto& codeColor = config_.theme.codeText;
+	const auto& uiColor = config_.theme.uiText;
+
+	const auto drawForegroundLine = [&](const int yOffset) {
+		static const auto& [fr, fg, fb, fa] = config_.theme.foreground;
+
+		const SDL_Rect barRect = {0, yOffset, windowWidth, settings_.tabHeight};
+		SDL_SetRenderDrawColor(renderer_, fr, fg, fb, fa);
+		SDL_RenderFillRect(renderer_, &barRect);
+	};
+
+	const int paddingX = settings_.paddingX;
 
 	int currentX{};
 	int currentY{};
 
-	const SDL_Rect barRect = {0, 0, windowWidth, tabCapLines * tabCapLines};
-	SDL_SetRenderDrawColor(renderer_, colBarBg.r, colBarBg.g, colBarBg.b, colBarBg.a);
-	SDL_RenderFillRect(renderer_, &barRect);
+	drawForegroundLine(0);
 
-	for (auto i{0zu}; i < tabs.size(); i++) {
+	for (auto i{0zu}; i < tabs.size(); ++i) {
 		const auto& filename = std::string{tabs.at(i)};
 
 		int textW{}, textH{};
 		TTF_SizeText(uiFont_, filename.c_str(), &textW, &textH);
 
-		const int tabWidth = textW + (constConfig.paddingX * 2);
-		const bool isActive = i == activeTab;
+		if (currentX + textW >= windowWidth) {
+			currentX = 0;
+			currentY += settings_.tabHeight;
 
-		SDL_Rect tabRect = {currentX, currentY, tabWidth, constConfig.uiCharHeight};
-
-		SDL_Color bg = isActive ? colTabAct : colTabInact;
-		SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
-		SDL_RenderFillRect(renderer_, &tabRect);
-
-		if (isActive) {
-			SDL_Rect accentRect = {currentX, currentY, tabWidth, 2}; // 2px height
-			SDL_SetRenderDrawColor(renderer_, colAccent.r, colAccent.g, colAccent.b, colAccent.a);
-			SDL_RenderFillRect(renderer_, &accentRect);
+			drawForegroundLine(currentY);
 		}
 
-		SDL_SetRenderDrawColor(renderer_, 20, 20, 20, 255); // Dark line
-		SDL_RenderDrawLine(renderer_, currentX + tabWidth - 1, currentY, currentX + tabWidth - 1,
-						   currentY + constConfig.uiCharHeight);
+		const int tabWidth = textW + (paddingX * 2);
 
-		SDL_Color textColor = isActive ? colTextAct : colTextInact;
+		SDL_Rect tabRect = {currentX, currentY, tabWidth, settings_.tabHeight};
 
-		SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, filename.c_str(), textColor);
+		const auto& tabBack = i == activeTab ? main : secondary;
+		const auto& tabTextColor = i == activeTab ? codeColor : uiColor ;
+
+		SDL_SetRenderDrawColor(renderer_, tabBack.r, tabBack.g, tabBack.b, tabBack.a);
+		SDL_RenderFillRect(renderer_, &tabRect);
+
+		SDL_SetRenderDrawColor(renderer_, 20, 20, 20, 255);
+		SDL_RenderDrawLine(renderer_, currentX + tabWidth - 1, currentY, currentX + tabWidth - 1, settings_.uiCharHeight+2);
+
+
+		SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, filename.c_str(), tabTextColor);
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-		SDL_Rect textRect = {currentX + constConfig.paddingX, (constConfig.uiCharHeight - textH) / 2 + currentY, textW,
-							 textH};
+		SDL_Rect textRect = {currentX + paddingX,(settings_.tabHeight - textH) / 2 + currentY, textW, textH};
 
 		SDL_RenderCopy(renderer_, texture, nullptr, &textRect);
 
@@ -149,8 +146,10 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowHeight, 
 }
 
 void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
-	const auto& fg = config_.colors_.foreground_color;
-	const auto constConfig = config_.constantConfig_;
+	const auto& fg = config_.theme.foreground;
+
+	const int codeCharWidth = settings_.codeCharWidth;
+	const int codeCharHeight = settings_.codeCharHeight;
 
 	for (const auto& pane : panes) {
 		const auto& [startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = pane;
@@ -161,12 +160,11 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 			SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), fg);
 			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-			const int length = line.length() * constConfig.codeCharWidth;
-			const int lineOffset = i * constConfig.codeCharHeight;
+			const int length = line.length() * codeCharWidth;
+			const int lineOffset = i * codeCharHeight;
 
 			const SDL_Rect src{0, 0, length, surface->h};
-			const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset * constConfig.codeCharHeight, length,
-							   surface->h};
+			const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset * codeCharHeight, length, surface->h};
 
 			SDL_RenderCopy(renderer_, texture, &src, &dst);
 
@@ -177,14 +175,13 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 }
 
 void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
-	const auto [cr, cg, cb, ca] = config_.colors_.cursor_color;
-	const auto& cursorFg = config_.colors_.selection_color;
+	const auto [cr, cg, cb, ca] = config_.theme.cursor;
+	const auto& cursorFg = config_.theme.highlight;
 
 	const auto& [active, cursorX, cursorY, letter, panesLayout] = t_cursorLayout;
 
 	SDL_SetRenderDrawColor(renderer_, cr, cg, cb, ca);
-	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] =
-		config_.constantConfig_;
+	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = settings_;
 
 	const int cursorOffsetY = codeCharHeight;
 	const int cursorOffsetX = codeCharWidth;
@@ -212,66 +209,63 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 	}
 }
 
-void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, const int windowHeight,
-								 const int windowWidth) const {
-	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] =
-		config_.constantConfig_;
+void Renderer::RenderCommandLine(const CommandLineLayout& t_commandLineLayout, const int windowHeight, const int windowWidth) const {
+	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight, paddingX] = settings_;
 	const auto& [mode, currFileName, currCommand, cursorX, cursorY, charCount, lineCount, args] = t_commandLineLayout;
-	std::string line{};
-	SDL_Color bg;
+
+	const auto& foreground = config_.theme.foreground;
+
+	std::string line{"  Normal"};
+	SDL_Color bg = normalModeColor_;
 
 	switch (mode) {
-	case Modes::Normal:
-		line = "Normal";
-		bg = {137, 180, 250};
-		break;
 	case Modes::Insert:
-		line = "Insert";
-		bg = {195, 232, 141};
+		line = "  Insert";
+		bg = insertModeColor_;
 		break;
 	case Modes::Command:
-		line = "Command";
-		bg = {254, 198, 118};
+		line = "  Command";
+		bg = commandModeColor_;
 		break;
-	default:
-		abort();
 	}
 
-	const int size = 9;
-	const float offset = (size - line.length()) / 2.0f;
-	const int modeOffset = offset * uiCharWidth;
+	const int modeBarWidth = uiCharWidth * 11;
+	const std::string cappedFilename = currFileName.substr(0, 20);
 
-	const auto topLRect = SDL_Rect{0, windowHeight - 2 * uiCharHeight, windowWidth, uiCharHeight};
+	const std::string formattedCommandAndCursorInfo = std::format("Command: {:>2}, ({}, {})",currCommand, cursorX, cursorY);
+	const std::string formattedFileInfo = std::format("Lines: {:>2}, Chars: {:>2}", lineCount, charCount);
 
-	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
+	const auto topLRect = SDL_Rect{0, windowHeight - (2 * uiCharHeight), windowWidth, 2 * uiCharHeight};
+	SDL_SetRenderDrawColor(renderer_, foreground.r, foreground.g, foreground.b, foreground.a);
 	SDL_RenderFillRect(renderer_, &topLRect);
 
-	SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, line.c_str(), config_.colors_.selection_color);
+	SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, line.c_str(), config_.theme.uiText);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-	const SDL_Rect dst{modeOffset, windowHeight - 2 * uiCharHeight, surface->w, surface->h};
+	const auto modeRect = SDL_Rect{0, windowHeight - (2 * uiCharHeight), modeBarWidth, uiCharHeight};
+	SDL_SetRenderDrawColor(renderer_, bg.r, bg.g, bg.b, bg.a);
+	SDL_RenderFillRect(renderer_, &modeRect);
+
+	SDL_Rect dst{0, windowHeight - 2 * uiCharHeight, surface->w, surface->h};
 	SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
-	/*if (mode == Modes::Command) {
-		const auto& temp = std::string{args};
-		surface = TTF_RenderText_Blended(uiFont_, temp.c_str(), config_.colors_.cursor_color);
+	surface = TTF_RenderText_Blended(uiFont_, cappedFilename.c_str(), config_.theme.uiText);
+	texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-		// TODO fix this ugly mess
-		const int lineLength = args.length();
-		const auto& [r, g, b, a] = config_.colors_.cursor_color;
-		SDL_SetRenderDrawColor(renderer_, r, g, b, a);
-		const auto rect = SDL_Rect{lineLength * uiCharWidth, windowHeight - uiCharHeight, 1, codeCharHeight};
+	dst = {modeBarWidth, windowHeight - 2 * uiCharHeight, surface->w, surface->h};
+	SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
-		SDL_RenderFillRect(renderer_, &rect);
+	auto surfaceTemp = TTF_RenderText_Blended(uiFont_, formattedFileInfo.c_str(), bg);
+	auto textureTemp = SDL_CreateTextureFromSurface(renderer_, surfaceTemp);
 
-		if (surface) {
-			texture = SDL_CreateTextureFromSurface(renderer_, surface);
+	dst = {windowWidth - surfaceTemp->w, windowHeight - 2 * uiCharHeight, surfaceTemp->w, surface->h};
+	SDL_RenderCopy(renderer_, textureTemp, nullptr, &dst);
 
-			const SDL_Rect dst2{0, windowHeight - uiCharHeight, surface->w, surface->h};
+	auto surfaceTemp2 = TTF_RenderText_Blended(uiFont_, formattedCommandAndCursorInfo.c_str(), config_.theme.uiText);
+	auto textureTemp2 = SDL_CreateTextureFromSurface(renderer_, surfaceTemp2);
 
-			SDL_RenderCopy(renderer_, texture, nullptr, &dst2);
-		}
-	}*/
+	dst = {windowWidth - surfaceTemp->w - surfaceTemp2->w, windowHeight - 2 * uiCharHeight, surfaceTemp2->w, surfaceTemp2->h};
+	SDL_RenderCopy(renderer_, textureTemp2, nullptr, &dst);
 
 	SDL_FreeSurface(surface);
 	SDL_DestroyTexture(texture);

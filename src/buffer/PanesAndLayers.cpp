@@ -1,12 +1,12 @@
 #include "PanesAndLayers.hpp"
 
 #include "core/EditorCore.hpp"
-#include "utils/Config.hpp"
+#include "utils/ConfigAndSettings.hpp"
 
 #include <algorithm>
 #include <ranges>
 
-Cursor::Cursor() : x_{0}, y_{0}, visible_{true}, absent_{} {}
+Cursor::Cursor() : x_{}, y_{}, visible_{true}, absent_{} {}
 
 void Cursor::incrementX() {
 	this->setX(x_ + 1);
@@ -96,20 +96,19 @@ CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int 
 						   const CursorType t_cursorType)
 	: visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letter}, cursorType{t_cursorType} {}
 
-LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config) : windowHeight{800}, windowWidth{1000} {
+LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, const Settings& t_settings) : windowHeight{t_config.window.height}, windowWidth{t_config.window.width} {
 	auto& fileManager = t_editorCore.getFilesManager();
 	auto& paneManager = t_editorCore.getPanesManager();
 	const auto& editorState = t_editorCore.getEditorState();
 	const auto& editorIO = t_editorCore.getEditorInputAndOutput();
 
-	addTabLayout(fileManager, t_config.constantConfig_);
-	addPanesLayout(fileManager, paneManager, t_config.constantConfig_, tabLayout.tabCapturedLinesOffsetY);
-	addCursorLayout(paneManager, t_config.constantConfig_, fileManager);
-	addCommandLineLayout(paneManager, t_config.constantConfig_, t_editorCore.getEditorState(),
-						 t_editorCore.getEditorInputAndOutput(), fileManager);
+	addTabLayout(fileManager, t_settings);
+	addPanesLayout(fileManager, paneManager, t_settings, tabLayout.tabCapturedLinesOffsetY);
+	addCursorLayout(paneManager, t_settings, fileManager);
+	addCommandLineLayout(paneManager, t_settings, editorState, editorIO, fileManager);
 }
 
-void LayoutManager::addTabLayout(const FilesManager& files, const ConstantsConfig& constConfig) {
+void LayoutManager::addTabLayout(const FilesManager& files, const Settings& constConfig) {
 
 	auto to_filename_view = [](const File& t_file) -> std::string {
 		std::string_view sv = t_file.filesPath_.native();
@@ -148,7 +147,7 @@ void LayoutManager::addTabLayout(const FilesManager& files, const ConstantsConfi
 }
 
 void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesLayout,
-								   const ConstantsConfig& t_config, const int t_tabOffsetY) {
+								   const Settings& t_config, const int t_tabOffsetY) {
 	const auto& pane = t_panesLayout.head_.pane.get();
 	const auto file = t_filesManager.getFile(pane->fileId_);
 	const auto& [text, stack, path, id] = file;
@@ -180,7 +179,7 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 	panesLayout.push_back(layoutPane);
 }
 
-void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const ConstantsConfig& t_config,
+void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const Settings& t_config,
 									FilesManager& t_filesManager) {
 	const auto pane = t_paneManager.paneMap_[t_paneManager.activePaneId_];
 	const auto [startX, startY, endX_, endY_, indexX, indexY] = pane->paneView_;
@@ -198,7 +197,7 @@ void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const Constants
 	cursorLayout = CursorLayout(pane->cursor_.isVisible(), cursorChar, cursorOffsetX, cursorOffsetY, CursorType::Block);
 }
 
-void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const ConstantsConfig& t_constConfig,
+void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
 										 const EditorState& t_editorState, const EditorInputAndOutput& t_io,
 										 FilesManager& t_filesManager) {
 	const Modes mode = t_editorState.currentMode_;

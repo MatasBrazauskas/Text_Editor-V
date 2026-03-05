@@ -10,7 +10,7 @@ using PaneId = uint_fast64_t;
 class EditorCore;
 class EditorState;
 class EditorInputAndOutput;
-class ConstantsConfig;
+class Settings;
 class Config;
 class FilesManager;
 
@@ -152,7 +152,7 @@ public:
 class LayoutManager final {
 public:
     LayoutManager() = delete;
-    explicit LayoutManager(EditorCore&, const Config&);
+    explicit LayoutManager(EditorCore&, const Config&, const Settings&);
     ~LayoutManager() noexcept = default;
 
 	int windowHeight, windowWidth;
@@ -163,8 +163,8 @@ public:
     CommandLineLayout commandLineLayout;
 
 private:
-    void addTabLayout(const FilesManager&, const ConstantsConfig&);
-    void addPanesLayout(FilesManager&, const PanesManager&, const ConstantsConfig&, int t_tabOffsetY);
-	void addCursorLayout(PanesManager& t_paneManager, const ConstantsConfig& t_config, FilesManager& t_filesManager);
-	void addCommandLineLayout(PanesManager& t_panesManager, const ConstantsConfig& t_constConfig, const EditorState& t_editorState, const EditorInputAndOutput& t_io, FilesManager& t_filesManager);
+    void addTabLayout(const FilesManager&, const Settings&);
+    void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY);
+	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager);
+	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig, const EditorState& t_editorState, const EditorInputAndOutput& t_io, FilesManager& t_filesManager);
 };

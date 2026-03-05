@@ -1,29 +1,56 @@
 {
-    "editor":
+  "window": 
+  {
+    "title": "Text Editor",
+    "width": 1280,
+    "height": 720,
+    "fps_limit": 60
+  },
+  "editor": 
+  {
+    "feel": 
     {
-        "title": "Text Editor",
-        "tab_size": 8,
-        "auto_save": false,
-        "auto_save_interval_s": 30,
-        "cursor_blink_ms": 1000,
-        "wrap_text": false,
-        "fps": 60,
-        "vertical_ruler": true,
-        "vertical_ruler_count": 20
+      "tab_size": 8,
+      "auto_save": 
+      {
+        "enabled": false, 
+        "interval_s": 30 
+      },
+      "cursor_blink_ms": 1000,
+      "wrap_text": false
     },
-    "font":
+    "view": 
     {
-        "code_font_path": "fonts/JetBrainsMono-ExtraLight.ttf",
-        "code_font_size": 19,
-        "ui_font_path": "fonts/JetBrainsMono-Medium.ttf",
-        "ui_font_size": 19
-    },
-    "colors":
-    {
-        "background_color": "1a1b26",
-        "foreground_color": "c0caf5",
-        "cursor_color": "ffffff",
-        "selection_color": "000000",
-        "vertical_ruler_color": "ffffff"
+      "vertical_ruler": 
+      { 
+        "enabled": true,
+        "column": 80 
+      },
+      "line_number_mode": "relative"
     }
+  },
+  "fonts": 
+  {
+    "code": 
+    {
+      "path": "fonts/JetBrainsMono-ExtraLight.ttf",
+      "size": 19
+    },
+    "ui": 
+    {
+      "path": "fonts/JetBrainsMono-Medium.ttf",
+      "size": 19
+    }
+    },
+  "theme": 
+  {
+    "code_text" : "ffffff",
+    "background": "222436",
+    "foreground": "1b1e1d",
+    "ui_text": "ffffff",
+    "main": "1b1f23",
+    "secondary": "0e004e",
+    "cursor": "ffffff",
+    "highlight": "000000"
+  }
 }

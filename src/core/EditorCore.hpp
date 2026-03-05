@@ -50,7 +50,7 @@ public:
 	EditorCore(int argc, char** argv);
 	~EditorCore() noexcept = default;
 
-	void HandleKeyboardInput();
+	void HandleKeyboardInput(Config&);
 
     FilesManager& getFilesManager();
     PanesManager& getPanesManager();

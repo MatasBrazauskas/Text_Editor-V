@@ -1,169 +1,72 @@
 @startuml
-class "nlohmann::basic_json" as C_0008843406913308057517
-class C_0008843406913308057517 {
-__
-}
-class "EditorConfig" as C_0014511316739402001150
-class C_0014511316739402001150 {
-+EditorConfig() = deleted : void
-+EditorConfig(std::string title_t, int tabSize_t, bool autoSave_t, int autoSaveIntervalsMs_t, int cursorBlinkMs_t, bool wrapText_t, int fps_t, bool verticalRuler_t, int verticalRulerCount_t) : void
-+~EditorConfig() constexpr noexcept = default : void
-..
-{static} +getEditorConfig(const Json &) : EditorConfig
-__
-+auto_save : bool
-+auto_save_intervals_ms : int
-+cursor_blink_ms : int
-+fps : int
-+tab_size : int
-+title : std::string
-+vertical_ruler : bool
-+vertical_ruler_count : int
-+wrap_text : bool
-}
-class "FontConfig" as C_0000021433759818595447
-class C_0000021433759818595447 {
-+FontConfig() = deleted : void
-+FontConfig(std::filesystem::path codeFontPath_t, int codeFontSize_t, std::filesystem::path uiFontPath_t, int uiFontSize_t) : void
-+~FontConfig() constexpr noexcept = default : void
-..
-{static} +getFontConfig(const Json &) : FontConfig
-__
-+code_font_path : std::filesystem::path
-+code_font_size : int
-+ui_font_path : std::filesystem::path
-+ui_font_size : int
-}
-class "ColorsConfig" as C_0012008145412256689023
-class C_0012008145412256689023 {
-+ColorsConfig() = deleted : void
-+ColorsConfig(const SDL_Color &, const SDL_Color &, const SDL_Color &, const SDL_Color &, const SDL_Color &) : void
-+~ColorsConfig() constexpr noexcept = default : void
-..
-{static} +getColorConfig(const Json &) : ColorsConfig
-{static} -getColorFromHex(std::string &) : SDL_Color
-__
-+background_color : SDL_Color
-+cursor_color : SDL_Color
-+foreground_color : SDL_Color
-+selection_color : SDL_Color
-+vertical_ruler_color : SDL_Color
-}
-class "Config" as C_0008289891971916880997
-class C_0008289891971916880997 {
-+Config(const std::filesystem::path &) : void
-+Config() = deleted : void
-+Config(const Json &) : void
-+~Config() noexcept : void
-__
-+colors_ : ColorsConfig
-+editor_ : EditorConfig
-+font_ : FontConfig
-}
 class "FileHandler" as C_0002918291441898942593
 class C_0002918291441898942593 {
 +FileHandler() = default : void
 +~FileHandler() constexpr = default : void
 ..
 +getContent(std::filesystem::path) const : std::vector<std::string>
-+writeToFile(const Document &) const : void
++writeToFile(const File &) const : void
 __
 }
-class "Cursor" as C_0000605994528586582938
-class C_0000605994528586582938 {
-+Cursor() : void
-+~Cursor() constexpr noexcept = default : void
+class "MatrixIterator" as C_0000499915192627540946
+class C_0000499915192627540946 {
++MatrixIterator(const std::vector<std::string> & t_matrix, int t_index, bool t_flag) : void
 ..
-+decrementX() : void
-+decrementY() : void
-+getX() const : int
-+getY() const : int
-+incrementX() : void
-+incrementY() : void
-+isVisible() const : bool
-+setVisible(bool) : void
-+setX(int) : void
-+setY(int) : void
++end(size_t) const : bool
++getLine() const : std::string_view
++next() : void
 __
--absent_ : int
--visible_ : bool
--x_ : int
--y_ : int
+-currLine_ : std::string_view
+-forwarded_ : bool
+-index_ : int
+-matrix_ : const std::vector<std::string> &
 }
-abstract "ITextBufferIterator" as C_0011603292986395824421
-abstract C_0011603292986395824421 {
-+ITextBufferIterator(const int index_t, const bool flag_t) : void
-+~ITextBufferIterator() constexpr noexcept = default : void
+class "Matrix" as C_0004693371551043460138
+class C_0004693371551043460138 {
++Matrix(const std::vector<std::string> & t_lines) : void
 ..
-{abstract} +end(size_t) const = 0 : const bool
-{abstract} +getLine() = 0 : std::string_view
-{abstract} +next() = 0 : void
++backwardIterator(size_t) const : MatrixIterator
++deleteCharacter(int row, int col) : void
++deleteLine(int row) : void
++deleteRange(int row, int startCol, int len) : void
++forwardIterator(size_t) const : MatrixIterator
++getCharCount() const : int
++getLine(int row) const : std::string_view
++getLineLength(int row) const : int
++getLineSubstr(int row, int col) const : std::string_view
++getLineSubstr(int row, int col, int n) const : std::string_view
++getLinesCount() const : int
++insertCharacter(int row, int col, char c) : void
++insertLine(int row, std::string line) : void
++insertRange(int row, int startCol, std::string_view range) : void
 __
-#currLine_ : std::string_view
-#forwarded_ : bool
-+index_ : int
+-charsCount_ : int
+-lines_ : std::vector<std::string>
+{static} +separators_ : const std::string
 }
-abstract "ITextBuffer" as C_0005241398686539464490
-abstract C_0005241398686539464490 {
-+ITextBuffer() = default : void
-+~ITextBuffer() constexpr noexcept = default : void
-..
-{abstract} +backwardIterator(size_t) = 0 : std::unique_ptr<ITextBufferIterator>
-{abstract} +deleteCharacter(int row, int col) = 0 : void
-{abstract} +deleteLine(int row) = 0 : void
-{abstract} +deleteRange(int row, int startCol, int len) = 0 : void
-{abstract} +forwardIterator(size_t) = 0 : std::unique_ptr<ITextBufferIterator>
-{abstract} +init(std::vector<std::string> matrix) = 0 : void
-{abstract} +insertCharacter(int row, int col, char c) = 0 : void
-{abstract} +insertLine(int row, std::string) = 0 : void
-{abstract} +insertRange(int row, int startCol, std::string_view range) = 0 : void
-{abstract} +linesCount() const = 0 : int
-{abstract} +rowSubstr(int row, int col) const = 0 : const std::string_view
-{abstract} +rowSubstr(int row, int col, int n) const = 0 : const std::string_view
-{abstract} +rowsLength(int row) const = 0 : int
-{abstract} +rowsView(int row) const = 0 : const std::string_view
+class "File" as C_0008611533756821712008
+class C_0008611533756821712008 {
++File() = deleted : void
++File(const Matrix &, std::filesystem::path, FileId) : void
++~File() noexcept = default : void
 __
-#charsCount_ : size_t
-#rowsCount_ : size_t
-{static} +separators : std::string
-}
-class "TextBufferView" as C_0002928650556855873887
-class C_0002928650556855873887 {
-+TextBufferView() : void
-+~TextBufferView() constexpr noexcept = default : void
-__
-+startX_ : int
-+startY_ : int
-+visibleColumns_ : int
-+visibleLines_ : int
-}
-class "Document" as C_0000418121225864476394
-class C_0000418121225864476394 {
-+Document() = deleted : void
-+Document(std::unique_ptr<ITextBuffer>, std::filesystem::path) : void
-+Document(Document &&) noexcept = default : void
-+Document(const Document &) = deleted : void
-+~Document() constexpr noexcept = default : void
-..
-+operator=(Document &&) noexcept = default : Document &
-+operator=(const Document &) = deleted : Document &
-__
-+cursor_ : Cursor
++fileId_ : FileId
 +filesPath_ : std::filesystem::path
-+textBuffer_ : std::unique_ptr<ITextBuffer>
-+textView_ : TextBufferView
++textBuffer_ : Matrix
++undoStack_ : std::stack<int>
 }
-class "Files" as C_0018030906234682690639
-class C_0018030906234682690639 {
-+Files() = deleted : void
-+Files(const FileHandler &, int argc, char ** argv) : void
-+~Files() constexpr noexcept = default : void
+class "FilesManager" as C_0011153622041461101778
+class C_0011153622041461101778 {
++FilesManager(const FileHandler &, int argc, char ** argv) : void
++~FilesManager() noexcept = default : void
 ..
-+addDocument(std::unique_ptr<ITextBuffer>, std::filesystem::path) : void
-+getDocument(size_t index_t) : std::optional<std::reference_wrapper<Document>>
-+removeDocument(size_t index_t) : void
++addFile(const Matrix &, const std::filesystem::path &) : void
++getFile(FileId) : File &
++getFile() : File &
 __
-+files_ : std::vector<Document>
++activeFileId_ : FileId
+{static} +fileIdCounter_ : FileId
++files_ : std::unordered_map<FileId,File>
 }
 class "CommandStructure" as C_0010644382166562200619
 class C_0010644382166562200619 {
@@ -178,11 +81,11 @@ class C_0005074260391803520833 {
 +CommandMode() : void
 +~CommandMode() noexcept = default : void
 ..
-+HandleKeyboardInput(EditorState &, FileHandler &, Files &) : void
-+closeProgramme(EditorState &, FileHandler &, Files &, const CommandStructure &) : void
-+openFile(EditorState &, FileHandler &, Files &, const CommandStructure &) : void
++HandleKeyboardInput(EditorState &, EditorInputAndOutput &, FileHandler &, FilesManager &) : void
++closeProgramme(EditorState &, EditorInputAndOutput &, FileHandler &, FilesManager &, const CommandStructure &) : void
++openFile(EditorState &, EditorInputAndOutput &, FileHandler &, FilesManager &, const CommandStructure &) : void
 -parseCommand(std::string input) : CommandStructure
-+writeToFile(EditorState &, FileHandler &, Files &, const CommandStructure &) : void
++writeToFile(EditorState &, EditorInputAndOutput &, FileHandler &, FilesManager &, const CommandStructure &) : void
 __
 -commands_ : std::unordered_map<std::string,Func>
 }
@@ -191,9 +94,9 @@ class C_0012293538125726347222 {
 +InsertMode() : void
 +~InsertMode() = default : void
 ..
-+HandleKeyboardInput(EditorState &, std::reference_wrapper<Document>) const : void
--handleBackspace(EditorState &, Document &) const : void
--handleEnter(EditorState &, Document &) const : void
++HandleKeyboardInput(EditorState &, EditorInputAndOutput &, File &, Cursor &) const : void
+-handleBackspace(File &, Cursor &) const : void
+-handleEnter(File &, Cursor &) const : void
 __
 -commands_ : std::unordered_map<char,Func>
 }
@@ -208,31 +111,31 @@ class C_0008676354845899506631 {
 +NormalModeTable() : void
 +~NormalModeTable() noexcept = default : void
 ..
-+actionDeleteChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+actionInsertLineAbove(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+actionInsertLineBelow(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+actionSwitchToInsertLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+actionSwitchToInsertRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+findFirstCharLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
-+findFirstCharRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
-+motionEndOfWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionEndOfWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionLine(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, MotionRange &, MotionRange &) const : void
-+motionMoveCursorBottomFile(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionMoveCursorDown(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionMoveCursorLeft(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionMoveCursorRight(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionMoveCursorUp(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionMoveLeftMost(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionMoveLeftMostChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionMoveRightMost(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionStartOfNextWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionStartOfNextWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionStartOfPrevWORD(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+motionStartOfPrevWord(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state) const : void
-+operationCopyText(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
-+operationDeleteChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
-+replaceChar(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, char) const : void
++actionDeleteChar(Matrix & text, Cursor & cursor, EditorState & state) const : void
++actionInsertLineAbove(Matrix & text, Cursor & cursor, EditorState & state) const : void
++actionInsertLineBelow(Matrix & text, Cursor & cursor, EditorState & state) const : void
++actionSwitchToInsertLeft(Matrix & text, Cursor & cursor, EditorState & state) const : void
++actionSwitchToInsertRight(Matrix & text, Cursor & cursor, EditorState & state) const : void
++findFirstCharLeft(Matrix & text, Cursor & cursor, EditorState & state, char) const : void
++findFirstCharRight(Matrix & text, Cursor & cursor, EditorState & state, char) const : void
++motionEndOfWORD(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionEndOfWord(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionLine(Matrix & text, Cursor & cursor, EditorState & state, MotionRange &, MotionRange &) const : void
++motionMoveCursorBottomFile(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorDown(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorLeft(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorRight(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionMoveCursorUp(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionMoveLeftMost(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionMoveLeftMostChar(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionMoveRightMost(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfNextWORD(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfNextWord(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfPrevWORD(Matrix & text, Cursor & cursor, EditorState & state) const : void
++motionStartOfPrevWord(Matrix & text, Cursor & cursor, EditorState & state) const : void
++operationCopyText(Matrix & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
++operationDeleteChar(Matrix & text, Cursor & cursor, EditorState & state, const MotionRange &, const MotionRange &) const : void
++replaceChar(Matrix & text, Cursor & cursor, EditorState & state, char) const : void
 __
 +actions : std::unordered_map<char,Func>
 +motions : std::unordered_map<char,Func>
@@ -284,7 +187,7 @@ class C_0006600579433868664182 {
 +NormalModeExecutor(const NormalModeTable & table) : void
 +~NormalModeExecutor() constexpr noexcept = default : void
 ..
-+executeNormalModeCommand(std::unique_ptr<ITextBuffer> & text, Cursor & cursor, EditorState & state, const NormalModeCommand command) : void
++executeNormalModeCommand(Matrix & text, Cursor & t_cursor, EditorState & state, const NormalModeCommand command) : void
 __
 -table : const NormalModeTable &
 }
@@ -293,12 +196,159 @@ class C_0007529857750796474345 {
 +NormalMode() : void
 +~NormalMode() noexcept = default : void
 ..
-+HandleKeyboardInput(EditorState &, std::reference_wrapper<Document>) : void
--updateView(TextBufferView &, const Cursor &) const : void
++HandleKeyboardInput(File &, Cursor &, EditorState &, EditorInputAndOutput &) : void
 __
 -executor : NormalModeExecutor
 -parser : NormalModeParser
 -table : NormalModeTable
+}
+enum "SplitType" as C_0008158980544207669507
+enum C_0008158980544207669507 {
+Vertical
+Horizontal
+None
+}
+class "PaneView" as C_0002098769177019822223
+class C_0002098769177019822223 {
+__
++endX_ : int
++endY_ : int
++indexX : int
++indexY : int
++startX : int
++startY : int
+}
+class "Cursor" as C_0000605994528586582938
+class C_0000605994528586582938 {
++Cursor() : void
++~Cursor() constexpr noexcept = default : void
+..
++decrementX() : void
++decrementY() : void
++getX() const : int
++getY() const : int
++incrementX() : void
++incrementY() : void
++isVisible() const : bool
++setVisible(bool) : void
++setX(int) : void
++setY(int) : void
+__
+-absent_ : int
+-visible_ : bool
+-x_ : int
+-y_ : int
+}
+class "Pane" as C_0009641012333666485056
+class C_0009641012333666485056 {
++Pane() = deleted : void
++Pane(PaneView, FileId, PaneId) : void
++Pane(const Pane &) : void
++~Pane() constexpr noexcept = default : void
+__
++cursor_ : Cursor
++fileId_ : FileId
++paneId_ : PaneId
++paneView_ : PaneView
+}
+class "SplitNode" as C_0002534243237892489902
+class C_0002534243237892489902 {
++SplitNode(SplitType, bool t_isLeaf, const Pane &) : void
++~SplitNode() constexpr noexcept = default : void
+__
++isLeaf : bool
++leftChild : std::unique_ptr<SplitNode>
++leftChildRation : float
++pane : std::unique_ptr<Pane>
++rightChild : std::unique_ptr<SplitNode>
++splitType : SplitType
+}
+class "PanesManager" as C_0001089593565127701584
+class C_0001089593565127701584 {
++PanesManager(const PaneView & t_view, FileId) : void
++~PanesManager() noexcept = default : void
+..
++getCurrPane() : Pane
++getPane(PaneId) : Pane
+__
++activePaneId_ : PaneId
++head_ : SplitNode
+{static} -paneIdCounter_ : PaneId
++paneMap_ : std::unordered_map<PaneId,Pane *>
+}
+class "TabLayout" as C_0011513247658760718338
+class C_0011513247658760718338 {
++TabLayout() = default : void
++TabLayout(int activeTab_t, int t_tabCapLines, const std::vector<std::string> & tabs_t) : void
++~TabLayout() constexpr noexcept = default : void
+__
++activeTab : int
++tabCapturedLinesOffsetY : int
++tabs : std::vector<std::string>
+}
+class "CommandLineLayout" as C_0017616088576490786441
+class C_0017616088576490786441 {
++CommandLineLayout() = default : void
++CommandLineLayout(Modes mode_t, std::string currFileName_t, std::string t_currCommand, int cursorX_t, int cursorY_t, int charCount_t, int lineCount_t, std::string commandLineArgs_t) : void
++~CommandLineLayout() constexpr noexcept = default : void
+__
++charCount : int
++commandLineArgs : std::string
++currentCommand : std::string
++currentFileName : std::string
++cursorX : int
++cursorY : int
++lineCount : int
++mode : Modes
+}
+class "PanesLayout" as C_0014595169417664517116
+class C_0014595169417664517116 {
++PanesLayout() = default : void
++PanesLayout(int t_startX, int t_startY, int t_endX, int t_endY, int t_leftDataOffsetX, const std::vector<std::string> & t_leftData, const std::vector<std::string> & t_lines) : void
++~PanesLayout() constexpr noexcept = default : void
+__
++endX : int
++endY : int
++leftData : std::vector<std::string>
++leftDataOffsetX : int
++lines : std::vector<std::string>
++startX : int
++startY : int
+}
+enum "CursorType" as C_0012464367428066152662
+enum C_0012464367428066152662 {
+Line
+Block
+}
+class "CursorLayout" as C_0012615196957786652613
+class C_0012615196957786652613 {
++CursorLayout() = default : void
++CursorLayout(bool t_visible, int t_cursorX, int t_cursorY, char t_letter, CursorType) : void
++~CursorLayout() constexpr noexcept = default : void
+__
++cursorType : CursorType
++cursorX : int
++cursorY : int
++letter : char
++visible : bool
+}
+class "LayoutManager" as C_0003126014528773811188
+class C_0003126014528773811188 {
++LayoutManager() = deleted : void
++LayoutManager(EditorCore &, const Config &, const Settings &) : void
++~LayoutManager() constexpr noexcept = default : void
+..
+-addCommandLineLayout(PanesManager & t_panesManager, const Settings & t_constConfig, const EditorState & t_editorState, const EditorInputAndOutput & t_io, FilesManager & t_filesManager) : void
+-addCursorLayout(PanesManager & t_paneManager, const Settings & t_config, FilesManager & t_filesManager) : void
+-addPanesLayout(FilesManager &, const PanesManager &, const Settings &, int t_tabOffsetY) : void
+-addTabLayout(const FilesManager &, const Settings &) : void
+__
++commandLineLayout : CommandLineLayout
++cursorLayout : CursorLayout
++panesLayout : std::vector<PanesLayout>
++tabLayout : TabLayout
++windowHeight : int
++windowWidth : int
 }
 enum "Modes" as C_0005029623504356834829
 enum C_0005029623504356834829 {
@@ -310,177 +360,357 @@ enum "SpecialKeys" as C_0000600665016167899302
 enum C_0000600665016167899302 {
 Backspace
 Enter
+LeftArrow
+UpArrow
+RightArrow
+DownArrow
+Tab
+Escape
 }
 class "EditorState" as C_0001199085475404894889
 class C_0001199085475404894889 {
-+EditorState() : void
++EditorState() = deleted : void
++EditorState(FileId) : void
 +~EditorState() constexpr noexcept = default : void
 __
-+activeTab_ : int
-+commandLineInput_ : std::string
++activeFileId_ : FileId
 +currentMode_ : Modes
-+input_ : std::string
 +running_ : bool
+}
+class "EditorInputAndOutput" as C_0014421814088461862077
+class C_0014421814088461862077 {
++EditorInputAndOutput() = default : void
++~EditorInputAndOutput() constexpr noexcept = default : void
+__
++commandLineMessage_ : std::string
++input_ : std::string
+}
+class "EditorCore" as C_0002215001822974810344
+class C_0002215001822974810344 {
++EditorCore() = deleted : void
++EditorCore(int argc, char ** argv) : void
++~EditorCore() noexcept = default : void
+..
+-EncodeInput(const SDL_Event &) : std::string
++HandleKeyboardInput(Config &) : void
++getEditorInputAndOutput() const : const EditorInputAndOutput &
++getEditorState() const : const EditorState &
++getFilesManager() : FilesManager &
++getPanesManager() : PanesManager &
+__
+-commandMode_ : CommandMode
++dirty : bool
+-editorInputAndOutput_ : EditorInputAndOutput
+-editorState_ : EditorState
+-fileHandler_ : FileHandler
+-filesManager_ : FilesManager
+-insertMode_ : InsertMode
+-normalMode_ : NormalMode
+-panesManager_ : PanesManager
+}
+class "Settings" as C_0000044394183364887320
+class C_0000044394183364887320 {
++Settings(const Config &) : void
++~Settings() constexpr noexcept = default : void
+__
++codeCharHeight : int
++codeCharWidth : int
++paddingX : int
++tabHeight : int
++uiCharHeight : int
++uiCharWidth : int
+}
+class "Document" as C_0000418121225864476394
+class C_0000418121225864476394 {
+__
+}
+class "TextBufferView" as C_0002928650556855873887
+class C_0002928650556855873887 {
+__
+}
+class "ITextBuffer" as C_0005241398686539464490
+class C_0005241398686539464490 {
+__
+}
+class "Config" as C_0008289891971916880997
+class C_0008289891971916880997 {
++Config() : void
++~Config() constexpr noexcept = default : void
+__
+{static} -KeyEditor : const std::basic_string_view<char>
+{static} -KeyFonts : const std::basic_string_view<char>
+{static} -KeyTheme : const std::basic_string_view<char>
+{static} -KeyWindow : const std::basic_string_view<char>
++editor : Editor
++fonts : Fonts
++theme : Theme
++window : Window
+}
+class "nlohmann::basic_json" as C_0008843406913308057517
+class C_0008843406913308057517 {
+__
+}
+class "Window" as C_0012650535846743144148
+class C_0012650535846743144148 {
++Window() = default : void
++Window(const Json &) : void
++~Window() constexpr noexcept = default : void
+__
+{static} -FpsLimit : const std::basic_string_view<char>
+{static} -Height : const std::basic_string_view<char>
+{static} -Title : const std::basic_string_view<char>
+{static} -Width : const std::basic_string_view<char>
++fps_limit : int
++height : int
++title : std::string
++width : int
+}
+class "AutoSave" as C_0007309718600355555336
+class C_0007309718600355555336 {
++AutoSave() = default : void
++AutoSave(const Json &) : void
++~AutoSave() constexpr noexcept = default : void
+__
+{static} -Enable : const std::basic_string_view<char>
+{static} -Interval_s : const std::basic_string_view<char>
++enabled : bool
++interval_s : int
+}
+class "Feel" as C_0003622906010140564478
+class C_0003622906010140564478 {
++Feel() = default : void
++Feel(const Json &) : void
++~Feel() constexpr noexcept = default : void
+__
+{static} -CursorBlinkMs : const std::basic_string_view<char>
+{static} -KeyAutoSave : const std::basic_string_view<char>
+{static} -TabSize : const std::basic_string_view<char>
+{static} -WrapText : const std::basic_string_view<char>
++autoSave : AutoSave
++cursorBlinkMs : int
++tabSize : int
++wrapText : bool
+}
+class "VerticalRuler" as C_0002535713228156635633
+class C_0002535713228156635633 {
++VerticalRuler() = default : void
++VerticalRuler(const Json &) : void
++~VerticalRuler() constexpr noexcept = default : void
+__
+{static} -Column : const std::basic_string_view<char>
+{static} -Enabled : const std::basic_string_view<char>
++column : int
++enabled : bool
+}
+enum "LineNumberModes" as C_0012863436700284520669
+enum C_0012863436700284520669 {
+None
+Relative
+Number
+}
+class "View" as C_0007547292977757101841
+class C_0007547292977757101841 {
++View() = default : void
++View(const Json &) : void
++~View() constexpr noexcept = default : void
+__
+{static} -KeyLineNumberMode : const std::basic_string_view<char>
+{static} -KeyVerticalRuler : const std::basic_string_view<char>
++lineNumberMode : LineNumberModes
++verticalRuler : VerticalRuler
 }
 class "Editor" as C_0008029553789768066328
 class C_0008029553789768066328 {
-+Editor() = deleted : void
-+Editor(Files &, FileHandler &, EditorState &) : void
-+~Editor() noexcept = default : void
-..
-+EncodeInput(const SDL_Event &) : std::string
-+HandleKeyboardInput() : void
++Editor() = default : void
++Editor(const Json &) : void
++~Editor() constexpr noexcept = default : void
 __
-+commandMode_ : CommandMode
-+editorState_ : EditorState &
-+fileHandler_ : FileHandler &
-+files_ : Files &
-+insertMode_ : InsertMode
-+normalMode_ : NormalMode
+{static} -KeyFeel : const std::basic_string_view<char>
+{static} -KeyView : const std::basic_string_view<char>
++feel : Feel
++view : View
 }
-class "MatrixIterator" as C_0000499915192627540946
-class C_0000499915192627540946 {
-+MatrixIterator(std::vector<std::string> & ds_t, int index_t, bool flag_t) : void
-..
-+end(size_t) const : const bool
-+getLine() : std::string_view
-+next() : void
+class "TextFonts" as C_0017976227713769243397
+class C_0017976227713769243397 {
++TextFonts() = default : void
++TextFonts(const Json &) : void
++~TextFonts() constexpr noexcept = default : void
 __
--lines_ : std::vector<std::string> &
+{static} -Path : const std::basic_string_view<char>
+{static} -Size : const std::basic_string_view<char>
++path : std::string
++size : int
 }
-class "Matrix" as C_0004693371551043460138
-class C_0004693371551043460138 {
-+Matrix() : void
-..
-+backwardIterator(size_t) : std::unique_ptr<ITextBufferIterator>
-+deleteCharacter(int row, int col) : void
-+deleteLine(int row) : void
-+deleteRange(int row, int startCol, int len) : void
-+forwardIterator(size_t) : std::unique_ptr<ITextBufferIterator>
-+init(std::vector<std::string> lines) : void
-+insertCharacter(int row, int col, char c) : void
-+insertLine(int row, std::string line) : void
-+insertRange(int row, int startCol, std::string_view range) : void
-+linesCount() const : int
-+rowSubstr(int row, int col) const : const std::string_view
-+rowSubstr(int row, int col, int n) const : const std::string_view
-+rowsLength(int row) const : int
-+rowsView(int row) const : const std::string_view
+class "Fonts" as C_0014908946137184387087
+class C_0014908946137184387087 {
++Fonts() = default : void
++Fonts(const Json &) : void
++~Fonts() constexpr noexcept = default : void
 __
-+iter_ : std::unique_ptr<ITextBufferIterator>
-+lines_ : std::vector<std::string>
+{static} -Code : const std::basic_string_view<char>
+{static} -Ui : const std::basic_string_view<char>
++code : TextFonts
++ui : TextFonts
 }
-class "RenderWindow" as C_0015827463279990430958
-class C_0015827463279990430958 {
-+RenderWindow(std::size_t index_t, int offsetX_t, int offsetY_t, int width_t, int height_t) : void
-..
-+Render(const Document &, const Config &, SDL_Renderer &, TTF_Font &, Modes) const : void
--RenderCursor(const Document &, const Config &, SDL_Renderer &, TTF_Font &, Modes) const : void
--RenderLine(const Config &, SDL_Renderer &, TTF_Font &, std::string_view, int) const : void
--RenderText(const Document &, const Config &, SDL_Renderer &, TTF_Font &) const : void
+class "Theme" as C_0007948538995288720498
+class C_0007948538995288720498 {
++Theme() = default : void
++Theme(const Json &) : void
++~Theme() constexpr noexcept = default : void
 __
-+height_ : int
-+index : std::size_t
-+offsetX_ : int
-+offsetY_ : int
-+width_ : int
+{static} -Background : const std::basic_string_view<char>
+{static} -CodeText : const std::basic_string_view<char>
+{static} -Cursor : const std::basic_string_view<char>
+{static} -Foreground : const std::basic_string_view<char>
+{static} -Highlight : const std::basic_string_view<char>
+{static} -Main : const std::basic_string_view<char>
+{static} -Secondary : const std::basic_string_view<char>
+{static} -UiText : const std::basic_string_view<char>
++background : SDL_Color
++codeText : SDL_Color
++cursor : SDL_Color
++foreground : SDL_Color
++highlight : SDL_Color
++main : SDL_Color
++secondary : SDL_Color
++uiText : SDL_Color
 }
-class "RenderScreen" as C_0005021160496080727633
-class C_0005021160496080727633 {
-+RenderScreen() = deleted : void
-+RenderScreen(const EditorState &, Files &, const Config &) : void
-+~RenderScreen() noexcept : void
+class "Renderer" as C_0018004500907526464145
+class C_0018004500907526464145 {
++Renderer() = deleted : void
++Renderer(const Config &, const Settings &) : void
++~Renderer() noexcept : void
 ..
-+Render() : void
--RenderCommandLine() const : void
--RenderTabs() : void
-+addWindow(const RenderWindow &) : void
-+removeWindow(const RenderWindow &) : void
++Render(const LayoutManager &) const : void
+-RenderCommandLine(const CommandLineLayout &, int windowHeight, int windowWidth) const : void
+-RenderCursor(const CursorLayout &) const : void
+-RenderPanes(const std::vector<PanesLayout> &) const : void
+-RenderTabs(const TabLayout &, int windowWidth) const : void
 __
-+codeFont_ : TTF_Font *
-+config_ : const Config &
-+editorState_ : const EditorState &
-+files_ : Files &
-+renderer_ : SDL_Renderer *
-+uiFont_ : TTF_Font *
-+windowHeight_ : int
-+windowWidth_ : int
-+window_ : SDL_Window *
-+windows_ : std::vector<RenderWindow>
+-codeFont_ : TTF_Font *
+-commandModeColor_ : SDL_Color
+-config_ : const Config &
+-insertModeColor_ : SDL_Color
+-normalModeColor_ : SDL_Color
+-renderer_ : SDL_Renderer *
+-settings_ : const Settings &
+-uiFont_ : TTF_Font *
+-window_ : SDL_Window *
 }
-C_0014511316739402001150 ..> C_0008843406913308057517
-C_0000021433759818595447 ..> C_0008843406913308057517
-C_0012008145412256689023 ..> C_0008843406913308057517
-C_0008289891971916880997 ..> C_0008843406913308057517
-C_0008289891971916880997 o-- C_0014511316739402001150 : +editor_
-C_0008289891971916880997 o-- C_0000021433759818595447 : +font_
-C_0008289891971916880997 o-- C_0012008145412256689023 : +colors_
-C_0002918291441898942593 ..> C_0000418121225864476394
-C_0005241398686539464490 ..> C_0011603292986395824421
-C_0000418121225864476394 o-- C_0005241398686539464490 : +textBuffer_
-C_0000418121225864476394 o-- C_0002928650556855873887 : +textView_
-C_0000418121225864476394 o-- C_0000605994528586582938 : +cursor_
-C_0018030906234682690639 ..> C_0002918291441898942593
-C_0018030906234682690639 ..> C_0005241398686539464490
-C_0018030906234682690639 o-- C_0000418121225864476394 : +files_
+class "ConfigAndSettings" as C_0016726519943719072625
+class C_0016726519943719072625 {
+__
+}
+C_0002918291441898942593 ..> C_0008611533756821712008
+C_0004693371551043460138 ..> C_0000499915192627540946
+C_0008611533756821712008 o-- C_0004693371551043460138 : +textBuffer_
+C_0011153622041461101778 ..> C_0002918291441898942593
+C_0011153622041461101778 ..> C_0004693371551043460138
+C_0011153622041461101778 o-- C_0008611533756821712008 : +files_
 C_0005074260391803520833 o-- C_0005074260391803520833 : -commands_
 C_0005074260391803520833 --> C_0001199085475404894889 : -commands_
+C_0005074260391803520833 --> C_0014421814088461862077 : -commands_
 C_0005074260391803520833 --> C_0002918291441898942593 : -commands_
-C_0005074260391803520833 --> C_0018030906234682690639 : -commands_
+C_0005074260391803520833 --> C_0011153622041461101778 : -commands_
 C_0005074260391803520833 --> C_0010644382166562200619 : -commands_
+C_0012293538125726347222 ..> C_0001199085475404894889
+C_0012293538125726347222 ..> C_0014421814088461862077
 C_0012293538125726347222 o-- C_0012293538125726347222 : -commands_
-C_0012293538125726347222 --> C_0001199085475404894889 : -commands_
-C_0012293538125726347222 --> C_0000418121225864476394 : -commands_
+C_0012293538125726347222 --> C_0008611533756821712008 : -commands_
+C_0012293538125726347222 --> C_0000605994528586582938 : -commands_
 C_0008676354845899506631 o-- C_0008676354845899506631 : +operations
-C_0008676354845899506631 o-- C_0005241398686539464490 : +operations
+C_0008676354845899506631 --> C_0004693371551043460138 : +operations
 C_0008676354845899506631 --> C_0000605994528586582938 : +operations
 C_0008676354845899506631 --> C_0001199085475404894889 : +operations
 C_0008676354845899506631 --> C_0009427962241399365514 : +operations
 C_0008676354845899506631 o-- C_0008676354845899506631 : +actions
-C_0008676354845899506631 o-- C_0005241398686539464490 : +actions
+C_0008676354845899506631 --> C_0004693371551043460138 : +actions
 C_0008676354845899506631 --> C_0000605994528586582938 : +actions
 C_0008676354845899506631 --> C_0001199085475404894889 : +actions
 C_0008676354845899506631 o-- C_0008676354845899506631 : +motions
-C_0008676354845899506631 o-- C_0005241398686539464490 : +motions
+C_0008676354845899506631 --> C_0004693371551043460138 : +motions
 C_0008676354845899506631 --> C_0000605994528586582938 : +motions
 C_0008676354845899506631 --> C_0001199085475404894889 : +motions
 C_0008676354845899506631 o-- C_0008676354845899506631 : +textObjects
-C_0008676354845899506631 o-- C_0005241398686539464490 : +textObjects
+C_0008676354845899506631 --> C_0004693371551043460138 : +textObjects
 C_0008676354845899506631 --> C_0000605994528586582938 : +textObjects
 C_0008676354845899506631 --> C_0001199085475404894889 : +textObjects
 C_0017832411717760654500 o-- C_0012699030901556025511 : +stage
 C_0000298199083752434582 ..> C_0012699030901556025511
 C_0000298199083752434582 --> C_0008676354845899506631 : -table
 C_0000298199083752434582 o-- C_0017832411717760654500 : -command
-C_0006600579433868664182 ..> C_0005241398686539464490
+C_0006600579433868664182 ..> C_0004693371551043460138
 C_0006600579433868664182 ..> C_0000605994528586582938
 C_0006600579433868664182 ..> C_0001199085475404894889
 C_0006600579433868664182 ..> C_0017832411717760654500
 C_0006600579433868664182 --> C_0008676354845899506631 : -table
-C_0007529857750796474345 ..> C_0001199085475404894889
-C_0007529857750796474345 ..> C_0000418121225864476394
-C_0007529857750796474345 ..> C_0002928650556855873887
+C_0007529857750796474345 ..> C_0008611533756821712008
 C_0007529857750796474345 ..> C_0000605994528586582938
+C_0007529857750796474345 ..> C_0001199085475404894889
+C_0007529857750796474345 ..> C_0014421814088461862077
 C_0007529857750796474345 o-- C_0008676354845899506631 : -table
 C_0007529857750796474345 o-- C_0000298199083752434582 : -parser
 C_0007529857750796474345 o-- C_0006600579433868664182 : -executor
+C_0009641012333666485056 o-- C_0002098769177019822223 : +paneView_
+C_0009641012333666485056 o-- C_0000605994528586582938 : +cursor_
+C_0002534243237892489902 o-- C_0008158980544207669507 : +splitType
+C_0002534243237892489902 o-- C_0002534243237892489902 : +leftChild
+C_0002534243237892489902 o-- C_0002534243237892489902 : +rightChild
+C_0002534243237892489902 o-- C_0009641012333666485056 : +pane
+C_0001089593565127701584 ..> C_0002098769177019822223
+C_0001089593565127701584 --> C_0009641012333666485056 : +paneMap_
+C_0001089593565127701584 o-- C_0002534243237892489902 : +head_
+C_0017616088576490786441 o-- C_0005029623504356834829 : +mode
+C_0012615196957786652613 o-- C_0012464367428066152662 : +cursorType
+C_0003126014528773811188 ..> C_0002215001822974810344
+C_0003126014528773811188 ..> C_0008289891971916880997
+C_0003126014528773811188 ..> C_0000044394183364887320
+C_0003126014528773811188 ..> C_0011153622041461101778
+C_0003126014528773811188 ..> C_0001089593565127701584
+C_0003126014528773811188 ..> C_0001199085475404894889
+C_0003126014528773811188 ..> C_0014421814088461862077
+C_0003126014528773811188 o-- C_0011513247658760718338 : +tabLayout
+C_0003126014528773811188 o-- C_0014595169417664517116 : +panesLayout
+C_0003126014528773811188 o-- C_0012615196957786652613 : +cursorLayout
+C_0003126014528773811188 o-- C_0017616088576490786441 : +commandLineLayout
 C_0001199085475404894889 o-- C_0005029623504356834829 : +currentMode_
-C_0008029553789768066328 --> C_0018030906234682690639 : +files_
-C_0008029553789768066328 --> C_0002918291441898942593 : +fileHandler_
-C_0008029553789768066328 --> C_0001199085475404894889 : +editorState_
-C_0008029553789768066328 o-- C_0007529857750796474345 : +normalMode_
-C_0008029553789768066328 o-- C_0012293538125726347222 : +insertMode_
-C_0008029553789768066328 o-- C_0005074260391803520833 : +commandMode_
-C_0011603292986395824421 <|-- C_0000499915192627540946
-C_0004693371551043460138 o-- C_0011603292986395824421 : +iter_
-C_0005241398686539464490 <|-- C_0004693371551043460138
-C_0015827463279990430958 ..> C_0000418121225864476394
-C_0015827463279990430958 ..> C_0008289891971916880997
-C_0015827463279990430958 ..> C_0005029623504356834829
-C_0005021160496080727633 --> C_0001199085475404894889 : +editorState_
-C_0005021160496080727633 --> C_0018030906234682690639 : +files_
-C_0005021160496080727633 --> C_0008289891971916880997 : +config_
-C_0005021160496080727633 o-- C_0015827463279990430958 : +windows_
+C_0002215001822974810344 ..> C_0008289891971916880997
+C_0002215001822974810344 o-- C_0002918291441898942593 : -fileHandler_
+C_0002215001822974810344 o-- C_0011153622041461101778 : -filesManager_
+C_0002215001822974810344 o-- C_0001089593565127701584 : -panesManager_
+C_0002215001822974810344 o-- C_0001199085475404894889 : -editorState_
+C_0002215001822974810344 o-- C_0014421814088461862077 : -editorInputAndOutput_
+C_0002215001822974810344 o-- C_0007529857750796474345 : -normalMode_
+C_0002215001822974810344 o-- C_0012293538125726347222 : -insertMode_
+C_0002215001822974810344 o-- C_0005074260391803520833 : -commandMode_
+C_0000044394183364887320 ..> C_0008289891971916880997
+C_0008289891971916880997 o-- C_0012650535846743144148 : +window
+C_0008289891971916880997 o-- C_0008029553789768066328 : +editor
+C_0008289891971916880997 o-- C_0014908946137184387087 : +fonts
+C_0008289891971916880997 o-- C_0007948538995288720498 : +theme
+C_0012650535846743144148 ..> C_0008843406913308057517
+C_0007309718600355555336 ..> C_0008843406913308057517
+C_0003622906010140564478 ..> C_0008843406913308057517
+C_0003622906010140564478 o-- C_0007309718600355555336 : +autoSave
+C_0002535713228156635633 ..> C_0008843406913308057517
+C_0007547292977757101841 ..> C_0008843406913308057517
+C_0007547292977757101841 o-- C_0002535713228156635633 : +verticalRuler
+C_0007547292977757101841 o-- C_0012863436700284520669 : +lineNumberMode
+C_0008029553789768066328 ..> C_0008843406913308057517
+C_0008029553789768066328 o-- C_0003622906010140564478 : +feel
+C_0008029553789768066328 o-- C_0007547292977757101841 : +view
+C_0017976227713769243397 ..> C_0008843406913308057517
+C_0014908946137184387087 ..> C_0008843406913308057517
+C_0014908946137184387087 o-- C_0017976227713769243397 : +code
+C_0014908946137184387087 o-- C_0017976227713769243397 : +ui
+C_0007948538995288720498 ..> C_0008843406913308057517
+C_0018004500907526464145 ..> C_0003126014528773811188
+C_0018004500907526464145 ..> C_0011513247658760718338
+C_0018004500907526464145 ..> C_0014595169417664517116
+C_0018004500907526464145 ..> C_0012615196957786652613
+C_0018004500907526464145 ..> C_0017616088576490786441
+C_0018004500907526464145 --> C_0008289891971916880997 : -config_
+C_0018004500907526464145 --> C_0000044394183364887320 : -settings_
 
 'Generated with clang-uml, version 0.6.2
 'LLVM version Ubuntu clang version 18.1.3 (1ubuntu1)

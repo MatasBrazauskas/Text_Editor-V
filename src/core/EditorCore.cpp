@@ -1,5 +1,7 @@
 #include "EditorCore.hpp"
 
+#include "utils/ConfigAndSettings.hpp"
+
 #include <SDL.h>
 #include <iostream>
 
@@ -40,11 +42,21 @@ std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	return {};
 }
 
-void EditorCore::HandleKeyboardInput() {
+void EditorCore::HandleKeyboardInput(Config& t_config) {
 	SDL_Event event;
 	// dirty = false;
 
 	while (SDL_PollEvent(&event)) {
+
+		if (event.type == SDL_WINDOWEVENT){
+			if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+				int newWidth = event.window.data1;
+				int newHeight = event.window.data2;
+
+				t_config.window.height = newHeight;
+				t_config.window.width = newWidth;
+			}
+		}
 
 		std::string input = EncodeInput(event);
 

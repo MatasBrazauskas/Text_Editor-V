@@ -1,0 +1,29 @@
+{
+    "editor":
+    {
+        "title": "Text Editor",
+        "tab_size": 8,
+        "auto_save": false,
+        "auto_save_interval_s": 30,
+        "cursor_blink_ms": 1000,
+        "wrap_text": false,
+        "fps": 60,
+        "vertical_ruler": true,
+        "vertical_ruler_count": 20
+    },
+    "font":
+    {
+        "code_font_path": "fonts/JetBrainsMono-ExtraLight.ttf",
+        "code_font_size": 19,
+        "ui_font_path": "fonts/JetBrainsMono-Medium.ttf",
+        "ui_font_size": 19
+    },
+    "colors":
+    {
+        "background_color": "1a1b26",
+        "foreground_color": "c0caf5",
+        "cursor_color": "ffffff",
+        "selection_color": "000000",
+        "vertical_ruler_color": "ffffff"
+    }
+}

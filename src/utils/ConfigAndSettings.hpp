@@ -8,6 +8,8 @@
 using namespace std::string_view_literals;
 using Json = nlohmann::json;
 
+const std::filesystem::path configPath = "config.json";
+
 class Window final {
   public:
 	Window() = default;
@@ -17,32 +19,31 @@ class Window final {
 	std::string title;
 	int width;
 	int height;
-	bool centered;
 	int fps_limit;
 
   private:
 	constexpr static auto Title = "title"sv;
 	constexpr static auto Width = "width"sv;
 	constexpr static auto Height = "height"sv;
-	constexpr static auto Centered = "centered"sv;
 	constexpr static auto FpsLimit = "fps_limit"sv;
 };
 
 class AutoSave final {
-public:
+  public:
 	AutoSave() = default;
 	explicit AutoSave(const Json&);
 	~AutoSave() noexcept = default;
 
 	bool enabled;
 	int interval_s;
-private:
-	constexpr static auto Enable = "enable"sv;
+
+  private:
+	constexpr static auto Enable = "enabled"sv;
 	constexpr static auto Interval_s = "interval_s"sv;
 };
 
 class Feel final {
-public:
+  public:
 	Feel() = default;
 	explicit Feel(const Json&);
 	~Feel() noexcept = default;
@@ -51,7 +52,8 @@ public:
 	AutoSave autoSave;
 	int cursorBlinkMs;
 	bool wrapText;
-private:
+
+  private:
 	constexpr static auto TabSize = "tab_size"sv;
 	constexpr static auto KeyAutoSave = "auto_save"sv;
 	constexpr static auto CursorBlinkMs = "cursor_blink_ms"sv;
@@ -59,74 +61,79 @@ private:
 };
 
 class VerticalRuler final {
-public:
+  public:
 	VerticalRuler() = default;
 	explicit VerticalRuler(const Json&);
 	~VerticalRuler() noexcept = default;
 
 	bool enabled;
 	int column;
-private:
+
+  private:
 	constexpr static auto Enabled = "enabled"sv;
 	constexpr static auto Column = "column"sv;
 };
 
-enum class LineNumberModes {None, Relative, Number};
+enum class LineNumberModes { None, Relative, Number };
 
 class View final {
-public:
+  public:
 	View() = default;
 	explicit View(const Json&);
 	~View() noexcept = default;
 
 	VerticalRuler verticalRuler;
 	LineNumberModes lineNumberMode;
-private:
+
+  private:
 	constexpr static auto KeyVerticalRuler = "vertical_ruler"sv;
 	constexpr static auto KeyLineNumberMode = "line_number_mode"sv;
 };
 
 class Editor final {
-public:
+  public:
 	Editor() = default;
 	explicit Editor(const Json&);
 	~Editor() noexcept = default;
 
 	Feel feel;
 	View view;
-private:
+
+  private:
 	constexpr static auto KeyFeel = "feel"sv;
 	constexpr static auto KeyView = "view"sv;
 };
 
 class TextFonts final {
-public:
+  public:
 	TextFonts() = default;
 	explicit TextFonts(const Json&);
 	~TextFonts() noexcept = default;
 
 	std::string path;
 	int size;
-private:
+
+  private:
 	constexpr static auto Path = "path"sv;
 	constexpr static auto Size = "size"sv;
 };
 
 class Fonts final {
-public:
+  public:
 	Fonts() = default;
 	explicit Fonts(const Json&);
 	~Fonts() noexcept = default;
 
 	TextFonts code;
 	TextFonts ui;
-private:
+
+  private:
 	constexpr static auto Code = "code"sv;
 	constexpr static auto Ui = "ui"sv;
 };
 
 class Theme final {
-public:
+  public:
 	Theme() = default;
 	explicit Theme(const Json&);
 	~Theme() noexcept = default;
@@ -139,7 +146,8 @@ public:
 	SDL_Color secondary;
 	SDL_Color cursor;
 	SDL_Color highlight;
-private:
+
+  private:
 	constexpr static auto CodeText = "code_text"sv;
 	constexpr static auto Background = "background"sv;
 	constexpr static auto Foreground = "foreground"sv;
@@ -151,9 +159,8 @@ private:
 };
 
 class Config final {
-public:
-	Config() = delete;
-	explicit Config(const std::filesystem::path&);
+  public:
+	Config();
 	~Config() noexcept = default;
 
 	Window window;
@@ -161,9 +168,21 @@ public:
 	Fonts fonts;
 	Theme theme;
 
-private:
+  private:
 	constexpr static auto KeyWindow = "window"sv;
 	constexpr static auto KeyEditor = "editor"sv;
 	constexpr static auto KeyFonts = "fonts"sv;
 	constexpr static auto KeyTheme = "theme"sv;
+};
+
+class Settings final {
+public:
+	explicit Settings(const Config&);
+	~Settings() noexcept = default;
+
+	int codeCharWidth{}, codeCharHeight{};
+	int uiCharWidth{}, uiCharHeight{};
+
+	int tabHeight{};
+	int paddingX = 25;
 };

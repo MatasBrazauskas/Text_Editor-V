@@ -1,9 +1,11 @@
-#include "Config.hpp"
+#include "ConfigAndSettings.hpp"
 
 #include <fstream>
 #include <stdexcept>
 
-template<typename T>
+#include <SDL2/SDL_ttf.h>
+
+template <typename T>
 static T getJsonObject(const Json& t_jsonObject, std::string_view t_name) {
 	if (const auto it = t_jsonObject.find(t_name); it != t_jsonObject.end() && !it.value().is_null()) {
 		return it.value().get<T>();
@@ -17,20 +19,13 @@ static SDL_Color HexToSDL(std::string hex) {
 		hex.erase(0, 1);
 
 	const uint32_t v = std::stoul(hex, nullptr, 16);
-	return {
-		static_cast<Uint8>((v >> 16) & 0xFF),
-		static_cast<Uint8>((v >> 8) & 0xFF),
-		static_cast<Uint8>(v & 0xFF),
-		255
-	};
+	return {static_cast<Uint8>((v >> 16) & 0xFF), static_cast<Uint8>((v >> 8) & 0xFF), static_cast<Uint8>(v & 0xFF),
+			255};
 }
 
 static LineNumberModes getLineNumber(const std::string& t_lineNumber) {
 	static std::unordered_map<std::string, LineNumberModes> lineNumberModes = {
-		{"none", LineNumberModes::None},
-		{"relative", LineNumberModes::Relative},
-		{"number", LineNumberModes::Number}
-	};
+		{"none", LineNumberModes::None}, {"relative", LineNumberModes::Relative}, {"number", LineNumberModes::Number}};
 
 	if (const auto it = lineNumberModes.find(t_lineNumber); it != lineNumberModes.end()) {
 		return it->second;
@@ -44,7 +39,6 @@ Window::Window(const Json& t_json) {
 		title = getJsonObject<std::string>(t_json, Title);
 		width = getJsonObject<int>(t_json, Width);
 		height = getJsonObject<int>(t_json, Height);
-		centered = getJsonObject<bool>(t_json, Centered);
 		fps_limit = getJsonObject<int>(t_json, FpsLimit);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing Window tab: " + std::string{e.what()});
@@ -123,7 +117,7 @@ Fonts::Fonts(const Json& t_json) {
 Theme::Theme(const Json& t_json) {
 	try {
 		const auto codeTextObj = getJsonObject<std::string>(t_json, CodeText);
-		const auto backgroundObj = getJsonObject<std::string>(t_json,Background);
+		const auto backgroundObj = getJsonObject<std::string>(t_json, Background);
 		const auto foregroundObj = getJsonObject<std::string>(t_json, Foreground);
 		const auto uiTextObj = getJsonObject<std::string>(t_json, UiText);
 		const auto mainObj = getJsonObject<std::string>(t_json, Main);
@@ -144,12 +138,12 @@ Theme::Theme(const Json& t_json) {
 	}
 }
 
-Config::Config(const std::filesystem::path& t_path):window{},editor{},fonts{}, theme{} {
-	if (!std::filesystem::exists(t_path)) {
-		throw std::runtime_error("Config path must be present.");
+Config::Config() : window{}, editor{}, fonts{}, theme{} {
+	if (!std::filesystem::exists(configPath)) {
+		throw std::runtime_error("ConfigAndSettings path must be present.");
 	}
 
-	std::ifstream configFile(t_path);
+	std::ifstream configFile(configPath);
 	Json json;
 	configFile >> json;
 
@@ -161,4 +155,29 @@ Config::Config(const std::filesystem::path& t_path):window{},editor{},fonts{}, t
 	} catch (const std::exception& e) {
 		throw std::runtime_error("JSON Parse Failure: " + std::string{e.what()});
 	}
+}
+
+Settings::Settings(const Config& t_config) {
+	TTF_Init();
+
+	const auto& codeFont = t_config.fonts.code;
+	const auto& uiFont = t_config.fonts.ui;
+
+	const auto codePath = codeFont.path.c_str();
+	const auto uiPath = uiFont.path.c_str();
+
+	const auto codeFont_ = TTF_OpenFont(codePath, codeFont.size);
+	const auto uiFont_ = TTF_OpenFont(uiPath, uiFont.size);
+
+	TTF_SetFontHinting(codeFont_, TTF_HINTING_MONO);
+	TTF_SetFontKerning(codeFont_, 0);
+
+	TTF_SizeText(codeFont_, "A", &codeCharWidth, &codeCharHeight);
+
+	TTF_SetFontHinting(uiFont_, TTF_HINTING_MONO);
+	TTF_SetFontKerning(uiFont_, 0);
+
+	TTF_SizeText(uiFont_, "A", &uiCharWidth, &uiCharHeight);
+
+	tabHeight = uiCharHeight + 5;
 }
