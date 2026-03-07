@@ -10,11 +10,11 @@ using Json = nlohmann::json;
 
 const std::filesystem::path configPath = "config.json";
 
-class Window final {
+class WindowConfig final {
   public:
-	Window() = default;
-	explicit Window(const Json&);
-	~Window() noexcept = default;
+	WindowConfig() = default;
+	explicit WindowConfig(const Json&);
+	~WindowConfig() noexcept = default;
 
 	std::string title;
 	int width;
@@ -42,11 +42,11 @@ class AutoSave final {
 	constexpr static auto Interval_s = "interval_s"sv;
 };
 
-class Feel final {
+class FeelConfig final {
   public:
-	Feel() = default;
-	explicit Feel(const Json&);
-	~Feel() noexcept = default;
+	FeelConfig() = default;
+	explicit FeelConfig(const Json&);
+	~FeelConfig() noexcept = default;
 
 	int tabSize;
 	AutoSave autoSave;
@@ -90,13 +90,13 @@ class View final {
 	constexpr static auto KeyLineNumberMode = "line_number_mode"sv;
 };
 
-class Editor final {
+class EditorConfig final {
   public:
-	Editor() = default;
-	explicit Editor(const Json&);
-	~Editor() noexcept = default;
+	EditorConfig() = default;
+	explicit EditorConfig(const Json&);
+	~EditorConfig() noexcept = default;
 
-	Feel feel;
+	FeelConfig feel;
 	View view;
 
   private:
@@ -118,11 +118,11 @@ class TextFonts final {
 	constexpr static auto Size = "size"sv;
 };
 
-class Fonts final {
+class FontsConfig final {
   public:
-	Fonts() = default;
-	explicit Fonts(const Json&);
-	~Fonts() noexcept = default;
+	FontsConfig() = default;
+	explicit FontsConfig(const Json&);
+	~FontsConfig() noexcept = default;
 
 	TextFonts code;
 	TextFonts ui;
@@ -132,11 +132,11 @@ class Fonts final {
 	constexpr static auto Ui = "ui"sv;
 };
 
-class Theme final {
+class ThemeConfig final {
   public:
-	Theme() = default;
-	explicit Theme(const Json&);
-	~Theme() noexcept = default;
+	ThemeConfig() = default;
+	explicit ThemeConfig(const Json&);
+	~ThemeConfig() noexcept = default;
 
 	SDL_Color codeText;
 	SDL_Color background;
@@ -163,10 +163,10 @@ class Config final {
 	Config();
 	~Config() noexcept = default;
 
-	Window window;
-	Editor editor;
-	Fonts fonts;
-	Theme theme;
+	WindowConfig window;
+	EditorConfig editor;
+	FontsConfig fonts;
+	ThemeConfig theme;
 
   private:
 	constexpr static auto KeyWindow = "window"sv;
@@ -175,14 +175,31 @@ class Config final {
 	constexpr static auto KeyTheme = "theme"sv;
 };
 
-class Settings final {
+class CharSettings final {
 public:
+	CharSettings() = default;
+	~CharSettings() noexcept = default;
+
+	int codeCharWidth, codeCharHeight;
+	int uiCharWidth, uiCharHeight;
+	int tabHeight;
+};
+
+class WindowSettings final {
+public:
+	WindowSettings() = default;
+	~WindowSettings() noexcept = default;
+
+	int width, height;
+};
+
+class Settings final {
+  public:
 	explicit Settings(const Config&);
 	~Settings() noexcept = default;
 
-	int codeCharWidth{}, codeCharHeight{};
-	int uiCharWidth{}, uiCharHeight{};
+	constexpr static int paddingX = 25;
 
-	int tabHeight{};
-	int paddingX = 25;
+	CharSettings charSettings;
+	WindowSettings windowSettings;
 };

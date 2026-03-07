@@ -2,8 +2,6 @@
 #include "core/Renderer.hpp"
 #include "utils/ConfigAndSettings.hpp"
 
-using namespace std::string_literals;
-
 int main(const int argc, char** argv) {
 
 	Config config{};
@@ -11,7 +9,7 @@ int main(const int argc, char** argv) {
 
 	const auto ticksPerFrame = 1.0 / static_cast<double>(config.window.fps_limit);
 
-	EditorCore editorCore{argc, argv};
+	EditorCore editorCore{argc, argv, settings};
 	Renderer renderer{config, settings};
 
 	const Uint64 freq = SDL_GetPerformanceFrequency();
@@ -22,7 +20,7 @@ int main(const int argc, char** argv) {
 		const Uint64 end = SDL_GetPerformanceCounter();
 		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
-		editorCore.HandleKeyboardInput(config);
+		editorCore.HandleKeyboardInput();
 
 		if (renderTime >= ticksPerFrame) {
 			renderStart = end;

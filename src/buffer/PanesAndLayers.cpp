@@ -52,6 +52,9 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
+
+PaneView::PaneView(int t_sx, int t_sy, int t_ex, int t_ey): startX{t_sx}, startY {t_sy}, endX{t_ex}, endY{t_ey} {}
+
 Pane::Pane(const PaneView paneView_t, const FileId t_fileId, const PaneId t_paneId)
 	: paneView_{paneView_t}, fileId_{t_fileId}, paneId_{t_paneId} {}
 
@@ -96,7 +99,8 @@ CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int 
 						   const CursorType t_cursorType)
 	: visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letter}, cursorType{t_cursorType} {}
 
-LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, const Settings& t_settings) : windowHeight{t_config.window.height}, windowWidth{t_config.window.width} {
+LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, const Settings& t_settings)
+	: windowHeight{t_config.window.height}, windowWidth{t_config.window.width} {
 	auto& fileManager = t_editorCore.getFilesManager();
 	auto& paneManager = t_editorCore.getPanesManager();
 	const auto& editorState = t_editorCore.getEditorState();
@@ -108,7 +112,8 @@ LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, c
 	addCommandLineLayout(paneManager, t_settings, editorState, editorIO, fileManager);
 }
 
-void LayoutManager::addTabLayout(const FilesManager& files, const Settings& constConfig) {
+void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_settings) {
+	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight] = t_settings.charSettings;
 
 	auto to_filename_view = [](const File& t_file) -> std::string {
 		std::string_view sv = t_file.filesPath_.native();
@@ -126,8 +131,8 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& cons
 
 	const std::vector<std::string> tabVec{temp.begin(), temp.end()};
 
-	const auto tempLambda = [constConfig](int a, std::string_view b) {
-		const int tabWidth = (b.length() * constConfig.uiCharWidth) + (constConfig.uiCharWidth * 2);
+	const auto tempLambda = [&](int a, std::string_view b) {
+		const int tabWidth = (b.length() * uiCharWidth) + (uiCharWidth * 2);
 		if (a + tabWidth) {
 			return 0;
 		}
@@ -142,20 +147,21 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& cons
 	}
 
 	this->tabLayout.activeTab = activePane;
-	this->tabLayout.tabCapturedLinesOffsetY = tabLines * constConfig.tabHeight;
+		this->tabLayout.tabCapturedLinesOffsetY = tabLines * tabHeight;
 	this->tabLayout.tabs = tabVec;
 }
 
 void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesLayout,
-								   const Settings& t_config, const int t_tabOffsetY) {
+								   const Settings& t_settings, const int t_tabOffsetY) {
 	const auto& pane = t_panesLayout.head_.pane.get();
 	const auto file = t_filesManager.getFile(pane->fileId_);
 	const auto& [text, stack, path, id] = file;
+	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight] = t_settings.charSettings;
 
-	const int startIndexY = pane->paneView_.startY / t_config.codeCharHeight;
-	const int startIndexX = pane->paneView_.startX / t_config.codeCharHeight;
-	const int charCountInWidth = (pane->paneView_.endX_ - pane->paneView_.startX) / t_config.codeCharWidth;
-	const int charCountInHeight = (pane->paneView_.endY_ - pane->paneView_.startY) / t_config.codeCharHeight;
+	const int startIndexY = pane->paneView_.startY / codeCharHeight;
+	const int startIndexX = pane->paneView_.startX / codeCharHeight;
+	const int charCountInWidth = (pane->paneView_.endX - pane->paneView_.startX) / codeCharWidth;
+	const int charCountInHeight = (pane->paneView_.endY - pane->paneView_.startY) / codeCharHeight;
 
 	std::vector<std::string> linesVec;
 	std::vector<std::string> leftSide;
@@ -173,19 +179,20 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 		linesVec.push_back(subStrView.data());
 	}
 
+	//TODO add offset ok
 	const auto& layoutPane =
-		PanesLayout(pane->paneView_.startX, pane->paneView_.endX_, pane->paneView_.startY + t_tabOffsetY,
-					pane->paneView_.endY_, 0, leftSide, linesVec);
+		PanesLayout(pane->paneView_.startX, pane->paneView_.startY, pane->paneView_.endX,
+					pane->paneView_.endY, 0, leftSide, linesVec);
 	panesLayout.push_back(layoutPane);
 }
 
-void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const Settings& t_config,
-									FilesManager& t_filesManager) {
-	const auto pane = t_paneManager.paneMap_[t_paneManager.activePaneId_];
-	const auto [startX, startY, endX_, endY_, indexX, indexY] = pane->paneView_;
+void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const Settings& t_settings, FilesManager& t_filesManager) {
+	/*const auto pane = t_paneManager.paneMap_[t_paneManager.activePaneId_];
+	const auto [startX, startY, endX, endY] = pane->paneView_;
+	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight] = t_settings.charSettings;
 
-	const int cursorOffsetX = (pane->cursor_.getY() - indexY) * t_config.uiCharWidth + startX;
-	const int cursorOffsetY = (pane->cursor_.getY() - indexX) * t_config.uiCharHeight + startY;
+	const int cursorOffsetX = (pane->cursor_.getY() - indexY) * uiCharWidth + startX;
+	const int cursorOffsetY = (pane->cursor_.getY() - indexX) * uiCharHeight + startY;
 
 	const auto line = t_filesManager.getFile(pane->fileId_).textBuffer_.getLine(pane->cursor_.getY());
 	char cursorChar = ' ';
@@ -194,7 +201,7 @@ void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const Settings&
 		cursorChar = line.at(pane->cursor_.getX());
 	}
 
-	cursorLayout = CursorLayout(pane->cursor_.isVisible(), cursorChar, cursorOffsetX, cursorOffsetY, CursorType::Block);
+	cursorLayout = CursorLayout(pane->cursor_.isVisible(), cursorChar, cursorOffsetX, cursorOffsetY, CursorType::Block);*/
 }
 
 void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,

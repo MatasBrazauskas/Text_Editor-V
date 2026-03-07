@@ -1,9 +1,8 @@
 #include "ConfigAndSettings.hpp"
 
+#include <SDL2/SDL_ttf.h>
 #include <fstream>
 #include <stdexcept>
-
-#include <SDL2/SDL_ttf.h>
 
 template <typename T>
 static T getJsonObject(const Json& t_jsonObject, std::string_view t_name) {
@@ -34,14 +33,14 @@ static LineNumberModes getLineNumber(const std::string& t_lineNumber) {
 	throw std::runtime_error("\nCan't read the field: line_number_modes");
 }
 
-Window::Window(const Json& t_json) {
+WindowConfig::WindowConfig(const Json& t_json) {
 	try {
 		title = getJsonObject<std::string>(t_json, Title);
 		width = getJsonObject<int>(t_json, Width);
 		height = getJsonObject<int>(t_json, Height);
 		fps_limit = getJsonObject<int>(t_json, FpsLimit);
 	} catch (std::exception& e) {
-		throw std::runtime_error("\nJSON error parsing Window tab: " + std::string{e.what()});
+		throw std::runtime_error("\nJSON error parsing WindowConfig tab: " + std::string{e.what()});
 	}
 }
 
@@ -54,14 +53,14 @@ AutoSave::AutoSave(const Json& t_json) {
 	}
 }
 
-Feel::Feel(const Json& t_json) {
+FeelConfig::FeelConfig(const Json& t_json) {
 	try {
 		tabSize = getJsonObject<int>(t_json, TabSize);
 		autoSave = AutoSave(getJsonObject<Json>(t_json, KeyAutoSave));
 		cursorBlinkMs = getJsonObject<int>(t_json, CursorBlinkMs);
 		wrapText = getJsonObject<bool>(t_json, WrapText);
 	} catch (std::exception& e) {
-		throw std::runtime_error("\nJSON error parsing Feel tab: " + std::string{e.what()});
+		throw std::runtime_error("\nJSON error parsing FeelConfig tab: " + std::string{e.what()});
 	}
 }
 
@@ -84,12 +83,12 @@ View::View(const Json& t_json) {
 	}
 }
 
-Editor::Editor(const Json& t_json) {
+EditorConfig::EditorConfig(const Json& t_json) {
 	try {
-		feel = Feel{getJsonObject<Json>(t_json, KeyFeel)};
+		feel = FeelConfig{getJsonObject<Json>(t_json, KeyFeel)};
 		view = View{getJsonObject<Json>(t_json, KeyView)};
 	} catch (std::exception& e) {
-		throw std::runtime_error("\nJSON error parsing Editor tab: " + std::string{e.what()});
+		throw std::runtime_error("\nJSON error parsing EditorConfig tab: " + std::string{e.what()});
 	}
 }
 
@@ -102,7 +101,7 @@ TextFonts::TextFonts(const Json& t_json) {
 	}
 }
 
-Fonts::Fonts(const Json& t_json) {
+FontsConfig::FontsConfig(const Json& t_json) {
 	try {
 		const Json code_Json = getJsonObject<Json>(t_json, Code);
 		const Json ui_Json = getJsonObject<Json>(t_json, Ui);
@@ -114,7 +113,7 @@ Fonts::Fonts(const Json& t_json) {
 	}
 }
 
-Theme::Theme(const Json& t_json) {
+ThemeConfig::ThemeConfig(const Json& t_json) {
 	try {
 		const auto codeTextObj = getJsonObject<std::string>(t_json, CodeText);
 		const auto backgroundObj = getJsonObject<std::string>(t_json, Background);
@@ -134,7 +133,7 @@ Theme::Theme(const Json& t_json) {
 		cursor = HexToSDL(cursorObj);
 		highlight = HexToSDL(highlightObj);
 	} catch (std::exception& e) {
-		throw std::runtime_error("\nJSON error parsing Theme tab: " + std::string{e.what()});
+		throw std::runtime_error("\nJSON error parsing ThemeConfig tab: " + std::string{e.what()});
 	}
 }
 
@@ -148,16 +147,16 @@ Config::Config() : window{}, editor{}, fonts{}, theme{} {
 	configFile >> json;
 
 	try {
-		window = Window{getJsonObject<Json>(json, KeyWindow)};
-		editor = Editor{getJsonObject<Json>(json, KeyEditor)};
-		fonts = Fonts{getJsonObject<Json>(json, KeyFonts)};
-		theme = Theme{getJsonObject<Json>(json, KeyTheme)};
+		window = WindowConfig{getJsonObject<Json>(json, KeyWindow)};
+		editor = EditorConfig{getJsonObject<Json>(json, KeyEditor)};
+		fonts = FontsConfig{getJsonObject<Json>(json, KeyFonts)};
+		theme = ThemeConfig{getJsonObject<Json>(json, KeyTheme)};
 	} catch (const std::exception& e) {
 		throw std::runtime_error("JSON Parse Failure: " + std::string{e.what()});
 	}
 }
 
-Settings::Settings(const Config& t_config) {
+Settings::Settings(const Config& t_config): charSettings{}, windowSettings{} {
 	TTF_Init();
 
 	const auto& codeFont = t_config.fonts.code;
@@ -172,12 +171,17 @@ Settings::Settings(const Config& t_config) {
 	TTF_SetFontHinting(codeFont_, TTF_HINTING_MONO);
 	TTF_SetFontKerning(codeFont_, 0);
 
-	TTF_SizeText(codeFont_, "A", &codeCharWidth, &codeCharHeight);
+
+
+	TTF_SizeText(codeFont_, "A", &charSettings.codeCharWidth, &charSettings.codeCharHeight);
 
 	TTF_SetFontHinting(uiFont_, TTF_HINTING_MONO);
 	TTF_SetFontKerning(uiFont_, 0);
 
-	TTF_SizeText(uiFont_, "A", &uiCharWidth, &uiCharHeight);
+	TTF_SizeText(uiFont_, "A", &charSettings.uiCharWidth, &charSettings.uiCharHeight);
 
-	tabHeight = uiCharHeight + 5;
+	charSettings.tabHeight = charSettings.uiCharHeight + 5;
+
+	windowSettings.width = t_config.window.width;
+	windowSettings.height = t_config.window.height;
 }

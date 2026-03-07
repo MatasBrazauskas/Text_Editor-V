@@ -8,9 +8,9 @@
 EditorState::EditorState(const FileId activeFileId_t)
 	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
-EditorCore::EditorCore(const int argc, char** argv)
-	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{PaneView(), filesManager_.fileIdCounter_},
-	  editorState_{0} {}
+EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
+	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{PaneView(0,0,t_settings.windowSettings.width,t_settings.windowSettings.height), filesManager_.fileIdCounter_},
+	  editorState_{0}, settings_{t_settings} {}
 
 std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	if (event.type == SDL_QUIT) {
@@ -42,23 +42,18 @@ std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	return {};
 }
 
-void EditorCore::HandleKeyboardInput(Config& t_config) {
+void EditorCore::HandleKeyboardInput() {
 	SDL_Event event;
-	// dirty = false;
 
 	while (SDL_PollEvent(&event)) {
-
-		if (event.type == SDL_WINDOWEVENT){
+		if (event.type == SDL_WINDOWEVENT) {
 			if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-				int newWidth = event.window.data1;
-				int newHeight = event.window.data2;
-
-				t_config.window.height = newHeight;
-				t_config.window.width = newWidth;
+				settings_.windowSettings.width= event.window.data1;
+				settings_.windowSettings.height= event.window.data2;
 			}
 		}
 
-		std::string input = EncodeInput(event);
+		const std::string input = EncodeInput(event);
 
 		if (input.empty())
 			return;
