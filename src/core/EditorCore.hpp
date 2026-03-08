@@ -1,11 +1,11 @@
 #pragma once
 
 #include "buffer/Files.hpp"
-#include "utils/ConfigAndSettings.hpp"
 #include "buffer/PanesAndLayers.hpp"
 #include "commands/CommandMode.hpp"
 #include "commands/InsertMode.hpp"
 #include "commands/NormalMode.hpp"
+#include "utils/ConfigAndSettings.hpp"
 
 #include <SDL2/SDL_events.h>
 

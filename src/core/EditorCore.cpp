@@ -9,7 +9,9 @@ EditorState::EditorState(const FileId activeFileId_t)
 	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
 EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
-	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{PaneView(0,0,t_settings.windowSettings.width,t_settings.windowSettings.height), filesManager_.fileIdCounter_},
+	: dirty{true}, filesManager_{fileHandler_, argc, argv},
+	  panesManager_{PaneView(0, 0, t_settings.windowSettings.width, t_settings.windowSettings.height),
+					filesManager_.fileIdCounter_},
 	  editorState_{0}, settings_{t_settings} {}
 
 std::string EditorCore::EncodeInput(const SDL_Event& event) {
@@ -48,8 +50,8 @@ void EditorCore::HandleKeyboardInput() {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_WINDOWEVENT) {
 			if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-				settings_.windowSettings.width= event.window.data1;
-				settings_.windowSettings.height= event.window.data2;
+				settings_.windowSettings.width = event.window.data1;
+				settings_.windowSettings.height = event.window.data2;
 			}
 		}
 

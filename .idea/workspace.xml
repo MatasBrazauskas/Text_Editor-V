@@ -39,13 +39,11 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/ConfigAndSettings.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ConfigAndSettings.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/ConfigAndSettings.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ConfigAndSettings.hpp" afterDir="false" />
     </list>
@@ -410,6 +408,10 @@
       <workItem from="1772788022017" duration="22000" />
       <workItem from="1772894210098" duration="6495000" />
       <workItem from="1772917033797" duration="1929000" />
+      <workItem from="1772970167615" duration="2267000" />
+      <workItem from="1772973732998" duration="15000" />
+      <workItem from="1772996297155" duration="17000" />
+      <workItem from="1772996328535" duration="1769000" />
     </task>
     <servers />
   </component>

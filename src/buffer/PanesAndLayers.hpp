@@ -1,8 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
 #include <vector>
+#include <variant>
+#include <optional>
 
 using FileId = std::uint_fast64_t;
 using PaneId = uint_fast64_t;
@@ -14,87 +15,94 @@ class Settings;
 class Config;
 class FilesManager;
 
+using FileId = std::uint_fast64_t;
+using PaneId = uint_fast64_t;
+
 enum class Modes : uint8_t;
 enum class SplitType : char { Vertical, Horizontal, None };
+enum class AddedPaneRotation: char { Top, Bottom, Right, Left };
 
-class PaneView final {
+class Coordinates {
 public:
-	PaneView() = delete;
-	PaneView(int ,int ,int ,int);
-	~PaneView() noexcept = default;
+    Coordinates() = delete;
+    Coordinates(int,int,int,int);
+    ~Coordinates() noexcept = default;
 
-	int startX, startY;
-	int endX, endY;
+    int startX, startY, endX, endY;
 };
 
 class Cursor final {
-  public:
-	Cursor();
-	~Cursor() noexcept = default;
+public:
+    Cursor();
+    ~Cursor() noexcept = default;
 
-	void incrementX();
-	void decrementX();
-	void incrementY();
-	void decrementY();
+    void incrementX();
+    void decrementX();
+    void incrementY();
+    void decrementY();
 
-	[[nodiscard]] int getX() const;
-	[[nodiscard]] int getY() const;
+    [[nodiscard]] int getX() const;
+    [[nodiscard]] int getY() const;
 
-	void setX(int);
-	void setY(int);
+    void setX(int);
+    void setY(int);
 
-	[[nodiscard]] bool isVisible() const;
-	void setVisible(bool);
+    [[nodiscard]] bool isVisible() const;
+    void setVisible(bool);
 
-  private:
-	int x_;
-	int y_;
-	bool visible_;
-	int absent_;
+private:
+    int x_;
+    int y_;
+    bool visible_;
+    int absent_;
 };
 
 class Pane final {
-  public:
-	Pane() = delete;
-	Pane(PaneView, FileId, PaneId);
-	Pane(const Pane&);
-	~Pane() noexcept = default;
+public:
+    Pane() = delete;
+    Pane(PaneId, FileId);
+    ~Pane() noexcept = default;
 
-	PaneView paneView_;
-
-	PaneId paneId_;
-	FileId fileId_;
-	Cursor cursor_;
+    PaneId paneId_;
+    FileId fileId_;
+    Cursor cursor_;
 };
 
 class SplitNode final {
-  public:
-	SplitNode(SplitType, bool t_isLeaf, const Pane&);
-	~SplitNode() noexcept = default;
+public:
+    explicit SplitNode(SplitType);
+    explicit SplitNode(Pane);
+    ~SplitNode() noexcept = default;
 
-	SplitType splitType;
-	float leftChildRation = 0.5f;
-	bool isLeaf;
+    float leftChildRation = 0.5f;
 
-	std::unique_ptr<SplitNode> leftChild;
-	std::unique_ptr<SplitNode> rightChild;
-	std::unique_ptr<Pane> pane;
+    std::variant<Pane, SplitType> nodeType;
+
+    std::unique_ptr<SplitNode> leftChild;
+    std::unique_ptr<SplitNode> rightChild;
 };
 
 class PanesManager final {
-  public:
-	PanesManager(const PaneView& t_view, FileId);
-	~PanesManager() noexcept = default;
+public:
+    PanesManager();
+    ~PanesManager() noexcept = default;
 
-	Pane getPane(PaneId);
-	Pane getCurrPane();
+    std::optional<Pane> getPane(PaneId);
+    std::optional<Pane> getCurrPane();
+    void addPane(PaneId t_parent, FileId t_fileId, AddedPaneRotation t_rotation);
+    void removePane(PaneId);
 
-	PaneId activePaneId_;
-	std::unordered_map<PaneId, Pane*> paneMap_;
-	SplitNode head_;
+    std::vector<std::pair<FileId, Coordinates>> getPaneCoordinates(int t_height, int t_width) const;
 
-  private:
-	inline static PaneId paneIdCounter_{};
+private:
+    inline static PaneId paneIdCounter_{};
+
+    SplitNode* head_;
+    PaneId activePaneId_;
+
+    std::vector<SplitNode*> getAllSplitNode();
+    std::optional<SplitNode*> getPanePointer(PaneId);
+    std::optional<SplitNode*> getPaneParentPointer(PaneId);
 };
 
 class TabLayout final {

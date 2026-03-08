@@ -73,7 +73,7 @@ void Renderer::Render(const LayoutManager& t_layoutManage) const {
 
 	RenderTabs(t_layoutManage.tabLayout, t_layoutManage.windowWidth);
 	RenderPanes(t_layoutManage.panesLayout);
-	//RenderCursor(t_layoutManage.cursorLayout);
+	// RenderCursor(t_layoutManage.cursorLayout);
 	RenderCommandLine(t_layoutManage.commandLineLayout);
 
 	SDL_RenderPresent(renderer_);
@@ -149,7 +149,6 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 	const auto& fg = config_.theme.foreground;
 	const auto& [charStg, winStg] = settings_;
 
-
 	for (const auto& pane : panes) {
 		const auto& [startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = pane;
 
@@ -167,7 +166,8 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 			const int lineOffset = i * charStg.codeCharHeight;
 
 			const SDL_Rect src{0, 0, length, surface->h};
-			const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset * charStg.codeCharHeight, length, surface->h};
+			const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset * charStg.codeCharHeight, length,
+							   surface->h};
 
 			SDL_RenderCopy(renderer_, texture, &src, &dst);
 
@@ -213,52 +213,60 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 }
 
 void Renderer::RenderCommandLine(const CommandLineLayout& t_layout) const {
-    const auto& [charStg, winStg] = settings_;
-    const auto [w, h] = winStg;
-    const auto& [mode, currFileName, currCommand, cursorX, cursorY, charCount, lineCount, args] = t_layout;
+	const auto& [charStg, winStg] = settings_;
+	const auto [w, h] = winStg;
+	const auto& [mode, currFileName, currCommand, cursorX, cursorY, charCount, lineCount, args] = t_layout;
 
-    std::string modeText = "  Normal";
-    SDL_Color modeBg = normalModeColor_;
-    if (mode == Modes::Insert) { modeText = "  Insert"; modeBg = insertModeColor_; }
-    else if (mode == Modes::Command) { modeText = "  Command"; modeBg = commandModeColor_; }
+	std::string modeText = "  Normal";
+	SDL_Color modeBg = normalModeColor_;
+	if (mode == Modes::Insert) {
+		modeText = "  Insert";
+		modeBg = insertModeColor_;
+	} else if (mode == Modes::Command) {
+		modeText = "  Command";
+		modeBg = commandModeColor_;
+	}
 
-    const int barY = h - (2 * charStg.uiCharHeight);
+	const int barY = h - (2 * charStg.uiCharHeight);
 
-    const SDL_Rect barRect = {0, barY, w, 2 * charStg.uiCharHeight};
-    SDL_SetRenderDrawColor(renderer_, config_.theme.foreground.r, config_.theme.foreground.g, config_.theme.foreground.b, 255);
-    SDL_RenderFillRect(renderer_, &barRect);
+	const SDL_Rect barRect = {0, barY, w, 2 * charStg.uiCharHeight};
+	SDL_SetRenderDrawColor(renderer_, config_.theme.foreground.r, config_.theme.foreground.g, config_.theme.foreground.b,
+						   255);
+	SDL_RenderFillRect(renderer_, &barRect);
 
-    const int modeBarWidth = charStg.uiCharWidth * 11;
-    const SDL_Rect modeRect = {0, barY, modeBarWidth, charStg.uiCharHeight}; // FIXED: used barY instead of w
-    SDL_SetRenderDrawColor(renderer_, modeBg.r, modeBg.g, modeBg.b, 255);
-    SDL_RenderFillRect(renderer_, &modeRect);
+	const int modeBarWidth = charStg.uiCharWidth * 11;
+	const SDL_Rect modeRect = {0, barY, modeBarWidth, charStg.uiCharHeight}; // FIXED: used barY instead of w
+	SDL_SetRenderDrawColor(renderer_, modeBg.r, modeBg.g, modeBg.b, 255);
+	SDL_RenderFillRect(renderer_, &modeRect);
 
-    auto drawText = [&](const std::string& text, SDL_Color color, int x, int y) {
-        if (text.empty()) return 0;
-        SDL_Surface* s = TTF_RenderText_Blended(uiFont_, text.c_str(), color);
-        if (!s) return 0;
-        SDL_Texture* t = SDL_CreateTextureFromSurface(renderer_, s);
+	auto drawText = [&](const std::string& text, SDL_Color color, int x, int y) {
+		if (text.empty())
+			return 0;
+		SDL_Surface* s = TTF_RenderText_Blended(uiFont_, text.c_str(), color);
+		if (!s)
+			return 0;
+		SDL_Texture* t = SDL_CreateTextureFromSurface(renderer_, s);
 
-        SDL_Rect dst = {x, y, s->w, s->h};
-        SDL_RenderCopy(renderer_, t, nullptr, &dst);
+		SDL_Rect dst = {x, y, s->w, s->h};
+		SDL_RenderCopy(renderer_, t, nullptr, &dst);
 
-        int width = s->w;
-        SDL_FreeSurface(s);
-        SDL_DestroyTexture(t);
-        return width;
-    };
+		int width = s->w;
+		SDL_FreeSurface(s);
+		SDL_DestroyTexture(t);
+		return width;
+	};
 
-    drawText(modeText, config_.theme.uiText, 0, barY);
-    drawText(currFileName.substr(0, 20), config_.theme.uiText, modeBarWidth + 5, barY);
+	drawText(modeText, config_.theme.uiText, 0, barY);
+	drawText(currFileName.substr(0, 20), config_.theme.uiText, modeBarWidth + 5, barY);
 
-    const std::string fileInfo = std::format("Lines: {}, Chars: {}", lineCount, charCount);
-    const std::string cursorInfo = std::format("Com: {}, ({}, {}) ", currCommand, cursorX, cursorY);
+	const std::string fileInfo = std::format("Lines: {}, Chars: {}", lineCount, charCount);
+	const std::string cursorInfo = std::format("Com: {}, ({}, {}) ", currCommand, cursorX, cursorY);
 
-    int fileInfoWidth = 0;
-    TTF_SizeText(uiFont_, fileInfo.c_str(), &fileInfoWidth, nullptr);
-    int cursorInfoWidth = 0;
-    TTF_SizeText(uiFont_, cursorInfo.c_str(), &cursorInfoWidth, nullptr);
+	int fileInfoWidth = 0;
+	TTF_SizeText(uiFont_, fileInfo.c_str(), &fileInfoWidth, nullptr);
+	int cursorInfoWidth = 0;
+	TTF_SizeText(uiFont_, cursorInfo.c_str(), &cursorInfoWidth, nullptr);
 
-    drawText(fileInfo, modeBg, w - fileInfoWidth - 5, barY);
-    drawText(cursorInfo, config_.theme.uiText, w - fileInfoWidth - cursorInfoWidth - 15, barY);
+	drawText(fileInfo, modeBg, w - fileInfoWidth - 5, barY);
+	drawText(cursorInfo, config_.theme.uiText, w - fileInfoWidth - cursorInfoWidth - 15, barY);
 }

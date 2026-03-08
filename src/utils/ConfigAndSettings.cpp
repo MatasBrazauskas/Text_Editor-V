@@ -156,7 +156,7 @@ Config::Config() : window{}, editor{}, fonts{}, theme{} {
 	}
 }
 
-Settings::Settings(const Config& t_config): charSettings{}, windowSettings{} {
+Settings::Settings(const Config& t_config) : charSettings{}, windowSettings{} {
 	TTF_Init();
 
 	const auto& codeFont = t_config.fonts.code;
@@ -170,8 +170,6 @@ Settings::Settings(const Config& t_config): charSettings{}, windowSettings{} {
 
 	TTF_SetFontHinting(codeFont_, TTF_HINTING_MONO);
 	TTF_SetFontKerning(codeFont_, 0);
-
-
 
 	TTF_SizeText(codeFont_, "A", &charSettings.codeCharWidth, &charSettings.codeCharHeight);
 

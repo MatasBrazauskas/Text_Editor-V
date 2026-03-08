@@ -176,7 +176,7 @@ class Config final {
 };
 
 class CharSettings final {
-public:
+  public:
 	CharSettings() = default;
 	~CharSettings() noexcept = default;
 
@@ -186,7 +186,7 @@ public:
 };
 
 class WindowSettings final {
-public:
+  public:
 	WindowSettings() = default;
 	~WindowSettings() noexcept = default;
 
