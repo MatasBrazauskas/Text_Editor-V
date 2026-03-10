@@ -1,5 +1,5 @@
 #pragma once
-#include "../includes/Json.hpp"
+#include "includes/Json.hpp"
 
 #include <SDL2/SDL_pixels.h>
 #include <filesystem>

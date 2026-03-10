@@ -9,10 +9,10 @@ EditorState::EditorState(const FileId activeFileId_t)
 	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
 EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
-	: dirty{true}, filesManager_{fileHandler_, argc, argv},
-	  panesManager_{PaneView(0, 0, t_settings.windowSettings.width, t_settings.windowSettings.height),
-					filesManager_.fileIdCounter_},
-	  editorState_{0}, settings_{t_settings} {}
+	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{},
+	  editorState_{0}, settings_{t_settings} {
+	panesManager_.addPane(0,0,AddedPaneRotation::Top);
+}
 
 std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	if (event.type == SDL_QUIT) {
@@ -65,7 +65,13 @@ void EditorCore::HandleKeyboardInput() {
 
 		auto file = filesManager_.getFile(this->editorState_.activeFileId_);
 
-		auto cursor = panesManager_.getCurrPane().cursor_;
+		const auto paneOpt = panesManager_.getCurrPane();
+
+		if (paneOpt == std::nullopt) {
+			throw std::runtime_error("No pane");
+		}
+
+		auto cursor = paneOpt.value().cursor_;
 
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:

@@ -34,7 +34,7 @@ class Renderer final {
 	const Config& config_;
 	const Settings& settings_;
 
-	void RenderTabs(const TabLayout&, int windowWidth) const;
+	void RenderTabs(const TabLayout&) const;
 	void RenderPanes(const std::vector<PanesLayout>&) const;
 	void RenderCursor(const CursorLayout&) const;
 	void RenderCommandLine(const CommandLineLayout&) const;

@@ -4,10 +4,12 @@
 #include "utils/ConfigAndSettings.hpp"
 
 #include <algorithm>
-#include <ranges>
 #include <cmath>
+#include <ranges>
 
-Coordinates::Coordinates(int sx,int sy,int ex,int ey): startX{sx}, startY{sy}, endX{ex}, endY{ey} {}
+Coordinates::Coordinates(int sx, int sy, int ex, int ey) : startX{sx}, startY{sy}, endX{ex}, endY{ey} {}
+
+TextIndex::TextIndex(const int t_indexX, const int t_indexY): indexX{t_indexX}, indexY {t_indexY} {}
 
 Cursor::Cursor() : x_{}, y_{}, visible_{true}, absent_{} {}
 
@@ -55,217 +57,218 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-Pane::Pane(const PaneId t_paneId, const FileId t_fileId):  paneId_{t_paneId}, fileId_{t_fileId}, cursor_{} {}
+Pane::Pane(const PaneId t_paneId, const FileId t_fileId) : paneId_{t_paneId}, fileId_{t_fileId}, textIndex_{0,0}, cursor_{} {}
 
-SplitNode::SplitNode(const Pane t_pane): nodeType{t_pane} {}
+SplitNode::SplitNode(const Pane t_pane) : nodeType{t_pane} {}
 
-SplitNode::SplitNode(SplitType t_splitType): nodeType{t_splitType} {}
+SplitNode::SplitNode(SplitType t_splitType) : nodeType{t_splitType} {}
 
-PanesManager::PanesManager(): activePaneId_{}, head_{nullptr} {}
+PanesManager::PanesManager() : activePaneId_{}, head_{nullptr} {}
 
-void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const AddedPaneRotation t_rotation){
-    const auto pane = Pane{paneIdCounter_++, t_fileId};
+void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const AddedPaneRotation t_rotation) {
+	const auto pane = Pane{paneIdCounter_++, t_fileId};
 
-    if (head_ == nullptr) {
-        head_ = new SplitNode(pane);
-    } else {
-        auto parentOption = getPanePointer(t_parentId);
+	if (head_ == nullptr) {
+		head_ = new SplitNode(pane);
+	} else {
+		auto parentOption = getPanePointer(t_parentId);
 
-        if (parentOption != std::nullopt) {
-            auto parent = parentOption.value();
-            const Pane parentPane = get<Pane>(parent->nodeType);
+		if (parentOption != std::nullopt) {
+			auto parent = parentOption.value();
+			const Pane parentPane = get<Pane>(parent->nodeType);
 
-            Pane leftChildPane = parentPane;
-            Pane rightChildPane = parentPane;
-            SplitType splitType;
+			Pane leftChildPane = parentPane;
+			Pane rightChildPane = parentPane;
+			SplitType splitType;
 
-            switch (t_rotation) {
-                case AddedPaneRotation::Right:
-                    leftChildPane = parentPane;
-                    rightChildPane = pane;
-                    splitType = SplitType::Vertical;
-                    break;
-                case AddedPaneRotation::Left:
-                    leftChildPane = pane;
-                    rightChildPane = parentPane;
-                    splitType = SplitType::Vertical;
-                    break;
-                case AddedPaneRotation::Top:
-                    leftChildPane =pane;
-                    rightChildPane =parentPane;
-                    splitType = SplitType::Horizontal;
-                    break;
-                case AddedPaneRotation::Bottom:
-                    leftChildPane = parentPane;
-                    rightChildPane = pane;
-                    splitType = SplitType::Horizontal;
-                    break;
-            }
+			switch (t_rotation) {
+			case AddedPaneRotation::Right:
+				leftChildPane = parentPane;
+				rightChildPane = pane;
+				splitType = SplitType::Vertical;
+				break;
+			case AddedPaneRotation::Left:
+				leftChildPane = pane;
+				rightChildPane = parentPane;
+				splitType = SplitType::Vertical;
+				break;
+			case AddedPaneRotation::Top:
+				leftChildPane = pane;
+				rightChildPane = parentPane;
+				splitType = SplitType::Horizontal;
+				break;
+			case AddedPaneRotation::Bottom:
+				leftChildPane = parentPane;
+				rightChildPane = pane;
+				splitType = SplitType::Horizontal;
+				break;
+			}
 
-            parent->nodeType = splitType;
+			parent->nodeType = splitType;
 
-            parent->leftChild = std::make_unique<SplitNode>(leftChildPane);
-            parent->rightChild = std::make_unique<SplitNode>(rightChildPane);
+			parent->leftChild = std::make_unique<SplitNode>(leftChildPane);
+			parent->rightChild = std::make_unique<SplitNode>(rightChildPane);
 
-            return;
-        }
+			return;
+		}
 
-        throw std::runtime_error{"No split node found"};
-    }
+		throw std::runtime_error{"No split node found"};
+	}
 }
 
 void PanesManager::removePane(const PaneId t_paneId) {
-    const auto parentOpt = getPaneParentPointer(t_paneId);
+	const auto parentOpt = getPaneParentPointer(t_paneId);
 
-    if (parentOpt == std::nullopt) {
-        throw std::runtime_error{"No split node found, child or parent"};
-    }
+	if (parentOpt == std::nullopt) {
+		throw std::runtime_error{"No split node found, child or parent"};
+	}
 
-    const auto parent = parentOpt.value();
-    const Pane leftChildPane = get<Pane>(parent->leftChild->nodeType);
-    const Pane rightChildPane = get<Pane>(parent->rightChild->nodeType);
+	const auto parent = parentOpt.value();
+	const Pane leftChildPane = get<Pane>(parent->leftChild->nodeType);
+	const Pane rightChildPane = get<Pane>(parent->rightChild->nodeType);
 
-    const Pane anotherChildPane = leftChildPane.paneId_ ==  t_paneId ? rightChildPane : leftChildPane;
+	const Pane anotherChildPane = leftChildPane.paneId_ == t_paneId ? rightChildPane : leftChildPane;
 
-    if (rightChildPane.paneId_ == t_paneId) {
-        parent->nodeType = anotherChildPane;
-    } else if (leftChildPane.paneId_ == t_paneId) {
-        parent->nodeType = anotherChildPane;
-    } else {
-        throw std::runtime_error("Id doesnt match the children of a parent");
-    }
+	if (rightChildPane.paneId_ == t_paneId) {
+		parent->nodeType = anotherChildPane;
+	} else if (leftChildPane.paneId_ == t_paneId) {
+		parent->nodeType = anotherChildPane;
+	} else {
+		throw std::runtime_error("Id doesnt match the children of a parent");
+	}
 
-    parent->leftChild.reset();
-    parent->rightChild.reset();
+	parent->leftChild.reset();
+	parent->rightChild.reset();
 }
 
 std::optional<SplitNode*> PanesManager::getPaneParentPointer(const PaneId t_paneId) {
-    const auto splitNodes = getAllSplitNode();
+	const auto splitNodes = getAllSplitNode();
 
-    const auto filterInternalNodes = [&](const SplitNode* splitNode){
-        const bool internalNodePredicate = std::holds_alternative<SplitType>(splitNode->nodeType);
-        if (internalNodePredicate == false) {
-            return false;
-        }
+	const auto filterInternalNodes = [&](const SplitNode* splitNode) {
+		const bool internalNodePredicate = std::holds_alternative<SplitType>(splitNode->nodeType);
+		if (internalNodePredicate == false) {
+			return false;
+		}
 
-        const bool parentToLeafPredicate = std::holds_alternative<Pane>(splitNode->leftChild->nodeType) && std::holds_alternative<Pane>(splitNode->rightChild->nodeType);
-        return parentToLeafPredicate;
-    };
+		const bool parentToLeafPredicate = std::holds_alternative<Pane>(splitNode->leftChild->nodeType) &&
+										   std::holds_alternative<Pane>(splitNode->rightChild->nodeType);
+		return parentToLeafPredicate;
+	};
 
-    const auto findLeafParent = [&](const SplitNode* internalNode) {
-        const auto leftId = get<Pane>(internalNode->leftChild->nodeType).paneId_;
-        const auto rightId = get<Pane>(internalNode->rightChild->nodeType).paneId_;
+	const auto findLeafParent = [&](const SplitNode* internalNode) {
+		const auto leftId = get<Pane>(internalNode->leftChild->nodeType).paneId_;
+		const auto rightId = get<Pane>(internalNode->rightChild->nodeType).paneId_;
 
-        return leftId == t_paneId || rightId == t_paneId;
-    };
+		return leftId == t_paneId || rightId == t_paneId;
+	};
 
-    auto internalNodes = splitNodes | std::ranges::views::filter(filterInternalNodes);
-    std::vector<SplitNode*> tempVec{internalNodes.begin(), internalNodes.end()};
+	auto internalNodes = splitNodes | std::ranges::views::filter(filterInternalNodes);
+	std::vector<SplitNode*> tempVec{internalNodes.begin(), internalNodes.end()};
 
-    const auto it = std::ranges::find_if(internalNodes, findLeafParent);
+	const auto it = std::ranges::find_if(internalNodes, findLeafParent);
 
-    if (it != internalNodes.end()) {
-        return *it;
-    }
+	if (it != internalNodes.end()) {
+		return *it;
+	}
 
-    return std::nullopt;
+	return std::nullopt;
 }
 
-static void addCoordinates(std::vector<std::pair<FileId, Coordinates>>& t_coordinates, SplitNode* t_splitNode, Coordinates t_cords) {
-    if (t_splitNode != nullptr) {
-        if (std::holds_alternative<SplitType>(t_splitNode->nodeType)) {
-            const auto split = get<SplitType>(t_splitNode->nodeType);
+static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_splitNode, Coordinates t_cords) {
+	if (t_splitNode != nullptr) {
+		if (std::holds_alternative<SplitType>(t_splitNode->nodeType)) {
+			const auto split = get<SplitType>(t_splitNode->nodeType);
 
-            const auto leftChild = t_splitNode->leftChild.get();
-            const auto rightChild = t_splitNode->rightChild.get();
+			const auto leftChild = t_splitNode->leftChild.get();
+			const auto rightChild = t_splitNode->rightChild.get();
 
-            if (split == SplitType::Vertical) {
-                Coordinates leftCoords = t_cords;
-                Coordinates rightCoords = t_cords;
+			if (split == SplitType::Vertical) {
+				Coordinates leftCoords = t_cords;
+				Coordinates rightCoords = t_cords;
 
-                const int widthDiff = t_cords.endX - t_cords.startX;
-                const int leftDiff = static_cast<int>(std::round(static_cast<float>(widthDiff) * t_splitNode->leftChildRation));
-                const int rightDiff = widthDiff - leftDiff;
+				const int widthDiff = t_cords.endX - t_cords.startX;
+				const int leftDiff =
+					static_cast<int>(std::round(static_cast<float>(widthDiff) * t_splitNode->leftChildRation));
+				const int rightDiff = widthDiff - leftDiff;
 
-                leftCoords.endX = leftCoords.startX + leftDiff;
-                rightCoords.startX =  rightDiff;
+				leftCoords.endX = leftCoords.startX + leftDiff;
+				rightCoords.startX = rightDiff;
 
-                addCoordinates(t_coordinates, leftChild, leftCoords);
-                addCoordinates(t_coordinates, rightChild, rightCoords);
-            } else if (split == SplitType::Horizontal) {
-                Coordinates topCoords = t_cords;
-                Coordinates bottomCoords= t_cords;
+				addCoordinates(t_coordinates, leftChild, leftCoords);
+				addCoordinates(t_coordinates, rightChild, rightCoords);
+			} else if (split == SplitType::Horizontal) {
+				Coordinates topCoords = t_cords;
+				Coordinates bottomCoords = t_cords;
 
-                const int heightDiff = t_cords.endY - t_cords.startY;
-                const int topDiff = static_cast<int>(std::round(static_cast<float>(heightDiff) * t_splitNode->leftChildRation));
-                const int bottomDiff = heightDiff - topDiff;
+				const int heightDiff = t_cords.endY - t_cords.startY;
+				const int topDiff =
+					static_cast<int>(std::round(static_cast<float>(heightDiff) * t_splitNode->leftChildRation));
+				const int bottomDiff = heightDiff - topDiff;
 
-                topCoords.endY = topCoords.startY + topDiff;
-                bottomCoords.startY =  bottomDiff;
+				topCoords.endY = topCoords.startY + topDiff;
+				bottomCoords.startY = bottomDiff;
 
-                addCoordinates(t_coordinates, leftChild, topCoords);
-                addCoordinates(t_coordinates, rightChild, bottomCoords);
-            }
-        } else if (std::holds_alternative<Pane>(t_splitNode->nodeType)) {
-            const auto fileId = get<Pane>(t_splitNode->nodeType).fileId_;
-            t_coordinates.emplace_back(fileId, t_cords);
-        }
-    }
+				addCoordinates(t_coordinates, leftChild, topCoords);
+				addCoordinates(t_coordinates, rightChild, bottomCoords);
+			}
+		} else if (std::holds_alternative<Pane>(t_splitNode->nodeType)) {
+			const auto pane = get<Pane>(t_splitNode->nodeType);
+			t_coordinates.emplace_back(pane.fileId_, pane.textIndex_, pane.cursor_, t_cords);
+		}
+	}
 }
 
-std::vector<std::pair<FileId, Coordinates>> PanesManager::getPaneCoordinates(const int t_height, const int t_width) const {
-    std::vector<std::pair<FileId, Coordinates>> coordinates;
-
-    addCoordinates(coordinates, head_, {0,0,t_width,t_height});
-
-    return coordinates;
+std::vector<PaneInfo> PanesManager::getPaneCoordinates(const int t_height, const int t_width) const {
+	std::vector<PaneInfo> coordinates;
+	addCoordinates(coordinates, head_, {0, 0, t_width, t_height});
+	return coordinates;
 }
 
 std::optional<Pane> PanesManager::getPane(const PaneId t_paneId) {
-    if (const auto pane = getPanePointer(t_paneId); pane != nullptr) {
-        return get<Pane>(pane.value()->nodeType);
-    }
-    return std::nullopt;
+	if (const auto pane = getPanePointer(t_paneId); pane != nullptr) {
+		return get<Pane>(pane.value()->nodeType);
+	}
+	return std::nullopt;
 }
 
 std::optional<Pane> PanesManager::getCurrPane() {
-    return getPane(this->activePaneId_);
+	return getPane(this->activePaneId_);
 }
 
 static void addPaneToList(std::vector<SplitNode*>& list, SplitNode* splitNode) {
-    if (splitNode != nullptr) {
-        list.push_back(splitNode);
+	if (splitNode != nullptr) {
+		list.push_back(splitNode);
 
-        addPaneToList(list, splitNode->leftChild.get());
-        addPaneToList(list, splitNode->rightChild.get());
-    }
+		addPaneToList(list, splitNode->leftChild.get());
+		addPaneToList(list, splitNode->rightChild.get());
+	}
 }
 
 std::vector<SplitNode*> PanesManager::getAllSplitNode() {
-    std::vector<SplitNode*> splitNodes;
+	std::vector<SplitNode*> splitNodes;
 
-    addPaneToList(splitNodes, head_);
+	addPaneToList(splitNodes, head_);
 
-    return splitNodes;
+	return splitNodes;
 }
 
 std::optional<SplitNode*> PanesManager::getPanePointer(const PaneId t_paneId) {
-    const auto temp = [&](const SplitNode* splitNode) {
-        if (std::holds_alternative<Pane>(splitNode->nodeType)) {
-            const auto paneId = get<Pane>(splitNode->nodeType).paneId_;
-            return paneId == t_paneId;
-        }
-        return false;
-    };
+	const auto temp = [&](const SplitNode* splitNode) {
+		if (std::holds_alternative<Pane>(splitNode->nodeType)) {
+			const auto paneId = get<Pane>(splitNode->nodeType).paneId_;
+			return paneId == t_paneId;
+		}
+		return false;
+	};
 
-    const auto splitNodes = getAllSplitNode();
-    const auto it = std::ranges::find_if(splitNodes, temp);
+	const auto splitNodes = getAllSplitNode();
+	const auto it = std::ranges::find_if(splitNodes, temp);
 
-    if (it != splitNodes.end()) {
-        return *it;
-    }
+	if (it != splitNodes.end()) {
+		return *it;
+	}
 
-    return std::nullopt;
+	return std::nullopt;
 }
 
 TabLayout::TabLayout(const int activeTab_t, const int t_tabCapLines, const std::vector<std::string>& tabs_t)
@@ -319,14 +322,30 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 
 	const std::vector<std::string> tabVec{temp.begin(), temp.end()};
 
-	const auto tempLambda = [&](int a, std::string_view b) {
+	int lineCount = 1;
+	int currentX = 0;
+	int paddingX = uiCharWidth * 2;
+
+	for (const auto& tab : tabVec) {
+		int tabWidth = (tab.length() * uiCharWidth) + paddingX;
+
+		// Check if this tab forces a wrap to the next line
+		if (currentX + tabWidth > windowWidth) {
+			lineCount++;
+			currentX = tabWidth; // Reset X to the start of the new line
+		} else {
+			currentX += tabWidth;
+		}
+	}
+
+	/*const auto tempLambda = [&](const int a, std::string_view b) {
 		const int tabWidth = (b.length() * uiCharWidth) + (uiCharWidth * 2);
 		if (a + tabWidth) {
 			return 0;
 		}
 		return tabWidth;
 	};
-	const int tabLines = std::accumulate(tabVec.begin(), tabVec.end(), 0, tempLambda);
+	const int tabLines = std::accumulate(tabVec.begin(), tabVec.end(), 1, tempLambda);*/
 
 	int activePane{};
 	const auto it = std::ranges::find(fileVec, 0, &File::fileId_);
@@ -335,19 +354,33 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	}
 
 	this->tabLayout.activeTab = activePane;
-	this->tabLayout.tabCapturedLinesOffsetY = tabLines * tabHeight;
+	this->tabLayout.tabCapturedLinesOffsetY = lineCount * tabHeight;
 	this->tabLayout.tabs = tabVec;
 }
 
 void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesManager,
-					const Settings& t_settings, const int t_tabOffsetY) {
+								   const Settings& t_settings, const int t_tabOffsetY) {
+	const int w = t_settings.windowSettings.width;
+	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
-	const auto panes = t_panesManager.getPaneCoordinates();
-	std::vector<std::string> linesVec;
-	std::vector<std::string> leftSide;
+	const auto panesInfo = t_panesManager.getPaneCoordinates(h, w);
 
-	for (const auto pane : panes) {
-		for (auto it = text.forwardIterator(startIndexY); !it.end(startIndexY + charCountInHeight); it.next()) {
+	for (const auto& [fileId, textIndex, cursor, coords] : panesInfo) {
+		const auto& file = t_filesManager.getFile(fileId);
+
+		const int charWidthCount = std::floor((coords.endX - coords.startX) / t_settings.charSettings.codeCharWidth);
+		const int charHeightCount = std::floor((coords.endY - coords.startY) / t_settings.charSettings.codeCharHeight);
+
+		const int startIndexX = coords.startX;
+		const int startIndexY = coords.startY;
+
+		const int endIndexX = startIndexX + charWidthCount;
+		const int endIndexY = std::min(startIndexY + charHeightCount, file.textBuffer_.getLinesCount());
+
+		std::vector<std::string> linesVec;
+		std::vector<std::string> leftSide;
+
+		for (auto it = file.textBuffer_.forwardIterator(startIndexY); !it.end(endIndexY); it.next()) {
 			std::string_view strView = it.getLine();
 
 			if (strView.length() < startIndexX) {
@@ -355,13 +388,13 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 				continue;
 			}
 
-			const int length = std::min(startIndexX + charCountInWidth, static_cast<int>(strView.length()));
+			const int length = std::min(endIndexX, static_cast<int>(strView.length()));
 			std::string_view subStrView = strView.substr(startIndexX, length);
+
 			linesVec.push_back(subStrView.data());
 		}
 
-		const auto& layoutPane = PanesLayout(pane->paneView_.startX, pane->paneView_.startY, pane->paneView_.endX,
-									 pane->paneView_.endY, 0, leftSide, linesVec);
+		const auto& layoutPane = PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX, coords.endY, 0, leftSide, linesVec);
 		panesLayout.push_back(layoutPane);
 	}
 }

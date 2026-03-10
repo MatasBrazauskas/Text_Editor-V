@@ -71,7 +71,7 @@ Renderer::~Renderer() noexcept {
 void Renderer::Render(const LayoutManager& t_layoutManage) const {
 	SDL_RenderClear(renderer_);
 
-	RenderTabs(t_layoutManage.tabLayout, t_layoutManage.windowWidth);
+	RenderTabs(t_layoutManage.tabLayout);
 	RenderPanes(t_layoutManage.panesLayout);
 	// RenderCursor(t_layoutManage.cursorLayout);
 	RenderCommandLine(t_layoutManage.commandLineLayout);
@@ -79,7 +79,7 @@ void Renderer::Render(const LayoutManager& t_layoutManage) const {
 	SDL_RenderPresent(renderer_);
 }
 
-void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowWidth) const {
+void Renderer::RenderTabs(const TabLayout& t_tabLayout) const {
 	const auto& [activeTab, tabCapLines, tabs] = t_tabLayout;
 	const auto& [charStg, winStg] = settings_;
 
@@ -92,7 +92,7 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowWidth) c
 	const auto drawForegroundLine = [&](const int yOffset) {
 		static const auto& [fr, fg, fb, fa] = config_.theme.foreground;
 
-		const SDL_Rect barRect = {0, yOffset, windowWidth, charStg.tabHeight};
+		const SDL_Rect barRect = {0, yOffset, winStg.width, charStg.tabHeight};
 		SDL_SetRenderDrawColor(renderer_, fr, fg, fb, fa);
 		SDL_RenderFillRect(renderer_, &barRect);
 	};
@@ -110,7 +110,7 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowWidth) c
 		int textW{}, textH{};
 		TTF_SizeText(uiFont_, filename.c_str(), &textW, &textH);
 
-		if (currentX + textW >= windowWidth) {
+		if (currentX + textW >= winStg.width) {
 			currentX = 0;
 			currentY += charStg.tabHeight;
 
@@ -146,7 +146,7 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout, const int windowWidth) c
 }
 
 void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
-	const auto& fg = config_.theme.foreground;
+	const auto& codeColor = config_.theme.codeText;
 	const auto& [charStg, winStg] = settings_;
 
 	for (const auto& pane : panes) {
@@ -159,17 +159,14 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 				continue;
 			}
 
-			SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), fg);
+			SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), codeColor);
 			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 			const int length = line.length() * charStg.codeCharWidth;
 			const int lineOffset = i * charStg.codeCharHeight;
 
-			const SDL_Rect src{0, 0, length, surface->h};
-			const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset * charStg.codeCharHeight, length,
-							   surface->h};
-
-			SDL_RenderCopy(renderer_, texture, &src, &dst);
+			const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset, length,surface->h};
+			SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
 			SDL_FreeSurface(surface);
 			SDL_DestroyTexture(texture);
