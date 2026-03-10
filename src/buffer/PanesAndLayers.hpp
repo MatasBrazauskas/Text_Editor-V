@@ -19,10 +19,9 @@ using FileId = std::uint_fast64_t;
 using PaneId = uint_fast64_t;
 
 enum class Modes : uint8_t;
-enum class SplitType : char {Vertical, Horizontal};
-enum class AddedPaneRotation : char {Top, Bottom, Right, Left};
-enum class MovePane: char {MoveLeft, MoveRight, MoveTop, MoveBottom};
-
+enum class SplitType : char { Vertical, Horizontal };
+enum class AddedPaneRotation : char { Top, Bottom, Right, Left };
+enum class PaneSizeChange: char { Expand, Contract };
 
 class Coordinates {
   public:
@@ -34,9 +33,9 @@ class Coordinates {
 };
 
 class TextIndex {
-public:
+  public:
 	TextIndex() = delete;
-	TextIndex(int,int);
+	TextIndex(int, int);
 	~TextIndex() noexcept = default;
 
 	int indexX, indexY;
@@ -103,8 +102,12 @@ class PanesManager final {
 
 	std::optional<Pane> getPane(PaneId);
 	std::optional<Pane> getCurrPane();
+
 	void addPane(PaneId t_parent, FileId t_fileId, AddedPaneRotation t_rotation);
 	void removePane(PaneId);
+
+	void shiftPane(PaneId, PaneSizeChange);
+	void resetRatios();
 
 	std::vector<PaneInfo> getPaneCoordinates(int t_height, int t_width) const;
 

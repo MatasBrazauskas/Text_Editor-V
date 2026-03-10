@@ -9,9 +9,8 @@ EditorState::EditorState(const FileId activeFileId_t)
 	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
 EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
-	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{},
-	  editorState_{0}, settings_{t_settings} {
-	panesManager_.addPane(0,0,AddedPaneRotation::Top);
+	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{}, editorState_{0}, settings_{t_settings} {
+	panesManager_.addPane(0, 0, AddedPaneRotation::Top);
 }
 
 std::string EditorCore::EncodeInput(const SDL_Event& event) {

@@ -9,7 +9,7 @@
 
 Coordinates::Coordinates(int sx, int sy, int ex, int ey) : startX{sx}, startY{sy}, endX{ex}, endY{ey} {}
 
-TextIndex::TextIndex(const int t_indexX, const int t_indexY): indexX{t_indexX}, indexY {t_indexY} {}
+TextIndex::TextIndex(const int t_indexX, const int t_indexY) : indexX{t_indexX}, indexY{t_indexY} {}
 
 Cursor::Cursor() : x_{}, y_{}, visible_{true}, absent_{} {}
 
@@ -57,7 +57,8 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-Pane::Pane(const PaneId t_paneId, const FileId t_fileId) : paneId_{t_paneId}, fileId_{t_fileId}, textIndex_{0,0}, cursor_{} {}
+Pane::Pane(const PaneId t_paneId, const FileId t_fileId)
+	: paneId_{t_paneId}, fileId_{t_fileId}, textIndex_{0, 0}, cursor_{} {}
 
 SplitNode::SplitNode(const Pane t_pane) : nodeType{t_pane} {}
 
@@ -252,6 +253,62 @@ std::vector<SplitNode*> PanesManager::getAllSplitNode() {
 	return splitNodes;
 }
 
+void PanesManager::shiftPane(const PaneId t_paneId, const PaneSizeChange t_change) {
+	const auto parentOpt = getPaneParentPointer(t_paneId);
+
+	if (parentOpt == std::nullopt) {
+		throw std::runtime_error("Pane id is invalid");
+	}
+
+	const auto parent = parentOpt.value();
+	const auto left = get<Pane>(parent->leftChild.get()->nodeType);
+	const auto right = get<Pane>(parent->rightChild.get()->nodeType);
+
+	if (left.paneId_ == t_paneId) {
+		switch (t_change) {
+			case PaneSizeChange::Contract:
+				parent->leftChildRation = std::clamp(parent->leftChildRation - 0.1f, 0.1f, 0.9f);
+				break;
+			case PaneSizeChange::Expand:
+				parent->leftChildRation = std::clamp(parent->leftChildRation + 0.1f, 0.1f, 0.9f);
+			break;
+		}
+
+	} else if (right.paneId_ == t_paneId) {
+		switch (t_change) {
+		case PaneSizeChange::Contract:
+				parent->leftChildRation = std::clamp(parent->leftChildRation + 0.1f, 0.1f, 0.9f);
+			break;
+		case PaneSizeChange::Expand:
+				parent->leftChildRation = std::clamp(parent->leftChildRation - 0.1f, 0.1f, 0.9f);
+			break;
+		}
+	} else {
+		throw std::runtime_error("Pane id is invalid");
+	}
+}
+
+void PanesManager::resetRatios() {
+	const auto splitNodes = getAllSplitNode();
+
+	const auto filterInternalNodes = [&](const SplitNode* splitNode) {
+		const bool internalNodePredicate = std::holds_alternative<SplitType>(splitNode->nodeType);
+		if (internalNodePredicate == false) {
+			return false;
+		}
+
+		const bool parentToLeafPredicate = std::holds_alternative<Pane>(splitNode->leftChild->nodeType) &&
+										   std::holds_alternative<Pane>(splitNode->rightChild->nodeType);
+		return parentToLeafPredicate;
+	};
+	auto internalNodes = splitNodes | std::ranges::views::filter(filterInternalNodes);
+
+	for (auto& intNode: internalNodes) {
+		intNode->leftChildRation = 0.5f;
+	}
+}
+
+
 std::optional<SplitNode*> PanesManager::getPanePointer(const PaneId t_paneId) {
 	const auto temp = [&](const SplitNode* splitNode) {
 		if (std::holds_alternative<Pane>(splitNode->nodeType)) {
@@ -394,7 +451,8 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 			linesVec.push_back(subStrView.data());
 		}
 
-		const auto& layoutPane = PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX, coords.endY, 0, leftSide, linesVec);
+		const auto& layoutPane =
+			PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX, t_tabOffsetY + coords.endY, 0, leftSide, linesVec);
 		panesLayout.push_back(layoutPane);
 	}
 }

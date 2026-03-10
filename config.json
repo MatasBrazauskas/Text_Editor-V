@@ -1,9 +1,11 @@
 {
   "window": 
   {
-    "title": "Text Editor",
+    "title": "V - Text Editor",
     "width": 1280,
     "height": 720,
+    "min_width": 300,
+    "min_height": 200,
     "fps_limit": 60
   },
   "editor": 

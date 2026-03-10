@@ -38,6 +38,8 @@ WindowConfig::WindowConfig(const Json& t_json) {
 		title = getJsonObject<std::string>(t_json, Title);
 		width = getJsonObject<int>(t_json, Width);
 		height = getJsonObject<int>(t_json, Height);
+		minWidth = getJsonObject<int>(t_json, MinWidth);
+		minHeight = getJsonObject<int>(t_json, MinHeight);
 		fps_limit = getJsonObject<int>(t_json, FpsLimit);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing WindowConfig tab: " + std::string{e.what()});

@@ -10,6 +10,47 @@
 
 // TODO Motions work on ranges, not on cursor. Operation execute the range, not cursor position.
 
+WindowSubCommandTable::WindowSubCommandTable() {
+
+	functionMap_ = {
+		{'v', &WindowSubCommandTable::verticalSplit},
+		{'s', &WindowSubCommandTable::horizontalSplit},
+		{'h', &WindowSubCommandTable::movePaneLeft},
+		{'j', &WindowSubCommandTable::movePaneDown},
+		{'k', &WindowSubCommandTable::movePaneUp},
+		{'l', &WindowSubCommandTable::movePaneRight},
+		{'c', &WindowSubCommandTable::closePane}
+	};
+}
+
+void WindowSubCommandTable::verticalSplit(PanesManager&) const {
+
+}
+
+void WindowSubCommandTable::horizontalSplit(PanesManager&) const {
+
+}
+
+void WindowSubCommandTable::movePaneLeft(PanesManager&) const {
+
+}
+
+void WindowSubCommandTable::movePaneRight(PanesManager&) const {
+
+}
+
+void WindowSubCommandTable::movePaneDown(PanesManager&) const {
+
+}
+
+void WindowSubCommandTable::movePaneUp(PanesManager&) const {
+
+}
+
+void WindowSubCommandTable::closePane(PanesManager&) const {
+
+}
+
 bool NormalModeParser::parseCount1(const char inputChar) const {
 	if (!std::isdigit(inputChar))
 		return false;

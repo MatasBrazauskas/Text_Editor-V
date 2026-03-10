@@ -19,12 +19,16 @@ class WindowConfig final {
 	std::string title;
 	int width;
 	int height;
+	int minWidth;
+	int minHeight;
 	int fps_limit;
 
   private:
 	constexpr static auto Title = "title"sv;
 	constexpr static auto Width = "width"sv;
 	constexpr static auto Height = "height"sv;
+	constexpr static auto MinWidth = "min_width"sv;
+	constexpr static auto MinHeight = "min_height"sv;
 	constexpr static auto FpsLimit = "fps_limit"sv;
 };
 
