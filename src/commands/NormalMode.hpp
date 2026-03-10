@@ -14,7 +14,7 @@ class PanesManager;
 using namespace std::string_view_literals;
 
 class WindowSubCommandTable final {
-public:
+  public:
 	WindowSubCommandTable();
 	~WindowSubCommandTable() noexcept = default;
 
@@ -29,20 +29,19 @@ public:
 	void movePaneUp(PanesManager&) const;
 
 	void closePane(PanesManager&) const;
-private:
+
+  private:
 	std::unordered_map<char, Func> functionMap_;
 };
 
 class WindowSubCommandExecutor final {
-public:
+  public:
 	WindowSubCommandExecutor() = delete;
 	explicit WindowSubCommandExecutor(const WindowSubCommandTable&);
 	~WindowSubCommandExecutor() noexcept = default;
-
-
 };
 
-#define FUNC_TYPES Matrix &text, Cursor & cursor, EditorState &state
+#define FUNC_TYPES Matrix &text, Cursor &cursor, EditorState &state
 constexpr char lineChar = static_cast<char>(128);
 
 struct MotionRange {
@@ -50,7 +49,7 @@ struct MotionRange {
 };
 
 class NormalModeTable {
-      public:
+  public:
 	NormalModeTable();
 	~NormalModeTable() noexcept = default;
 	using Func = void (NormalModeTable::*)(FUNC_TYPES) const;
@@ -113,9 +112,9 @@ enum class ParsingStages : char {
 
 struct NormalModeCommand {
 	NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar,
-			  bool ignoreCount, ParsingStages stage)
-	    : count1(count1), operation(operation), count2(count2), motion(motion), textObject(textObject),
-	      targetChar(targetChar), ignoreCount(ignoreCount), stage(stage) {}
+					  bool ignoreCount, ParsingStages stage)
+		: count1(count1), operation(operation), count2(count2), motion(motion), textObject(textObject),
+		  targetChar(targetChar), ignoreCount(ignoreCount), stage(stage) {}
 	int count1;
 	int count2;
 
@@ -131,10 +130,10 @@ struct NormalModeCommand {
 };
 
 class NormalModeParser {
-      public:
+  public:
 	explicit NormalModeParser(const NormalModeTable&);
 	explicit NormalModeParser(const NormalModeTable&, int count1, char operation, int count2, char motion,
-				  char textObject, char targetChar, bool ignoreCount, ParsingStages stage);
+							  char textObject, char targetChar, bool ignoreCount, ParsingStages stage);
 	~NormalModeParser() noexcept = default;
 
 	void parseCommand(std::string& input);
@@ -142,7 +141,7 @@ class NormalModeParser {
 	void clear();
 	NormalModeCommand getCommand() const;
 
-      private:
+  private:
 	bool parseCount1(char inputChar) const;
 	bool parseCount2(char inputChar) const;
 	bool parseAction(char inputChar) const;
@@ -155,26 +154,26 @@ class NormalModeParser {
 };
 
 class NormalModeExecutor {
-      public:
+  public:
 	explicit NormalModeExecutor(const NormalModeTable& table);
 	~NormalModeExecutor() noexcept = default;
 
 	void executeNormalModeCommand(Matrix& text, Cursor& t_cursor, EditorState& state, const NormalModeCommand command);
 
-      private:
+  private:
 	const NormalModeTable& table;
 };
 
 class NormalMode final {
-      public:
+  public:
 	NormalMode();
 	~NormalMode() noexcept = default;
 	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&);
 
-private:
+  private:
 	NormalModeTable table;
 	NormalModeParser parser;
 	NormalModeExecutor executor;
 
-	//void updateView(TextBufferView&, const Cursor&) const;
+	// void updateView(TextBufferView&, const Cursor&) const;
 };

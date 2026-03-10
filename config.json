@@ -28,7 +28,8 @@
         "enabled": true,
         "column": 80 
       },
-      "line_number_mode": "relative"
+      "line_number_mode": "number",
+      "line_info": true
     }
   },
   "fonts": 

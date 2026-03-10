@@ -14,10 +14,9 @@ Renderer::Renderer(const Config& t_config, const Settings& t_settings)
 		throw std::runtime_error(SDL_GetError());
 	}
 
+
 	window_ = SDL_CreateWindow(config_.window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-							   config_.window.width, config_.window.height,
-							   SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
-	);
+							   config_.window.width, config_.window.height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
 	SDL_SetWindowMinimumSize(window_, t_config.window.minWidth, t_config.window.minHeight);
 
@@ -26,6 +25,7 @@ Renderer::Renderer(const Config& t_config, const Settings& t_settings)
 		throw std::runtime_error(SDL_GetError());
 	}
 
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	if (!renderer_) {
@@ -150,33 +150,38 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout) const {
 void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 	const auto& codeColor = config_.theme.codeText;
 	const auto& background = config_.theme.background;
+	const auto& foregound = config_.theme.foreground;
 	const auto& [charStg, winStg] = settings_;
 
 	for (const auto& pane : panes) {
 		const auto& [startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = pane;
 
-		const SDL_Rect box = { startX, startY, endX - startX, endY - startY };
+
+
+		const SDL_Rect box = {startX, startY, endX - startX, endY - startY};
 
 		SDL_SetRenderDrawColor(renderer_, background.r, background.g, background.b, background.a);
 		SDL_RenderFillRect(renderer_, &box);
+
+		const SDL_Rect leftSideBox = {startX, startY, leftDataOffsetX, endY - startY};
+		SDL_SetRenderDrawColor(renderer_, foregound.r, foregound.g, foregound.b, foregound.a);
+		SDL_RenderFillRect(renderer_, &leftSideBox);
 
 		SDL_SetRenderDrawColor(renderer_, codeColor.r, codeColor.g, codeColor.b, codeColor.a);
 		SDL_RenderDrawRect(renderer_, &box);
 
 		for (auto i{0zu}; i < lines.size(); i++) {
-			const auto& line = std::string{lines.at(i)};
-
-			if (line.empty()) {
-				continue;
-			}
+			std::string line = std::string{lines.at(i)};
+			line.insert(0, leftData.at(i));
 
 			SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), codeColor);
-			if (!surface) continue;
+			if (!surface)
+				continue;
 
 			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
 			const int lineOffset = i * charStg.codeCharHeight;
-			const SDL_Rect dst{startX + leftDataOffsetX, startY + lineOffset, surface->w, surface->h};
+			const SDL_Rect dst{startX, startY + lineOffset, surface->w, surface->h};
 
 			SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
@@ -185,7 +190,6 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 		}
 	}
 }
-
 
 void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 	const auto [cr, cg, cb, ca] = config_.theme.cursor;

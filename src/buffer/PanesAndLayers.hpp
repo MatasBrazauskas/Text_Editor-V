@@ -21,7 +21,7 @@ using PaneId = uint_fast64_t;
 enum class Modes : uint8_t;
 enum class SplitType : char { Vertical, Horizontal };
 enum class AddedPaneRotation : char { Top, Bottom, Right, Left };
-enum class PaneSizeChange: char { Expand, Contract };
+enum class PaneSizeChange : char { Expand, Contract };
 
 class Coordinates {
   public:
@@ -195,7 +195,7 @@ class LayoutManager final {
 
   private:
 	void addTabLayout(const FilesManager&, const Settings&);
-	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY);
+	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&);
 	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager);
 	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
 							  const EditorState& t_editorState, const EditorInputAndOutput& t_io,

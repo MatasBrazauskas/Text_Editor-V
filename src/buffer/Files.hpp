@@ -13,6 +13,8 @@ inline constexpr int framesToSkip = 4;
 
 using FileId = uint_fast64_t;
 
+enum class LineInfo: char {None, Insert, Changed};
+
 class MatrixIterator final {
 public:
     MatrixIterator(const std::vector<std::string>& t_matrix, int t_index, bool t_flag);
@@ -20,11 +22,10 @@ public:
     void next();
     std::string_view getLine() const;
     bool end(size_t) const;
-
+    int index_;
 private:
     const std::vector<std::string>& matrix_;
 
-    int index_;
     std::string_view currLine_;
     bool forwarded_;
 };
@@ -55,6 +56,7 @@ public:
     [[nodiscard]] MatrixIterator backwardIterator(size_t) const;
 
 	static constexpr std::string separators_ = "<>?/";
+	std::vector<LineInfo> lineInfo_;
 private:
     std::vector<std::string> lines_;
     int charsCount_;

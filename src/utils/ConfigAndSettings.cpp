@@ -80,6 +80,7 @@ View::View(const Json& t_json) {
 		verticalRuler = VerticalRuler{getJsonObject<Json>(t_json, KeyVerticalRuler)};
 		const auto lineModeStr = getJsonObject<std::string>(t_json, KeyLineNumberMode);
 		lineNumberMode = getLineNumber(lineModeStr);
+		lineInfo = getJsonObject<bool>(t_json, KeyLineInfo);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing View tab: " + std::string{e.what()});
 	}

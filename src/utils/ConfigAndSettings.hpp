@@ -88,10 +88,12 @@ class View final {
 
 	VerticalRuler verticalRuler;
 	LineNumberModes lineNumberMode;
+	bool lineInfo;
 
   private:
 	constexpr static auto KeyVerticalRuler = "vertical_ruler"sv;
 	constexpr static auto KeyLineNumberMode = "line_number_mode"sv;
+	constexpr static auto KeyLineInfo = "line_info"sv;
 };
 
 class EditorConfig final {

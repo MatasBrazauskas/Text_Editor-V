@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <ranges>
 
 Coordinates::Coordinates(int sx, int sy, int ex, int ey) : startX{sx}, startY{sy}, endX{ex}, endY{ey} {}
@@ -266,21 +267,21 @@ void PanesManager::shiftPane(const PaneId t_paneId, const PaneSizeChange t_chang
 
 	if (left.paneId_ == t_paneId) {
 		switch (t_change) {
-			case PaneSizeChange::Contract:
-				parent->leftChildRation = std::clamp(parent->leftChildRation - 0.1f, 0.1f, 0.9f);
-				break;
-			case PaneSizeChange::Expand:
-				parent->leftChildRation = std::clamp(parent->leftChildRation + 0.1f, 0.1f, 0.9f);
+		case PaneSizeChange::Contract:
+			parent->leftChildRation = std::clamp(parent->leftChildRation - 0.1f, 0.1f, 0.9f);
+			break;
+		case PaneSizeChange::Expand:
+			parent->leftChildRation = std::clamp(parent->leftChildRation + 0.1f, 0.1f, 0.9f);
 			break;
 		}
 
 	} else if (right.paneId_ == t_paneId) {
 		switch (t_change) {
 		case PaneSizeChange::Contract:
-				parent->leftChildRation = std::clamp(parent->leftChildRation + 0.1f, 0.1f, 0.9f);
+			parent->leftChildRation = std::clamp(parent->leftChildRation + 0.1f, 0.1f, 0.9f);
 			break;
 		case PaneSizeChange::Expand:
-				parent->leftChildRation = std::clamp(parent->leftChildRation - 0.1f, 0.1f, 0.9f);
+			parent->leftChildRation = std::clamp(parent->leftChildRation - 0.1f, 0.1f, 0.9f);
 			break;
 		}
 	} else {
@@ -303,11 +304,10 @@ void PanesManager::resetRatios() {
 	};
 	auto internalNodes = splitNodes | std::ranges::views::filter(filterInternalNodes);
 
-	for (auto& intNode: internalNodes) {
+	for (auto& intNode : internalNodes) {
 		intNode->leftChildRation = 0.5f;
 	}
 }
-
 
 std::optional<SplitNode*> PanesManager::getPanePointer(const PaneId t_paneId) {
 	const auto temp = [&](const SplitNode* splitNode) {
@@ -355,7 +355,7 @@ LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, c
 	const auto& editorIO = t_editorCore.getEditorInputAndOutput();
 
 	addTabLayout(fileManager, t_settings);
-	addPanesLayout(fileManager, paneManager, t_settings, tabLayout.tabCapturedLinesOffsetY);
+	addPanesLayout(fileManager, paneManager, t_settings, tabLayout.tabCapturedLinesOffsetY, t_config);
 	addCursorLayout(paneManager, t_settings, fileManager);
 	addCommandLineLayout(paneManager, t_settings, editorState, editorIO, fileManager);
 }
@@ -415,8 +415,46 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	this->tabLayout.tabs = tabVec;
 }
 
+static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, int cursorY, LineNumberModes lineMode, const File& t_file, const Config& t_config) {
+	std::vector<std::string> leftSide;
+
+	const auto addNumber = [](const int lineNumber) {
+		return std::format("{:>4}", lineNumber);
+	};
+	const auto addRelativeNumber = [](const int lineNumber, const int cursorY) {
+		const int lineIndex = lineNumber == cursorY ? cursorY : std::abs(lineNumber - cursorY);
+		return std::format("{:>4}", lineIndex);
+	};
+
+	for (auto it = t_file.textBuffer_.forwardIterator(startIndex); !it.end(endIndex); it.next()){
+		std::string number;
+		if (lineMode == LineNumberModes::Number) {
+			number = addNumber(it.index_);
+		}
+		else if (lineMode == LineNumberModes::Relative) {
+			number = addRelativeNumber(it.index_, cursorY);
+		}
+
+		if (t_config.editor.view.lineInfo) {
+			char symb = ' ';
+
+			if (t_file.textBuffer_.lineInfo_[it.index_] == LineInfo::Insert) {
+				symb = '+';
+			} else if (t_file.textBuffer_.lineInfo_[it.index_] == LineInfo::Changed) {
+				symb = '~';
+			}
+
+			number.insert(0,1,symb);
+		}
+
+		leftSide.push_back(number);
+	}
+
+	return leftSide;
+}
+
 void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesManager,
-								   const Settings& t_settings, const int t_tabOffsetY) {
+								   const Settings& t_settings, const int t_tabOffsetY, const Config& t_config) {
 	const int w = t_settings.windowSettings.width;
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
@@ -428,17 +466,19 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 		const int charWidthCount = std::floor((coords.endX - coords.startX) / t_settings.charSettings.codeCharWidth);
 		const int charHeightCount = std::floor((coords.endY - coords.startY) / t_settings.charSettings.codeCharHeight);
 
-		const int startIndexX = coords.startX;
-		const int startIndexY = coords.startY;
+		const int startIndexX = std::floor(coords.startX / t_settings.charSettings.codeCharWidth);
+		const int startIndexY = std::floor(coords.startY / t_settings.charSettings.codeCharWidth);
 
-		const int endIndexX = startIndexX + charWidthCount;
 		const int endIndexY = std::min(startIndexY + charHeightCount, file.textBuffer_.getLinesCount());
 
 		std::vector<std::string> linesVec;
-		std::vector<std::string> leftSide;
+		linesVec.reserve(endIndexY - startIndexY);
+		std::vector<std::string> leftSide = leftSideNumbers(startIndexY, endIndexY, cursor.getY(), t_config.editor.view.lineNumberMode, file, t_config);
+
+		const int endIndexX = startIndexX + charWidthCount - leftSide.at(0).length();
 
 		for (auto it = file.textBuffer_.forwardIterator(startIndexY); !it.end(endIndexY); it.next()) {
-			std::string_view strView = it.getLine();
+			const std::string_view strView = it.getLine();
 
 			if (strView.length() < startIndexX) {
 				linesVec.push_back("");
@@ -446,13 +486,13 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 			}
 
 			const int length = std::min(endIndexX, static_cast<int>(strView.length()));
-			std::string_view subStrView = strView.substr(startIndexX, length);
+			std::string_view subStrView = strView.substr(startIndexX, length - startIndexX);
 
-			linesVec.push_back(subStrView.data());
+			linesVec.emplace_back(subStrView);
 		}
 
-		const auto& layoutPane =
-			PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX, t_tabOffsetY + coords.endY, 0, leftSide, linesVec);
+		const auto& layoutPane = PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX,
+											 t_tabOffsetY + coords.endY, leftSide.at(0).length() * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
 		panesLayout.push_back(layoutPane);
 	}
 }
