@@ -69,6 +69,7 @@ class File final {
   public:
 	File() = delete;
 	explicit File(const Matrix&, std::filesystem::path, FileId);
+	explicit File(const Matrix&, FileId);
 	~File() noexcept = default;
 
 	Matrix textBuffer_;
@@ -83,7 +84,11 @@ class FilesManager final {
 	FilesManager(const FileHandler&, int argc, char** argv);
 	~FilesManager() noexcept = default;
 
-	void addFile(const Matrix&, const std::filesystem::path&);
+	void addRegularFile(const Matrix&, const std::filesystem::path&);
+	void addSpecialFile(const Matrix&);
+
+	bool specialFile(FileId);
+	bool regularFile(FileId);
 
 	[[nodiscard]] File& getFile(FileId);
 	[[nodiscard]] File& getFile();
@@ -91,4 +96,6 @@ class FilesManager final {
 	std::unordered_map<FileId, File> files_;
 	FileId activeFileId_;
 	inline static FileId fileIdCounter_{0};
+
+	std::vector<FileId> specialFiles_;
 };

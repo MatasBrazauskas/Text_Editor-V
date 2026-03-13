@@ -192,7 +192,8 @@ class LayoutManager final {
   private:
 	void addTabLayout(const FilesManager&, const Settings&);
 	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&);
-	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager, int t_tabOffsetY);
+	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager,
+						 int t_tabOffsetY);
 	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
 							  const EditorState& t_editorState, const EditorInputAndOutput& t_io,
 							  FilesManager& t_filesManager);

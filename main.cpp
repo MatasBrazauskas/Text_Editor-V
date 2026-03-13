@@ -25,10 +25,8 @@ int main(const int argc, char** argv) {
 		if (renderTime >= ticksPerFrame) {
 			renderStart = end;
 
-			if (editorCore.dirty) {
-				const LayoutManager layouts{editorCore, config, settings};
-				renderer.Render(layouts);
-			}
+			const LayoutManager layouts{editorCore, config, settings};
+			renderer.Render(layouts);
 		}
 	}
 }

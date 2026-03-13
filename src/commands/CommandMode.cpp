@@ -84,7 +84,7 @@ void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandle
 		const auto path = std::filesystem::path(fileNames);
 
 		const auto& file = fileHandler.getContent(path);
-		files.addFile(Matrix(std::move(file)), std::move(path));
+		files.addRegularFile(Matrix(std::move(file)), std::move(path));
 	}
 }
 

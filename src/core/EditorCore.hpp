@@ -19,7 +19,20 @@ enum class SpecialKeys : char {
 	RightArrow = static_cast<char>(133),
 	DownArrow = static_cast<char>(134),
 	Tab = static_cast<char>(135),
-	Escape = static_cast<char>(136)
+	Escape = static_cast<char>(136),
+	Control = static_cast<char>(137)
+};
+
+static const std::unordered_map<SDL_Keycode, char> specialKeyMap = {
+	{SDLK_BACKSPACE, static_cast<char>(SpecialKeys::Backspace)},
+	{SDLK_RETURN, static_cast<char>(SpecialKeys::Enter)},
+	{SDLK_LEFT, static_cast<char>(SpecialKeys::LeftArrow)},
+	{SDLK_UP, static_cast<char>(SpecialKeys::UpArrow)},
+	{SDLK_RIGHT, static_cast<char>(SpecialKeys::RightArrow)},
+	{SDLK_DOWN, static_cast<char>(SpecialKeys::DownArrow)},
+	{SDLK_TAB, static_cast<char>(SpecialKeys::Tab)},
+	{SDLK_ESCAPE, static_cast<char>(SpecialKeys::Escape)},
+	{SDLK_LCTRL, static_cast<char>(SpecialKeys::Control)}
 };
 
 using FileId = uint_fast64_t;
@@ -57,9 +70,6 @@ class EditorCore final {
 	PanesManager& getPanesManager();
 	const EditorState& getEditorState() const;
 	const EditorInputAndOutput& getEditorInputAndOutput() const;
-
-	bool dirty;
-
   private:
 	Settings& settings_;
 	FileHandler fileHandler_;
@@ -70,7 +80,7 @@ class EditorCore final {
 	EditorState editorState_;
 	EditorInputAndOutput editorInputAndOutput_;
 
-	NormalMode normalMode_;
+	NormalModeDistributor normalModeDistributor_;
 	InsertMode insertMode_;
 	CommandMode commandMode_;
 

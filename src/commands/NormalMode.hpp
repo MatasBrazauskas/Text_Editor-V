@@ -3,43 +3,18 @@
 #include <string_view>
 #include <unordered_map>
 
+#include "NormalModeSubModes.hpp"
+
 class EditorState;
 class EditorInputAndOutput;
 class File;
+class FilesManager;
 class TextBufferView;
 class Cursor;
 class Matrix;
 class PanesManager;
 
 using namespace std::string_view_literals;
-
-class WindowSubCommandTable final {
-  public:
-	WindowSubCommandTable();
-	~WindowSubCommandTable() noexcept = default;
-
-	using Func = void (WindowSubCommandTable::*)(PanesManager&) const;
-
-	void verticalSplit(PanesManager&) const;
-	void horizontalSplit(PanesManager&) const;
-
-	void movePaneLeft(PanesManager&) const;
-	void movePaneRight(PanesManager&) const;
-	void movePaneDown(PanesManager&) const;
-	void movePaneUp(PanesManager&) const;
-
-	void closePane(PanesManager&) const;
-
-  private:
-	std::unordered_map<char, Func> functionMap_;
-};
-
-class WindowSubCommandExecutor final {
-  public:
-	WindowSubCommandExecutor() = delete;
-	explicit WindowSubCommandExecutor(const WindowSubCommandTable&);
-	~WindowSubCommandExecutor() noexcept = default;
-};
 
 #define FUNC_TYPES Matrix &text, Cursor &cursor, EditorState &state
 constexpr char lineChar = static_cast<char>(128);
@@ -99,8 +74,6 @@ class NormalModeTable {
 	void motionEndOfWORD(FUNC_TYPES) const;
 
 	void motionLine(FUNC_TYPES, MotionRange&, MotionRange&) const;
-
-	void switchToWindowMode(FUNC_TYPES) const;
 };
 
 enum class ParsingStages : char {
@@ -176,4 +149,19 @@ class NormalMode final {
 	NormalModeExecutor executor;
 
 	// void updateView(TextBufferView&, const Cursor&) const;
+};
+
+class NormalModeDistributor final {
+public:
+	NormalModeDistributor();
+	~NormalModeDistributor() noexcept = default;
+
+	void HandleKeyboardInput(PanesManager&, FilesManager&, Cursor&, EditorState&, EditorInputAndOutput&);
+private:
+	bool pressedCtrl;
+	bool windowMode;
+
+	NormalMode normalMode;
+	WindowSubCommand winSubMode;
+	FileSubCommand fileSubMode;
 };

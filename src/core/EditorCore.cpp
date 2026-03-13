@@ -1,15 +1,15 @@
 #include "EditorCore.hpp"
 
-#include "utils/ConfigAndSettings.hpp"
-
 #include <SDL.h>
 #include <iostream>
+
+#include "utils/ConfigAndSettings.hpp"
 
 EditorState::EditorState(const FileId activeFileId_t)
 	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
 
 EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
-	: dirty{true}, filesManager_{fileHandler_, argc, argv}, panesManager_{}, editorState_{0}, settings_{t_settings} {
+	: filesManager_{fileHandler_, argc, argv}, panesManager_{}, editorState_{0}, settings_{t_settings} {
 	panesManager_.addPane(0, 0, AddedPaneRotation::Top);
 }
 
@@ -18,20 +18,19 @@ std::string EditorCore::EncodeInput(const SDL_Event& event) {
 		editorState_.running_ = false;
 		return {};
 	}
-	auto& doc = filesManager_.getFile(editorState_.activeFileId_);
+
 	if (event.type == SDL_KEYDOWN) {
-		switch (event.key.keysym.sym) {
-		case SDLK_ESCAPE:
+		const SDL_Keycode keyCode = event.key.keysym.sym;
+		if (keyCode == SDLK_ESCAPE) {
 			editorState_.currentMode_ = Modes::Normal;
 			editorInputAndOutput_.input_.clear();
-			break;
-		case SDLK_BACKSPACE:
-			return std::string(1, static_cast<char>(SpecialKeys::Backspace));
-		case SDLK_RETURN:
-			return std::string(1, static_cast<char>(SpecialKeys::Enter));
-		default:
-			break;
+			return {};
 		}
+
+		if (const auto it = specialKeyMap.find(keyCode); it != specialKeyMap.end()) {
+			return std::string(1, it->second);
+		}
+
 	} else if (event.type == SDL_TEXTINPUT) {
 		if (event.text.text[0] == ':') {
 			editorState_.currentMode_ = Modes::Command;
@@ -74,7 +73,7 @@ void EditorCore::HandleKeyboardInput() {
 
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
-			normalMode_.HandleKeyboardInput(file, cursor, editorState_, editorInputAndOutput_);
+			normalModeDistributor_.HandleKeyboardInput(panesManager_,filesManager_, cursor, editorState_, editorInputAndOutput_);
 			break;
 		case Modes::Insert:
 			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);
@@ -83,8 +82,6 @@ void EditorCore::HandleKeyboardInput() {
 			commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_);
 			break;
 		}
-
-		dirty = true;
 	}
 }
 

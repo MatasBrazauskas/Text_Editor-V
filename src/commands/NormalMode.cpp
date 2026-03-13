@@ -8,30 +8,6 @@
 #include <iostream>
 #include <ranges>
 
-// TODO Motions work on ranges, not on cursor. Operation execute the range, not cursor position.
-
-WindowSubCommandTable::WindowSubCommandTable() {
-
-	functionMap_ = {{'v', &WindowSubCommandTable::verticalSplit}, {'s', &WindowSubCommandTable::horizontalSplit},
-					{'h', &WindowSubCommandTable::movePaneLeft},  {'j', &WindowSubCommandTable::movePaneDown},
-					{'k', &WindowSubCommandTable::movePaneUp},	  {'l', &WindowSubCommandTable::movePaneRight},
-					{'c', &WindowSubCommandTable::closePane}};
-}
-
-void WindowSubCommandTable::verticalSplit(PanesManager&) const {}
-
-void WindowSubCommandTable::horizontalSplit(PanesManager&) const {}
-
-void WindowSubCommandTable::movePaneLeft(PanesManager&) const {}
-
-void WindowSubCommandTable::movePaneRight(PanesManager&) const {}
-
-void WindowSubCommandTable::movePaneDown(PanesManager&) const {}
-
-void WindowSubCommandTable::movePaneUp(PanesManager&) const {}
-
-void WindowSubCommandTable::closePane(PanesManager&) const {}
-
 bool NormalModeParser::parseCount1(const char inputChar) const {
 	if (!std::isdigit(inputChar))
 		return false;
@@ -271,6 +247,40 @@ NormalModeTable::NormalModeTable() {
 	textObjects = {{'f', &NormalModeTable::findFirstCharLeft},
 				   {'F', &NormalModeTable::findFirstCharRight},
 				   {'r', &NormalModeTable::replaceChar}};
+}
+
+
+NormalModeDistributor::NormalModeDistributor(): pressedCtrl{}, windowMode{} {}
+
+void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, FilesManager& t_filesManager, Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io) {
+
+	auto& file = t_filesManager.getFile(t_filesManager.activeFileId_);
+
+	if (t_filesManager.specialFile(file.fileId_)) {
+		fileSubMode.ExecuteCommand();
+		return;
+	}
+
+	if (windowMode) {
+		winSubMode.ExecuteCommand(t_panesManager, t_io.input_.back());
+		std::cout << "Execute window mode\n";
+		pressedCtrl = false;
+		windowMode = false;
+		return;
+	}
+
+	if (static_cast<uint8_t>(t_io.input_.back()) == static_cast<uint8_t>(SpecialKeys::Control)) {
+		std::cout << "Special window mode\n";
+		pressedCtrl = true;
+		return;
+	} else if (pressedCtrl && t_io.input_.back() == 'w') {
+		std::cout << "Switch to window mode\n";
+		windowMode = true;
+		return;
+	}
+
+	windowMode = false;
+	normalMode.HandleKeyboardInput(file, t_cursor, t_state, t_io);
 }
 
 void NormalModeTable::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {

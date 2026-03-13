@@ -46,7 +46,7 @@ class AutoSave final {
 	constexpr static auto KeyInterval_s = "interval_s"sv;
 };
 
-enum class IndentType: char { Space, Tabs };
+enum class IndentType : char { Space, Tabs };
 
 class FeelConfig final {
   public:

@@ -331,8 +331,10 @@ std::optional<SplitNode*> PanesManager::getPanePointer(const PaneId t_paneId) {
 TabLayout::TabLayout(const int activeTab_t, const int t_tabCapLines, const std::vector<std::string>& tabs_t)
 	: activeTab{activeTab_t}, tabCapturedLinesOffsetY{t_tabCapLines}, tabs{tabs_t} {}
 
-CommandLineLayout::CommandLineLayout(const Modes mode_t, std::string t_modeName, std::string t_commandInfo, std::string t_lineAndCharInfo, std::string t_commandArgs)
-		:mode{mode_t}, modeName{t_modeName}, commandInfo{t_commandInfo}, fileInfo{t_lineAndCharInfo}, commandLineArgs{t_commandArgs} {}
+CommandLineLayout::CommandLineLayout(const Modes mode_t, std::string t_modeName, std::string t_commandInfo,
+									 std::string t_lineAndCharInfo, std::string t_commandArgs)
+	: mode{mode_t}, modeName{t_modeName}, commandInfo{t_commandInfo}, fileInfo{t_lineAndCharInfo},
+	  commandLineArgs{t_commandArgs} {}
 
 PanesLayout::PanesLayout(const int t_startX, const int t_startY, const int t_endX, const int t_endY,
 						 const int t_leftDataOffsetX, const std::vector<std::string>& t_leftData,
@@ -361,14 +363,11 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight] = t_settings.charSettings;
 
 	auto to_filename_view = [](const File& t_file) -> std::string {
-		std::string_view sv = t_file.filesPath_.native();
-		const auto pos = sv.find_last_of("/\\");
-
-		if (pos != std::string::npos) {
-			sv = sv.substr(pos + 1);
+		auto sv = std::string{t_file.filesPath_.filename()};
+		if (t_file.textBuffer_.dirty) {
+			sv.insert(0,1, '*');
 		}
-
-		return std::string{sv};
+		return sv;
 	};
 
 	const auto fileVec = files.files_ | std::views::values;
@@ -383,23 +382,13 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	for (const auto& tab : tabVec) {
 		int tabWidth = (tab.length() * uiCharWidth) + paddingX;
 
-		// Check if this tab forces a wrap to the next line
 		if (currentX + tabWidth > windowWidth) {
 			lineCount++;
-			currentX = tabWidth; // Reset X to the start of the new line
+			currentX = tabWidth;
 		} else {
 			currentX += tabWidth;
 		}
 	}
-
-	/*const auto tempLambda = [&](const int a, std::string_view b) {
-		const int tabWidth = (b.length() * uiCharWidth) + (uiCharWidth * 2);
-		if (a + tabWidth) {
-			return 0;
-		}
-		return tabWidth;
-	};
-	const int tabLines = std::accumulate(tabVec.begin(), tabVec.end(), 1, tempLambda);*/
 
 	int activePane{};
 	const auto it = std::ranges::find(fileVec, 0, &File::fileId_);
@@ -461,8 +450,8 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 		const int charWidthCount = std::floor((coords.endX - coords.startX) / t_settings.charSettings.codeCharWidth);
 		const int charHeightCount = std::floor((coords.endY - coords.startY) / t_settings.charSettings.codeCharHeight);
 
-		const int startIndexX = std::floor(coords.startX / t_settings.charSettings.codeCharWidth);
-		const int startIndexY = std::floor(coords.startY / t_settings.charSettings.codeCharWidth);
+		const int startIndexX = textIndex.indexX;//std::floor(coords.startX / t_settings.charSettings.codeCharWidth);
+		const int startIndexY = textIndex.indexY;//std::floor(coords.startY / t_settings.charSettings.codeCharWidth);
 
 		const int endIndexY = std::min(startIndexY + charHeightCount, file.textBuffer_.getLinesCount());
 
@@ -494,7 +483,8 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 	}
 }
 
-void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings& t_settings, FilesManager& t_filesManager, int t_tabOffsetY) {
+void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings& t_settings,
+									FilesManager& t_filesManager, int t_tabOffsetY) {
 	const int w = t_settings.windowSettings.width;
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 

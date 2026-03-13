@@ -29,7 +29,7 @@
         "enabled": true,
         "column": 80 
       },
-      "line_number_mode": "none"
+      "line_number_mode": "number"
     }
   },
   "fonts": 

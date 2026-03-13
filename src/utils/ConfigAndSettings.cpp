@@ -34,10 +34,8 @@ static LineNumberModes getLineNumber(const std::string& t_lineNumber) {
 }
 
 static IndentType getIndentType(const std::string& t_indentType) {
-	static std::unordered_map<std::string, IndentType> indentTypeMap = {
-		{"space", IndentType::Space},
-		{"tabs", IndentType::Tabs}
-	};
+	static std::unordered_map<std::string, IndentType> indentTypeMap = {{"space", IndentType::Space},
+																		{"tabs", IndentType::Tabs}};
 
 	if (const auto it = indentTypeMap.find(t_indentType); it != indentTypeMap.end()) {
 		return it->second;

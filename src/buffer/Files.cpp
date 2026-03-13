@@ -35,7 +35,7 @@ bool MatrixIterator::end(const size_t endIndex_t) const {
 	return this->index_ < endIndex_t;
 }
 
-Matrix::Matrix(const std::vector<std::string>& t_lines) : lines_{std::move(t_lines)}, charsCount_{}, dirty{} {
+Matrix::Matrix(const std::vector<std::string>& t_lines) : lines_{std::move(t_lines)}, charsCount_{}, dirty{true} {
 	if (lines_.size() == 1 && lines_.at(0).empty()) {
 		this->insertLine(0, "");
 	}
@@ -125,6 +125,8 @@ MatrixIterator Matrix::backwardIterator(const size_t startCount_t) const {
 File::File(const Matrix& text_t, std::filesystem::path path_t, const FileId t_fileId)
 	: textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{t_fileId} {}
 
+File::File(const Matrix& t_matrix,const FileId t_fileId): textBuffer_{t_matrix}, fileId_{t_fileId} {}
+
 FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char** argv) : activeFileId_{} {
 	if (argc < 1 || argv == nullptr) {
 		return;
@@ -134,21 +136,38 @@ FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char*
 
 	if (filePaths.empty()) {
 		auto ptr = Matrix({});
-		this->addFile(std::move(ptr), "Untitled");
+		this->addRegularFile(std::move(ptr), "Untitled");
 	} else {
 		for (const auto& path : filePaths) {
 			const auto lines = fileHandler.getContent(path.data());
 			auto ptr = Matrix(lines);
 
-			this->addFile(std::move(ptr), path);
+			this->addRegularFile(std::move(ptr), path);
 		}
 	}
 }
 
-void FilesManager::addFile(const Matrix& textBuffer, const std::filesystem::path& filePath_t) {
-	const auto file = File{std::move(textBuffer), filePath_t, fileIdCounter_};
-	files_.insert({fileIdCounter_, file});
+void FilesManager::addRegularFile(const Matrix& t_textBuffer, const std::filesystem::path& t_filePath) {
+	const auto regularFile = File{std::move(t_textBuffer), t_filePath, fileIdCounter_};
+	files_.insert({fileIdCounter_, regularFile});
 	fileIdCounter_++;
+}
+
+
+void FilesManager::addSpecialFile(const Matrix& t_textBuffer) {
+	const auto specialFile = File{std::move(t_textBuffer), fileIdCounter_};
+	files_.insert({fileIdCounter_, specialFile});
+	fileIdCounter_++;
+
+	specialFiles_.push_back(specialFile.fileId_);
+}
+
+bool FilesManager::specialFile(const FileId t_fileId) {
+	return std::ranges::contains(specialFiles_, t_fileId);
+}
+
+bool FilesManager::regularFile(const FileId t_fileId) {
+	return !specialFile(t_fileId);
 }
 
 File& FilesManager::getFile(const FileId t_fileId) {
