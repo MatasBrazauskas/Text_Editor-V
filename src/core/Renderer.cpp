@@ -14,7 +14,6 @@ Renderer::Renderer(const Config& t_config, const Settings& t_settings)
 		throw std::runtime_error(SDL_GetError());
 	}
 
-
 	window_ = SDL_CreateWindow(config_.window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 							   config_.window.width, config_.window.height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
@@ -75,7 +74,7 @@ void Renderer::Render(const LayoutManager& t_layoutManage) const {
 
 	RenderTabs(t_layoutManage.tabLayout);
 	RenderPanes(t_layoutManage.panesLayout);
-	// RenderCursor(t_layoutManage.cursorLayout);
+	RenderCursor(t_layoutManage.cursorLayout);
 	RenderCommandLine(t_layoutManage.commandLineLayout);
 
 	SDL_RenderPresent(renderer_);
@@ -156,8 +155,6 @@ void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
 	for (const auto& pane : panes) {
 		const auto& [startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = pane;
 
-
-
 		const SDL_Rect box = {startX, startY, endX - startX, endY - startY};
 
 		SDL_SetRenderDrawColor(renderer_, background.r, background.g, background.b, background.a);
@@ -195,21 +192,18 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 	const auto [cr, cg, cb, ca] = config_.theme.cursor;
 	const auto& cursorFg = config_.theme.highlight;
 
-	const auto& [active, cursorX, cursorY, letter, panesLayout] = t_cursorLayout;
+	const auto& [active, cursorX, cursorY, letter, cursorType] = t_cursorLayout;
 
 	SDL_SetRenderDrawColor(renderer_, cr, cg, cb, ca);
 	const auto& [charStg, winStg] = settings_;
 
-	const int cursorOffsetY = charStg.codeCharHeight;
-	const int cursorOffsetX = charStg.codeCharWidth;
-
 	if (active) {
-		if (letter == '\0') {
-			const auto rect = SDL_Rect{cursorOffsetX, cursorOffsetY, 1, charStg.codeCharHeight};
+		if (cursorType == CursorType::Line) {
+			const auto rect = SDL_Rect{cursorX + 1, cursorY, 1, charStg.codeCharHeight};
 
 			SDL_RenderFillRect(renderer_, &rect);
 		} else {
-			const SDL_Rect cursorRect{cursorOffsetX, cursorOffsetY, charStg.codeCharWidth, charStg.codeCharHeight};
+			const SDL_Rect cursorRect{cursorX, cursorY, charStg.codeCharWidth, charStg.codeCharHeight};
 			SDL_RenderFillRect(renderer_, &cursorRect);
 
 			const char text[2] = {letter, '\0'};
@@ -217,7 +211,7 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 			SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, text, cursorFg);
 			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-			const SDL_Rect dst{cursorOffsetX, cursorOffsetY, surface->w, surface->h};
+			const SDL_Rect dst{cursorX, cursorY, surface->w, surface->h};
 			SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 
 			SDL_FreeSurface(surface);
@@ -229,15 +223,12 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 void Renderer::RenderCommandLine(const CommandLineLayout& t_layout) const {
 	const auto& [charStg, winStg] = settings_;
 	const auto [w, h] = winStg;
-	const auto& [mode, currFileName, currCommand, cursorX, cursorY, charCount, lineCount, args] = t_layout;
+	const auto& [mode, modeName, commandInfo, fileInfo, commandLineArgs] = t_layout;
 
-	std::string modeText = "  Normal";
 	SDL_Color modeBg = normalModeColor_;
 	if (mode == Modes::Insert) {
-		modeText = "  Insert";
 		modeBg = insertModeColor_;
 	} else if (mode == Modes::Command) {
-		modeText = "  Command";
 		modeBg = commandModeColor_;
 	}
 
@@ -249,7 +240,7 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_layout) const {
 	SDL_RenderFillRect(renderer_, &barRect);
 
 	const int modeBarWidth = charStg.uiCharWidth * 11;
-	const SDL_Rect modeRect = {0, barY, modeBarWidth, charStg.uiCharHeight}; // FIXED: used barY instead of w
+	const SDL_Rect modeRect = {0, barY, modeBarWidth, charStg.uiCharHeight};
 	SDL_SetRenderDrawColor(renderer_, modeBg.r, modeBg.g, modeBg.b, 255);
 	SDL_RenderFillRect(renderer_, &modeRect);
 
@@ -270,17 +261,11 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_layout) const {
 		return width;
 	};
 
-	drawText(modeText, config_.theme.uiText, 0, barY);
-	drawText(currFileName.substr(0, 20), config_.theme.uiText, modeBarWidth + 5, barY);
-
-	const std::string fileInfo = std::format("Lines: {}, Chars: {}", lineCount, charCount);
-	const std::string cursorInfo = std::format("Com: {}, ({}, {}) ", currCommand, cursorX, cursorY);
+	drawText(modeName, config_.theme.uiText, 0, barY);
+	drawText(commandInfo, config_.theme.uiText, modeBarWidth + 5, barY);
 
 	int fileInfoWidth = 0;
 	TTF_SizeText(uiFont_, fileInfo.c_str(), &fileInfoWidth, nullptr);
-	int cursorInfoWidth = 0;
-	TTF_SizeText(uiFont_, cursorInfo.c_str(), &cursorInfoWidth, nullptr);
 
 	drawText(fileInfo, modeBg, w - fileInfoWidth - 5, barY);
-	drawText(cursorInfo, config_.theme.uiText, w - fileInfoWidth - cursorInfoWidth - 15, barY);
 }

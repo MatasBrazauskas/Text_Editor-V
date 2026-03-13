@@ -30,17 +30,30 @@ static LineNumberModes getLineNumber(const std::string& t_lineNumber) {
 		return it->second;
 	}
 
-	throw std::runtime_error("\nCan't read the field: line_number_modes");
+	throw std::runtime_error("\nCan't read the field: line_number_mode");
+}
+
+static IndentType getIndentType(const std::string& t_indentType) {
+	static std::unordered_map<std::string, IndentType> indentTypeMap = {
+		{"space", IndentType::Space},
+		{"tabs", IndentType::Tabs}
+	};
+
+	if (const auto it = indentTypeMap.find(t_indentType); it != indentTypeMap.end()) {
+		return it->second;
+	}
+
+	throw std::runtime_error("\nCan't read the field: indent_type");
 }
 
 WindowConfig::WindowConfig(const Json& t_json) {
 	try {
-		title = getJsonObject<std::string>(t_json, Title);
-		width = getJsonObject<int>(t_json, Width);
-		height = getJsonObject<int>(t_json, Height);
-		minWidth = getJsonObject<int>(t_json, MinWidth);
-		minHeight = getJsonObject<int>(t_json, MinHeight);
-		fps_limit = getJsonObject<int>(t_json, FpsLimit);
+		title = getJsonObject<std::string>(t_json, KeyTitle);
+		width = getJsonObject<int>(t_json, KeyWidth);
+		height = getJsonObject<int>(t_json, KeyHeight);
+		minWidth = getJsonObject<int>(t_json, KeyMinWidth);
+		minHeight = getJsonObject<int>(t_json, KeyMinHeight);
+		fps_limit = getJsonObject<int>(t_json, KeyFpsLimit);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing WindowConfig tab: " + std::string{e.what()});
 	}
@@ -48,8 +61,8 @@ WindowConfig::WindowConfig(const Json& t_json) {
 
 AutoSave::AutoSave(const Json& t_json) {
 	try {
-		enabled = getJsonObject<bool>(t_json, Enable);
-		interval_s = getJsonObject<int>(t_json, Interval_s);
+		enabled = getJsonObject<bool>(t_json, KeyEnable);
+		interval_s = getJsonObject<int>(t_json, KeyInterval_s);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing AutoSave tab: " + std::string{e.what()});
 	}
@@ -57,10 +70,12 @@ AutoSave::AutoSave(const Json& t_json) {
 
 FeelConfig::FeelConfig(const Json& t_json) {
 	try {
-		tabSize = getJsonObject<int>(t_json, TabSize);
+		const auto indentTypeStr = getJsonObject<std::string>(t_json, KeyIndentType);
+		indentType = getIndentType(indentTypeStr);
+		indentSize = getJsonObject<int>(t_json, KeyIndentSize);
 		autoSave = AutoSave(getJsonObject<Json>(t_json, KeyAutoSave));
-		cursorBlinkMs = getJsonObject<int>(t_json, CursorBlinkMs);
-		wrapText = getJsonObject<bool>(t_json, WrapText);
+		cursorBlinkMs = getJsonObject<int>(t_json, KeyCursorBlinkMs);
+		wrapText = getJsonObject<bool>(t_json, KeyWrapText);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing FeelConfig tab: " + std::string{e.what()});
 	}
@@ -68,8 +83,8 @@ FeelConfig::FeelConfig(const Json& t_json) {
 
 VerticalRuler::VerticalRuler(const Json& t_json) {
 	try {
-		enabled = getJsonObject<int>(t_json, Enabled);
-		column = getJsonObject<int>(t_json, Column);
+		enabled = getJsonObject<int>(t_json, KeyEnabled);
+		column = getJsonObject<int>(t_json, KeyColumn);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing VerticalRuler tab: " + std::string{e.what()});
 	}
@@ -80,7 +95,6 @@ View::View(const Json& t_json) {
 		verticalRuler = VerticalRuler{getJsonObject<Json>(t_json, KeyVerticalRuler)};
 		const auto lineModeStr = getJsonObject<std::string>(t_json, KeyLineNumberMode);
 		lineNumberMode = getLineNumber(lineModeStr);
-		lineInfo = getJsonObject<bool>(t_json, KeyLineInfo);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing View tab: " + std::string{e.what()});
 	}
@@ -97,8 +111,8 @@ EditorConfig::EditorConfig(const Json& t_json) {
 
 TextFonts::TextFonts(const Json& t_json) {
 	try {
-		path = getJsonObject<std::string>(t_json, Path);
-		size = getJsonObject<int>(t_json, Size);
+		path = getJsonObject<std::string>(t_json, KeyPath);
+		size = getJsonObject<int>(t_json, KeySize);
 	} catch (std::exception& e) {
 		throw std::runtime_error("\nJSON error parsing TextFonts tab: " + std::string{e.what()});
 	}
@@ -106,8 +120,8 @@ TextFonts::TextFonts(const Json& t_json) {
 
 FontsConfig::FontsConfig(const Json& t_json) {
 	try {
-		const Json code_Json = getJsonObject<Json>(t_json, Code);
-		const Json ui_Json = getJsonObject<Json>(t_json, Ui);
+		const Json code_Json = getJsonObject<Json>(t_json, KeyCode);
+		const Json ui_Json = getJsonObject<Json>(t_json, KeyUi);
 
 		code = TextFonts(code_Json);
 		ui = TextFonts(ui_Json);
@@ -118,14 +132,14 @@ FontsConfig::FontsConfig(const Json& t_json) {
 
 ThemeConfig::ThemeConfig(const Json& t_json) {
 	try {
-		const auto codeTextObj = getJsonObject<std::string>(t_json, CodeText);
-		const auto backgroundObj = getJsonObject<std::string>(t_json, Background);
-		const auto foregroundObj = getJsonObject<std::string>(t_json, Foreground);
-		const auto uiTextObj = getJsonObject<std::string>(t_json, UiText);
-		const auto mainObj = getJsonObject<std::string>(t_json, Main);
-		const auto secondaryObj = getJsonObject<std::string>(t_json, Secondary);
-		const auto cursorObj = getJsonObject<std::string>(t_json, Cursor);
-		const auto highlightObj = getJsonObject<std::string>(t_json, Highlight);
+		const auto codeTextObj = getJsonObject<std::string>(t_json, KeyCodeText);
+		const auto backgroundObj = getJsonObject<std::string>(t_json, KeyBackground);
+		const auto foregroundObj = getJsonObject<std::string>(t_json, KeyForeground);
+		const auto uiTextObj = getJsonObject<std::string>(t_json, KeyUiText);
+		const auto mainObj = getJsonObject<std::string>(t_json, KeyMain);
+		const auto secondaryObj = getJsonObject<std::string>(t_json, KeySecondary);
+		const auto cursorObj = getJsonObject<std::string>(t_json, KeyCursor);
+		const auto highlightObj = getJsonObject<std::string>(t_json, KeyHighlight);
 
 		codeText = HexToSDL(codeTextObj);
 		background = HexToSDL(backgroundObj);

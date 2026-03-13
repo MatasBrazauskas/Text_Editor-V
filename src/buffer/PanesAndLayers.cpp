@@ -215,7 +215,7 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 			}
 		} else if (std::holds_alternative<Pane>(t_splitNode->nodeType)) {
 			const auto pane = get<Pane>(t_splitNode->nodeType);
-			t_coordinates.emplace_back(pane.fileId_, pane.textIndex_, pane.cursor_, t_cords);
+			t_coordinates.emplace_back(pane.paneId_, pane.fileId_, pane.textIndex_, pane.cursor_, t_cords);
 		}
 	}
 }
@@ -331,11 +331,8 @@ std::optional<SplitNode*> PanesManager::getPanePointer(const PaneId t_paneId) {
 TabLayout::TabLayout(const int activeTab_t, const int t_tabCapLines, const std::vector<std::string>& tabs_t)
 	: activeTab{activeTab_t}, tabCapturedLinesOffsetY{t_tabCapLines}, tabs{tabs_t} {}
 
-CommandLineLayout::CommandLineLayout(const Modes mode_t, const std::string currFileName_t,
-									 const std::string t_currCommand, const int cursorX_t, const int cursorY_t,
-									 const int charCount_t, const int lineCount_t, const std::string commandLineArgs_t)
-	: mode{mode_t}, currentFileName{currFileName_t}, currentCommand{t_currCommand}, cursorX{cursorX_t},
-	  cursorY{cursorY_t}, charCount{charCount_t}, lineCount{lineCount_t}, commandLineArgs{commandLineArgs_t} {}
+CommandLineLayout::CommandLineLayout(const Modes mode_t, std::string t_modeName, std::string t_commandInfo, std::string t_lineAndCharInfo, std::string t_commandArgs)
+		:mode{mode_t}, modeName{t_modeName}, commandInfo{t_commandInfo}, fileInfo{t_lineAndCharInfo}, commandLineArgs{t_commandArgs} {}
 
 PanesLayout::PanesLayout(const int t_startX, const int t_startY, const int t_endX, const int t_endY,
 						 const int t_leftDataOffsetX, const std::vector<std::string>& t_leftData,
@@ -356,7 +353,7 @@ LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, c
 
 	addTabLayout(fileManager, t_settings);
 	addPanesLayout(fileManager, paneManager, t_settings, tabLayout.tabCapturedLinesOffsetY, t_config);
-	addCursorLayout(paneManager, t_settings, fileManager);
+	addCursorLayout(paneManager, t_settings, fileManager, tabLayout.tabCapturedLinesOffsetY);
 	addCommandLineLayout(paneManager, t_settings, editorState, editorIO, fileManager);
 }
 
@@ -415,27 +412,25 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	this->tabLayout.tabs = tabVec;
 }
 
-static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, int cursorY, LineNumberModes lineMode, const File& t_file, const Config& t_config) {
+static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, int cursorY, LineNumberModes lineMode,
+												const File& t_file, const Config& t_config) {
 	std::vector<std::string> leftSide;
 
-	const auto addNumber = [](const int lineNumber) {
-		return std::format("{:>4}", lineNumber);
-	};
+	const auto addNumber = [](const int lineNumber) { return std::format("{:^5}", lineNumber); };
 	const auto addRelativeNumber = [](const int lineNumber, const int cursorY) {
 		const int lineIndex = lineNumber == cursorY ? cursorY : std::abs(lineNumber - cursorY);
 		return std::format("{:>4}", lineIndex);
 	};
 
-	for (auto it = t_file.textBuffer_.forwardIterator(startIndex); !it.end(endIndex); it.next()){
+	for (auto it = t_file.textBuffer_.forwardIterator(startIndex); !it.end(endIndex); it.next()) {
 		std::string number;
 		if (lineMode == LineNumberModes::Number) {
 			number = addNumber(it.index_);
-		}
-		else if (lineMode == LineNumberModes::Relative) {
+		} else if (lineMode == LineNumberModes::Relative) {
 			number = addRelativeNumber(it.index_, cursorY);
 		}
 
-		if (t_config.editor.view.lineInfo) {
+		if (t_config.editor.view.lineNumberMode != LineNumberModes::None) {
 			char symb = ' ';
 
 			if (t_file.textBuffer_.lineInfo_[it.index_] == LineInfo::Insert) {
@@ -444,7 +439,7 @@ static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, in
 				symb = '~';
 			}
 
-			number.insert(0,1,symb);
+			number.insert(0, 1, symb);
 		}
 
 		leftSide.push_back(number);
@@ -460,7 +455,7 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 
 	const auto panesInfo = t_panesManager.getPaneCoordinates(h, w);
 
-	for (const auto& [fileId, textIndex, cursor, coords] : panesInfo) {
+	for (const auto& [paneId, fileId, textIndex, cursor, coords] : panesInfo) {
 		const auto& file = t_filesManager.getFile(fileId);
 
 		const int charWidthCount = std::floor((coords.endX - coords.startX) / t_settings.charSettings.codeCharWidth);
@@ -473,7 +468,8 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 
 		std::vector<std::string> linesVec;
 		linesVec.reserve(endIndexY - startIndexY);
-		std::vector<std::string> leftSide = leftSideNumbers(startIndexY, endIndexY, cursor.getY(), t_config.editor.view.lineNumberMode, file, t_config);
+		std::vector<std::string> leftSide =
+			leftSideNumbers(startIndexY, endIndexY, cursor.getY(), t_config.editor.view.lineNumberMode, file, t_config);
 
 		const int endIndexX = startIndexX + charWidthCount - leftSide.at(0).length();
 
@@ -491,48 +487,50 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 			linesVec.emplace_back(subStrView);
 		}
 
-		const auto& layoutPane = PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX,
-											 t_tabOffsetY + coords.endY, leftSide.at(0).length() * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
+		const auto& layoutPane =
+			PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX, t_tabOffsetY + coords.endY,
+						leftSide.at(0).length() * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
 		panesLayout.push_back(layoutPane);
 	}
 }
 
-void LayoutManager::addCursorLayout(PanesManager& t_paneManager, const Settings& t_settings,
-									FilesManager& t_filesManager) {
-	/*const auto pane = t_paneManager.paneMap_[t_paneManager.activePaneId_];
-	const auto [startX, startY, endX, endY] = pane->paneView_;
-	const auto& [codeCharWidth, codeCharHeight, uiCharWidth, uiCharHeight, tabHeight] = t_settings.charSettings;
+void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings& t_settings, FilesManager& t_filesManager, int t_tabOffsetY) {
+	const int w = t_settings.windowSettings.width;
+	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
-	const int cursorOffsetX = (pane->cursor_.getY() - indexY) * uiCharWidth + startX;
-	const int cursorOffsetY = (pane->cursor_.getY() - indexX) * uiCharHeight + startY;
+	const auto panesInfo = t_panesManager.getPaneCoordinates(h, w);
+	const auto& [paneId, fileId, textIndex, cursor, coords] = panesInfo.at(0);
 
-	const auto line = t_filesManager.getFile(pane->fileId_).textBuffer_.getLine(pane->cursor_.getY());
-	char cursorChar = ' ';
+	const auto& file = t_filesManager.getFile(fileId);
 
-	if (line.length() < pane->cursor_.getX()) {
-		cursorChar = line.at(pane->cursor_.getX());
-	}
+	const bool visible{true};
+	const int cursorX = coords.startX + cursor.getX() * t_settings.charSettings.codeCharWidth;
+	const int cursorY = coords.startY + t_tabOffsetY + cursor.getY() * t_settings.charSettings.codeCharHeight;
+	const char letter = file.textBuffer_.getLine(cursor.getY()).at(cursor.getX());
+	const auto cursorType = CursorType::Block;
 
-	cursorLayout = CursorLayout(pane->cursor_.isVisible(), cursorChar, cursorOffsetX, cursorOffsetY,
-	CursorType::Block);*/
+	cursorLayout = CursorLayout{visible, cursorX, cursorY, letter, cursorType};
 }
 
 void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
 										 const EditorState& t_editorState, const EditorInputAndOutput& t_io,
 										 FilesManager& t_filesManager) {
 	const Modes mode = t_editorState.currentMode_;
-	const std::string fileName = t_filesManager.getFile().filesPath_.filename();
-	const std::string currCommand = t_io.input_;
+	std::string modeText = "  Normal";
 
-	const auto activePane = t_panesManager.getCurrPane();
-	const int cursorPotionX = activePane->cursor_.getX();
-	const int cursorPotionY = activePane->cursor_.getY();
+	if (mode == Modes::Insert) {
+		modeText = "  Insert";
+	} else if (mode == Modes::Command) {
+		modeText = "  Command";
+	}
+
+	const std::string commandInfo = std::format("{:<5}", t_io.input_);
 
 	const int charCount = t_filesManager.getFile().textBuffer_.getCharCount();
-	const int linesCount = t_filesManager.getFile().textBuffer_.getLinesCount();
+	const int lineCount = t_filesManager.getFile().textBuffer_.getLinesCount();
+	const std::string fileInfo = std::format("Lines: {}, Chars: {}", lineCount, charCount);
 
 	const std::string commandLineArgs = t_io.commandLineMessage_;
 
-	commandLineLayout = CommandLineLayout(mode, fileName, currCommand, cursorPotionX, cursorPotionY, charCount,
-										  linesCount, commandLineArgs);
+	commandLineLayout = CommandLineLayout(mode, modeText, commandInfo, fileInfo, commandLineArgs);
 }

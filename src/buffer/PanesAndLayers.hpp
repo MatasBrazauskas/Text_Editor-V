@@ -93,7 +93,7 @@ class SplitNode final {
 	std::unique_ptr<SplitNode> rightChild;
 };
 
-using PaneInfo = std::tuple<FileId, TextIndex, Cursor, Coordinates>;
+using PaneInfo = std::tuple<PaneId, FileId, TextIndex, Cursor, Coordinates>;
 
 class PanesManager final {
   public:
@@ -136,18 +136,14 @@ class TabLayout final {
 class CommandLineLayout final {
   public:
 	CommandLineLayout() = default;
-	CommandLineLayout(Modes mode_t, std::string currFileName_t, std::string t_currCommand, int cursorX_t, int cursorY_t,
-					  int charCount_t, int lineCount_t, std::string commandLineArgs_t);
+	CommandLineLayout(Modes mode_t, std::string, std::string, std::string, std::string);
 	~CommandLineLayout() noexcept = default;
 
 	Modes mode;
 
-	std::string currentFileName;
-	std::string currentCommand;
-
-	int cursorX, cursorY;
-	int charCount, lineCount;
-
+	std::string modeName;
+	std::string commandInfo;
+	std::string fileInfo;
 	std::string commandLineArgs;
 };
 
@@ -196,7 +192,7 @@ class LayoutManager final {
   private:
 	void addTabLayout(const FilesManager&, const Settings&);
 	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&);
-	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager);
+	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager, int t_tabOffsetY);
 	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
 							  const EditorState& t_editorState, const EditorInputAndOutput& t_io,
 							  FilesManager& t_filesManager);

@@ -24,12 +24,12 @@ class WindowConfig final {
 	int fps_limit;
 
   private:
-	constexpr static auto Title = "title"sv;
-	constexpr static auto Width = "width"sv;
-	constexpr static auto Height = "height"sv;
-	constexpr static auto MinWidth = "min_width"sv;
-	constexpr static auto MinHeight = "min_height"sv;
-	constexpr static auto FpsLimit = "fps_limit"sv;
+	constexpr static auto KeyTitle = "title"sv;
+	constexpr static auto KeyWidth = "width"sv;
+	constexpr static auto KeyHeight = "height"sv;
+	constexpr static auto KeyMinWidth = "min_width"sv;
+	constexpr static auto KeyMinHeight = "min_height"sv;
+	constexpr static auto KeyFpsLimit = "fps_limit"sv;
 };
 
 class AutoSave final {
@@ -42,9 +42,11 @@ class AutoSave final {
 	int interval_s;
 
   private:
-	constexpr static auto Enable = "enabled"sv;
-	constexpr static auto Interval_s = "interval_s"sv;
+	constexpr static auto KeyEnable = "enabled"sv;
+	constexpr static auto KeyInterval_s = "interval_s"sv;
 };
+
+enum class IndentType: char { Space, Tabs };
 
 class FeelConfig final {
   public:
@@ -52,16 +54,18 @@ class FeelConfig final {
 	explicit FeelConfig(const Json&);
 	~FeelConfig() noexcept = default;
 
-	int tabSize;
+	IndentType indentType;
+	int indentSize;
 	AutoSave autoSave;
 	int cursorBlinkMs;
 	bool wrapText;
 
   private:
-	constexpr static auto TabSize = "tab_size"sv;
+	constexpr static auto KeyIndentType = "indent_type"sv;
+	constexpr static auto KeyIndentSize = "indent_size"sv;
 	constexpr static auto KeyAutoSave = "auto_save"sv;
-	constexpr static auto CursorBlinkMs = "cursor_blink_ms"sv;
-	constexpr static auto WrapText = "wrap_text"sv;
+	constexpr static auto KeyCursorBlinkMs = "cursor_blink_ms"sv;
+	constexpr static auto KeyWrapText = "wrap_text"sv;
 };
 
 class VerticalRuler final {
@@ -74,8 +78,8 @@ class VerticalRuler final {
 	int column;
 
   private:
-	constexpr static auto Enabled = "enabled"sv;
-	constexpr static auto Column = "column"sv;
+	constexpr static auto KeyEnabled = "enabled"sv;
+	constexpr static auto KeyColumn = "column"sv;
 };
 
 enum class LineNumberModes { None, Relative, Number };
@@ -88,12 +92,10 @@ class View final {
 
 	VerticalRuler verticalRuler;
 	LineNumberModes lineNumberMode;
-	bool lineInfo;
 
   private:
 	constexpr static auto KeyVerticalRuler = "vertical_ruler"sv;
 	constexpr static auto KeyLineNumberMode = "line_number_mode"sv;
-	constexpr static auto KeyLineInfo = "line_info"sv;
 };
 
 class EditorConfig final {
@@ -120,8 +122,8 @@ class TextFonts final {
 	int size;
 
   private:
-	constexpr static auto Path = "path"sv;
-	constexpr static auto Size = "size"sv;
+	constexpr static auto KeyPath = "path"sv;
+	constexpr static auto KeySize = "size"sv;
 };
 
 class FontsConfig final {
@@ -134,8 +136,8 @@ class FontsConfig final {
 	TextFonts ui;
 
   private:
-	constexpr static auto Code = "code"sv;
-	constexpr static auto Ui = "ui"sv;
+	constexpr static auto KeyCode = "code"sv;
+	constexpr static auto KeyUi = "ui"sv;
 };
 
 class ThemeConfig final {
@@ -154,14 +156,14 @@ class ThemeConfig final {
 	SDL_Color highlight;
 
   private:
-	constexpr static auto CodeText = "code_text"sv;
-	constexpr static auto Background = "background"sv;
-	constexpr static auto Foreground = "foreground"sv;
-	constexpr static auto UiText = "ui_text"sv;
-	constexpr static auto Main = "main"sv;
-	constexpr static auto Secondary = "secondary"sv;
-	constexpr static auto Cursor = "cursor"sv;
-	constexpr static auto Highlight = "highlight"sv;
+	constexpr static auto KeyCodeText = "code_text"sv;
+	constexpr static auto KeyBackground = "background"sv;
+	constexpr static auto KeyForeground = "foreground"sv;
+	constexpr static auto KeyUiText = "ui_text"sv;
+	constexpr static auto KeyMain = "main"sv;
+	constexpr static auto KeySecondary = "secondary"sv;
+	constexpr static auto KeyCursor = "cursor"sv;
+	constexpr static auto KeyHighlight = "highlight"sv;
 };
 
 class Config final {

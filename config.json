@@ -12,8 +12,9 @@
   {
     "feel": 
     {
-      "tab_size": 8,
-      "auto_save": 
+      "indent_type": "tabs",
+      "indent_size": 8,
+      "auto_save":
       {
         "enabled": false, 
         "interval_s": 30 
@@ -28,8 +29,7 @@
         "enabled": true,
         "column": 80 
       },
-      "line_number_mode": "number",
-      "line_info": true
+      "line_number_mode": "none"
     }
   },
   "fonts": 
@@ -42,7 +42,7 @@
     "ui": 
     {
       "path": "fonts/JetBrainsMono-Medium.ttf",
-      "size": 19
+      "size": 20
     }
     },
   "theme": 

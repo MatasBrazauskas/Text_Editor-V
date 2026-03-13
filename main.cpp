@@ -7,7 +7,7 @@ int main(const int argc, char** argv) {
 	Config config{};
 	Settings settings{config};
 
-	const auto ticksPerFrame = 1.0 / static_cast<double>(config.window.fps_limit);
+	const auto ticksPerFrame = 1.0l / config.window.fps_limit;
 
 	EditorCore editorCore{argc, argv, settings};
 	Renderer renderer{config, settings};
