@@ -106,16 +106,21 @@ class PanesManager final {
 	void addPane(PaneId t_parent, FileId t_fileId, AddedPaneRotation t_rotation);
 	void removePane(PaneId);
 
+	void moveToPaneUp(PaneId);
+	void moveToPaneDown(int t_height, int t_width);
+	void moveToPaneRight(PaneId);
+	void moveToPaneLeft(PaneId);
+
 	void shiftPane(PaneId, PaneSizeChange);
 	void resetRatios();
 
 	std::vector<PaneInfo> getPaneCoordinates(int t_height, int t_width) const;
+	PaneId activePaneId_;
 
   private:
 	inline static PaneId paneIdCounter_{};
 
 	SplitNode* head_;
-	PaneId activePaneId_;
 
 	std::vector<SplitNode*> getAllSplitNode();
 	std::optional<SplitNode*> getPanePointer(PaneId);
@@ -191,7 +196,8 @@ class LayoutManager final {
 
   private:
 	void addTabLayout(const FilesManager&, const Settings&);
-	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&, int& t_left);
+	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&,
+						int& t_left);
 	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager,
 						 int t_tabOffsetY, int t_leftSideOffsetX);
 	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,

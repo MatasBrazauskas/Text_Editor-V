@@ -63,7 +63,7 @@ class EditorCore final {
 	EditorCore(int argc, char** argv, Settings&);
 	~EditorCore() noexcept = default;
 
-	void HandleKeyboardInput();
+	void HandleKeyboardInput(WindowSettings&);
 
 	FilesManager& getFilesManager();
 	PanesManager& getPanesManager();

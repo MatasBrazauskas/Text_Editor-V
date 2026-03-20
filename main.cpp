@@ -20,7 +20,7 @@ int main(const int argc, char** argv) {
 		const Uint64 end = SDL_GetPerformanceCounter();
 		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
-		editorCore.HandleKeyboardInput();
+		editorCore.HandleKeyboardInput(settings.windowSettings);
 
 		if (renderTime >= ticksPerFrame) {
 			renderStart = end;

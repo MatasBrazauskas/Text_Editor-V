@@ -5,26 +5,27 @@
 #include <unordered_map>
 
 class PanesManager;
+class WindowSettings;
 
 class WindowSubCommand final {
   public:
 	WindowSubCommand();
 	~WindowSubCommand() noexcept = default;
-	void ExecuteCommand(PanesManager&, char t_inputChar) const;
+	void ExecuteCommand(PanesManager&, WindowSettings&, char t_inputChar) const;
 
   private:
-	using Func = void (WindowSubCommand::*)(PanesManager&) const;
+	using Func = void (WindowSubCommand::*)(PanesManager&, WindowSettings&) const;
 
-	void verticalSplit(PanesManager&) const;
-	void horizontalSplit(PanesManager&) const;
+	void verticalSplit(PanesManager&, WindowSettings&) const;
+	void horizontalSplit(PanesManager&, WindowSettings&) const;
 
-	void movePaneLeft(PanesManager&) const;
-	void movePaneRight(PanesManager&) const;
-	void movePaneDown(PanesManager&) const;
-	void movePaneUp(PanesManager&) const;
+	void movePaneLeft(PanesManager&, WindowSettings&) const;
+	void movePaneRight(PanesManager&, WindowSettings&) const;
+	void moveToPaneDown(PanesManager&, WindowSettings&) const;
+	void movePaneUp(PanesManager&, WindowSettings&) const;
 
-	void closePane(PanesManager&) const;
-	void equalizePanes(PanesManager&) const;
+	void closePane(PanesManager&, WindowSettings&) const;
+	void equalizePanes(PanesManager&, WindowSettings&) const;
 
 	std::unordered_map<char, Func> functionMap_;
 };

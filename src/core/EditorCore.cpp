@@ -42,7 +42,7 @@ std::string EditorCore::EncodeInput(const SDL_Event& event) {
 	return {};
 }
 
-void EditorCore::HandleKeyboardInput() {
+void EditorCore::HandleKeyboardInput(WindowSettings& t_winSettings) {
 	SDL_Event event;
 
 	while (SDL_PollEvent(&event)) {
@@ -74,7 +74,7 @@ void EditorCore::HandleKeyboardInput() {
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
 			normalModeDistributor_.HandleKeyboardInput(panesManager_, filesManager_, cursor, editorState_,
-													   editorInputAndOutput_);
+													   editorInputAndOutput_, t_winSettings);
 			break;
 		case Modes::Insert:
 			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);

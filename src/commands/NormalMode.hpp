@@ -13,6 +13,7 @@ class TextBufferView;
 class Cursor;
 class Matrix;
 class PanesManager;
+class WindowSettings;
 
 using namespace std::string_view_literals;
 
@@ -156,7 +157,7 @@ class NormalModeDistributor final {
 	NormalModeDistributor();
 	~NormalModeDistributor() noexcept = default;
 
-	void HandleKeyboardInput(PanesManager&, FilesManager&, Cursor&, EditorState&, EditorInputAndOutput&);
+	void HandleKeyboardInput(PanesManager&, FilesManager&, Cursor&, EditorState&, EditorInputAndOutput&, WindowSettings&);
 
   private:
 	bool pressedCtrl;

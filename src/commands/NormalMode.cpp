@@ -252,7 +252,7 @@ NormalModeTable::NormalModeTable() {
 NormalModeDistributor::NormalModeDistributor() : pressedCtrl{}, windowMode{} {}
 
 void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, FilesManager& t_filesManager,
-												Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io) {
+												Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io, WindowSettings& t_winSettings) {
 
 	auto& file = t_filesManager.getFile(t_filesManager.activeFileId_);
 
@@ -262,7 +262,7 @@ void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, Fi
 	}
 
 	if (windowMode) {
-		winSubMode.ExecuteCommand(t_panesManager, t_io.input_.back());
+		winSubMode.ExecuteCommand(t_panesManager, t_winSettings, t_io.input_.back());
 		std::cout << "Execute window mode\n";
 		pressedCtrl = false;
 		windowMode = false;
