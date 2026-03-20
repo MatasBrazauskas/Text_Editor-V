@@ -31,11 +31,11 @@ CommandStructure CommandMode::parseCommand(std::string input) {
 }
 
 CommandMode::CommandMode() {
-	commands_ = {
-	    {"q", &CommandMode::closeProgramme}, {"w", &CommandMode::writeToFile}, {"e", &CommandMode::openFile}};
+	commands_ = {{"q", &CommandMode::closeProgramme}, {"w", &CommandMode::writeToFile}, {"e", &CommandMode::openFile}};
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FileHandler& fileHandler, FilesManager& files) {
+void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FileHandler& fileHandler,
+									  FilesManager& files) {
 	if (t_io.input_.empty())
 		return;
 
@@ -62,7 +62,8 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 	}
 }
 
-void CommandMode::writeToFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files, const CommandStructure& com) {
+void CommandMode::writeToFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files,
+							  const CommandStructure& com) {
 	std::cout << "Writing to file...\n";
 	std::cout << "Implement this shit\n";
 	/*if (com.args_.empty()) {
@@ -73,7 +74,8 @@ void CommandMode::writeToFile(EditorState& state, EditorInputAndOutput&, FileHan
 	}*/
 }
 
-void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files, const CommandStructure& com) {
+void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files,
+						   const CommandStructure& com) {
 	std::cout << "Opening file...\n";
 
 	if (com.args_.empty()) {
@@ -88,7 +90,8 @@ void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandle
 	}
 }
 
-void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&, const CommandStructure& com) {
+void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&,
+								 const CommandStructure& com) {
 	if (!com.args_.empty()) {
 		t_io.commandLineMessage_ = "Trailing characters";
 	} else {

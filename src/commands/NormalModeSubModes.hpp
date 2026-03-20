@@ -7,11 +7,12 @@
 class PanesManager;
 
 class WindowSubCommand final {
-public:
+  public:
 	WindowSubCommand();
 	~WindowSubCommand() noexcept = default;
 	void ExecuteCommand(PanesManager&, char t_inputChar) const;
-private:
+
+  private:
 	using Func = void (WindowSubCommand::*)(PanesManager&) const;
 
 	void verticalSplit(PanesManager&) const;
@@ -29,11 +30,12 @@ private:
 };
 
 class FileSubCommand final {
-public:
+  public:
 	FileSubCommand();
 	~FileSubCommand() noexcept = default;
 	void ExecuteCommand() const;
-private:
+
+  private:
 	using Func = void (FileSubCommand::*)() const;
 
 	void moveUp() const;

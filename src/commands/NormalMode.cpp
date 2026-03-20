@@ -249,10 +249,10 @@ NormalModeTable::NormalModeTable() {
 				   {'r', &NormalModeTable::replaceChar}};
 }
 
+NormalModeDistributor::NormalModeDistributor() : pressedCtrl{}, windowMode{} {}
 
-NormalModeDistributor::NormalModeDistributor(): pressedCtrl{}, windowMode{} {}
-
-void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, FilesManager& t_filesManager, Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io) {
+void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, FilesManager& t_filesManager,
+												Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io) {
 
 	auto& file = t_filesManager.getFile(t_filesManager.activeFileId_);
 
@@ -266,6 +266,7 @@ void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, Fi
 		std::cout << "Execute window mode\n";
 		pressedCtrl = false;
 		windowMode = false;
+		t_io.input_.clear();
 		return;
 	}
 

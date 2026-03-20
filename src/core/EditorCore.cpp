@@ -1,9 +1,9 @@
 #include "EditorCore.hpp"
 
+#include "utils/ConfigAndSettings.hpp"
+
 #include <SDL.h>
 #include <iostream>
-
-#include "utils/ConfigAndSettings.hpp"
 
 EditorState::EditorState(const FileId activeFileId_t)
 	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
@@ -73,7 +73,8 @@ void EditorCore::HandleKeyboardInput() {
 
 		switch (editorState_.currentMode_) {
 		case Modes::Normal:
-			normalModeDistributor_.HandleKeyboardInput(panesManager_,filesManager_, cursor, editorState_, editorInputAndOutput_);
+			normalModeDistributor_.HandleKeyboardInput(panesManager_, filesManager_, cursor, editorState_,
+													   editorInputAndOutput_);
 			break;
 		case Modes::Insert:
 			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);

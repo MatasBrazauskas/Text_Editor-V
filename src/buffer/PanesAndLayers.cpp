@@ -191,10 +191,10 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 				const int widthDiff = t_cords.endX - t_cords.startX;
 				const int leftDiff =
 					static_cast<int>(std::round(static_cast<float>(widthDiff) * t_splitNode->leftChildRation));
-				const int rightDiff = widthDiff - leftDiff;
+				//const int rightDiff = widthDiff - leftDiff;
 
 				leftCoords.endX = leftCoords.startX + leftDiff;
-				rightCoords.startX = rightDiff;
+				rightCoords.startX = leftCoords.endX;
 
 				addCoordinates(t_coordinates, leftChild, leftCoords);
 				addCoordinates(t_coordinates, rightChild, rightCoords);
@@ -205,10 +205,10 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 				const int heightDiff = t_cords.endY - t_cords.startY;
 				const int topDiff =
 					static_cast<int>(std::round(static_cast<float>(heightDiff) * t_splitNode->leftChildRation));
-				const int bottomDiff = heightDiff - topDiff;
+				//const int bottomDiff = heightDiff - topDiff;
 
 				topCoords.endY = topCoords.startY + topDiff;
-				bottomCoords.startY = bottomDiff;
+				bottomCoords.startY = topCoords.endY;
 
 				addCoordinates(t_coordinates, leftChild, topCoords);
 				addCoordinates(t_coordinates, rightChild, bottomCoords);
@@ -292,20 +292,11 @@ void PanesManager::shiftPane(const PaneId t_paneId, const PaneSizeChange t_chang
 void PanesManager::resetRatios() {
 	const auto splitNodes = getAllSplitNode();
 
-	const auto filterInternalNodes = [&](const SplitNode* splitNode) {
-		const bool internalNodePredicate = std::holds_alternative<SplitType>(splitNode->nodeType);
-		if (internalNodePredicate == false) {
-			return false;
+	for (auto& node : splitNodes) {
+		const bool internalNodePredicate = std::holds_alternative<SplitType>(node->nodeType);
+		if (internalNodePredicate) {
+			node->leftChildRation = 0.5f;
 		}
-
-		const bool parentToLeafPredicate = std::holds_alternative<Pane>(splitNode->leftChild->nodeType) &&
-										   std::holds_alternative<Pane>(splitNode->rightChild->nodeType);
-		return parentToLeafPredicate;
-	};
-	auto internalNodes = splitNodes | std::ranges::views::filter(filterInternalNodes);
-
-	for (auto& intNode : internalNodes) {
-		intNode->leftChildRation = 0.5f;
 	}
 }
 
@@ -354,8 +345,9 @@ LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, c
 	const auto& editorIO = t_editorCore.getEditorInputAndOutput();
 
 	addTabLayout(fileManager, t_settings);
-	addPanesLayout(fileManager, paneManager, t_settings, tabLayout.tabCapturedLinesOffsetY, t_config);
-	addCursorLayout(paneManager, t_settings, fileManager, tabLayout.tabCapturedLinesOffsetY);
+	int left = 0;
+	addPanesLayout(fileManager, paneManager, t_settings, tabLayout.tabCapturedLinesOffsetY, t_config, left);
+	addCursorLayout(paneManager, t_settings, fileManager, tabLayout.tabCapturedLinesOffsetY, left);
 	addCommandLineLayout(paneManager, t_settings, editorState, editorIO, fileManager);
 }
 
@@ -365,7 +357,7 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	auto to_filename_view = [](const File& t_file) -> std::string {
 		auto sv = std::string{t_file.filesPath_.filename()};
 		if (t_file.textBuffer_.dirty) {
-			sv.insert(0,1, '*');
+			sv.insert(0, 1, '*');
 		}
 		return sv;
 	};
@@ -438,7 +430,7 @@ static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, in
 }
 
 void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesManager,
-								   const Settings& t_settings, const int t_tabOffsetY, const Config& t_config) {
+								   const Settings& t_settings, const int t_tabOffsetY, const Config& t_config, int& t_left) {
 	const int w = t_settings.windowSettings.width;
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
@@ -450,8 +442,8 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 		const int charWidthCount = std::floor((coords.endX - coords.startX) / t_settings.charSettings.codeCharWidth);
 		const int charHeightCount = std::floor((coords.endY - coords.startY) / t_settings.charSettings.codeCharHeight);
 
-		const int startIndexX = textIndex.indexX;//std::floor(coords.startX / t_settings.charSettings.codeCharWidth);
-		const int startIndexY = textIndex.indexY;//std::floor(coords.startY / t_settings.charSettings.codeCharWidth);
+		const int startIndexX = textIndex.indexX; // std::floor(coords.startX / t_settings.charSettings.codeCharWidth);
+		const int startIndexY = textIndex.indexY; // std::floor(coords.startY / t_settings.charSettings.codeCharWidth);
 
 		const int endIndexY = std::min(startIndexY + charHeightCount, file.textBuffer_.getLinesCount());
 
@@ -476,15 +468,18 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 			linesVec.emplace_back(subStrView);
 		}
 
+		const int leftSideOffset = leftSide.at(0).length();
+		t_left = leftSideOffset * t_settings.charSettings.codeCharWidth;
+
 		const auto& layoutPane =
 			PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX, t_tabOffsetY + coords.endY,
-						leftSide.at(0).length() * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
+						leftSideOffset * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
 		panesLayout.push_back(layoutPane);
 	}
 }
 
 void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings& t_settings,
-									FilesManager& t_filesManager, int t_tabOffsetY) {
+									FilesManager& t_filesManager, int t_tabOffsetY, int t_leftSideOffsetX) {
 	const int w = t_settings.windowSettings.width;
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
@@ -494,7 +489,7 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	const auto& file = t_filesManager.getFile(fileId);
 
 	const bool visible{true};
-	const int cursorX = coords.startX + cursor.getX() * t_settings.charSettings.codeCharWidth;
+	const int cursorX = coords.startX + t_leftSideOffsetX + cursor.getX() * t_settings.charSettings.codeCharWidth;
 	const int cursorY = coords.startY + t_tabOffsetY + cursor.getY() * t_settings.charSettings.codeCharHeight;
 	const char letter = file.textBuffer_.getLine(cursor.getY()).at(cursor.getX());
 	const auto cursorType = CursorType::Block;

@@ -1,13 +1,12 @@
 #include "NormalModeSubModes.hpp"
 
 WindowSubCommand::WindowSubCommand() {
-
 	functionMap_ = {{'v', &WindowSubCommand::verticalSplit}, {'s', &WindowSubCommand::horizontalSplit},
-					{'h', &WindowSubCommand::movePaneLeft},  {'j', &WindowSubCommand::movePaneDown},
-					{'k', &WindowSubCommand::movePaneUp},	  {'l', &WindowSubCommand::movePaneRight},
-					{'c', &WindowSubCommand::closePane}};
+					{'h', &WindowSubCommand::movePaneLeft},	 {'j', &WindowSubCommand::movePaneDown},
+					{'k', &WindowSubCommand::movePaneUp},	 {'l', &WindowSubCommand::movePaneRight},
+					{'c', &WindowSubCommand::closePane}, {'=', &WindowSubCommand::equalizePanes}};
 }
-void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, const char t_inputChar) const{
+void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, const char t_inputChar) const {
 
 	const auto it = functionMap_.find(t_inputChar);
 	if (it != functionMap_.end()) {
@@ -25,8 +24,7 @@ void WindowSubCommand::horizontalSplit(PanesManager& t_panesManager) const {
 	t_panesManager.addPane(pane->paneId_, pane->fileId_, AddedPaneRotation::Bottom);
 }
 
-void WindowSubCommand::movePaneLeft(PanesManager& t_panesManager) const {
-}
+void WindowSubCommand::movePaneLeft(PanesManager& t_panesManager) const {}
 
 void WindowSubCommand::movePaneRight(PanesManager&) const {}
 
@@ -52,22 +50,12 @@ FileSubCommand::FileSubCommand() {
 	};
 }
 
-void FileSubCommand::ExecuteCommand() const {
+void FileSubCommand::ExecuteCommand() const {}
 
-}
+void FileSubCommand::moveUp() const {}
 
-void FileSubCommand::moveUp() const {
+void FileSubCommand::moveDown() const {}
 
-}
+void FileSubCommand::open() const {}
 
-void FileSubCommand::moveDown() const {
-
-}
-
-void FileSubCommand::open() const {
-
-}
-
-void FileSubCommand::refresh() const {
-
-}
+void FileSubCommand::refresh() const {}

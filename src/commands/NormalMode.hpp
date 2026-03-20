@@ -1,9 +1,9 @@
 #pragma once
 
+#include "NormalModeSubModes.hpp"
+
 #include <string_view>
 #include <unordered_map>
-
-#include "NormalModeSubModes.hpp"
 
 class EditorState;
 class EditorInputAndOutput;
@@ -152,12 +152,13 @@ class NormalMode final {
 };
 
 class NormalModeDistributor final {
-public:
+  public:
 	NormalModeDistributor();
 	~NormalModeDistributor() noexcept = default;
 
 	void HandleKeyboardInput(PanesManager&, FilesManager&, Cursor&, EditorState&, EditorInputAndOutput&);
-private:
+
+  private:
 	bool pressedCtrl;
 	bool windowMode;
 

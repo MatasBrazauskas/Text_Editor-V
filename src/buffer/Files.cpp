@@ -125,7 +125,7 @@ MatrixIterator Matrix::backwardIterator(const size_t startCount_t) const {
 File::File(const Matrix& text_t, std::filesystem::path path_t, const FileId t_fileId)
 	: textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{t_fileId} {}
 
-File::File(const Matrix& t_matrix,const FileId t_fileId): textBuffer_{t_matrix}, fileId_{t_fileId} {}
+File::File(const Matrix& t_matrix, const FileId t_fileId) : textBuffer_{t_matrix}, fileId_{t_fileId} {}
 
 FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char** argv) : activeFileId_{} {
 	if (argc < 1 || argv == nullptr) {
@@ -152,7 +152,6 @@ void FilesManager::addRegularFile(const Matrix& t_textBuffer, const std::filesys
 	files_.insert({fileIdCounter_, regularFile});
 	fileIdCounter_++;
 }
-
 
 void FilesManager::addSpecialFile(const Matrix& t_textBuffer) {
 	const auto specialFile = File{std::move(t_textBuffer), fileIdCounter_};
