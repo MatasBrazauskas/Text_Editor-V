@@ -10,7 +10,7 @@ EditorState::EditorState(const FileId activeFileId_t)
 
 EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
 	: filesManager_{fileHandler_, argc, argv}, panesManager_{}, editorState_{0}, settings_{t_settings} {
-	panesManager_.addPane(0, 0, AddedPaneRotation::Top);
+	panesManager_.addPane(0, 0, PaneDirection::Top);
 }
 
 std::string EditorCore::EncodeInput(const SDL_Event& event) {

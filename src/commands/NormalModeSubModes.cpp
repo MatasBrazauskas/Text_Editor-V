@@ -8,7 +8,8 @@ WindowSubCommand::WindowSubCommand() {
 					{'k', &WindowSubCommand::movePaneUp},	 {'l', &WindowSubCommand::movePaneRight},
 					{'c', &WindowSubCommand::closePane},	 {'=', &WindowSubCommand::equalizePanes}};
 }
-void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, WindowSettings& t_winSettings, const char t_inputChar) const {
+void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, WindowSettings& t_winSettings,
+									  const char t_inputChar) const {
 
 	const auto it = functionMap_.find(t_inputChar);
 	if (it != functionMap_.end()) {
@@ -18,23 +19,29 @@ void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, WindowSettin
 
 void WindowSubCommand::verticalSplit(PanesManager& t_panesManager, WindowSettings&) const {
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->paneId_, pane->fileId_, AddedPaneRotation::Left);
+	t_panesManager.addPane(pane->paneId_, pane->fileId_, PaneDirection::Left);
 }
 
 void WindowSubCommand::horizontalSplit(PanesManager& t_panesManager, WindowSettings&) const {
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->paneId_, pane->fileId_, AddedPaneRotation::Bottom);
+	t_panesManager.addPane(pane->paneId_, pane->fileId_, PaneDirection::Bottom);
 }
 
-void WindowSubCommand::movePaneLeft(PanesManager& t_panesManager, WindowSettings&) const {}
-
-void WindowSubCommand::movePaneRight(PanesManager&, WindowSettings&) const {}
-
-void WindowSubCommand::moveToPaneDown(PanesManager& t_panesManger, WindowSettings& t_winSettings) const {
-	t_panesManger.moveToPaneDown(t_winSettings.height, t_winSettings.width);
+void WindowSubCommand::movePaneLeft(PanesManager& t_panesManager, WindowSettings& t_winSettings) const {
+	t_panesManager.moveToPane(t_winSettings.height, t_winSettings.width, PaneDirection::Left);
 }
 
-void WindowSubCommand::movePaneUp(PanesManager&, WindowSettings&) const {}
+void WindowSubCommand::movePaneRight(PanesManager& t_panesManager, WindowSettings& t_winSettings) const {
+	t_panesManager.moveToPane(t_winSettings.height, t_winSettings.width, PaneDirection::Right);
+}
+
+void WindowSubCommand::moveToPaneDown(PanesManager& t_panesManager, WindowSettings& t_winSettings) const {
+	t_panesManager.moveToPane(t_winSettings.height, t_winSettings.width, PaneDirection::Bottom);
+}
+
+void WindowSubCommand::movePaneUp(PanesManager& t_panesManager, WindowSettings& t_winSettings) const {
+	t_panesManager.moveToPane(t_winSettings.height, t_winSettings.width, PaneDirection::Top);
+}
 
 void WindowSubCommand::closePane(PanesManager& t_panesManager, WindowSettings&) const {
 	const auto paneId = t_panesManager.getCurrPane()->paneId_;

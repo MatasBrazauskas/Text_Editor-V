@@ -20,7 +20,7 @@ using PaneId = uint_fast64_t;
 
 enum class Modes : uint8_t;
 enum class SplitType : char { Vertical, Horizontal };
-enum class AddedPaneRotation : char { Top, Bottom, Right, Left };
+enum class PaneDirection : char { Top, Bottom, Right, Left };
 enum class PaneSizeChange : char { Expand, Contract };
 
 class Coordinates {
@@ -103,13 +103,10 @@ class PanesManager final {
 	std::optional<Pane> getPane(PaneId);
 	std::optional<Pane> getCurrPane();
 
-	void addPane(PaneId t_parent, FileId t_fileId, AddedPaneRotation t_rotation);
+	void addPane(PaneId t_parent, FileId t_fileId, PaneDirection t_rotation);
 	void removePane(PaneId);
 
-	void moveToPaneUp(PaneId);
-	void moveToPaneDown(int t_height, int t_width);
-	void moveToPaneRight(PaneId);
-	void moveToPaneLeft(PaneId);
+	void moveToPane(int t_height, int t_width, PaneDirection);
 
 	void shiftPane(PaneId, PaneSizeChange);
 	void resetRatios();

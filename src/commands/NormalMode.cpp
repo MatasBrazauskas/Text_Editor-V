@@ -252,7 +252,8 @@ NormalModeTable::NormalModeTable() {
 NormalModeDistributor::NormalModeDistributor() : pressedCtrl{}, windowMode{} {}
 
 void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, FilesManager& t_filesManager,
-												Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io, WindowSettings& t_winSettings) {
+												Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io,
+												WindowSettings& t_winSettings) {
 
 	auto& file = t_filesManager.getFile(t_filesManager.activeFileId_);
 

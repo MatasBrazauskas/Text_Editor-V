@@ -67,7 +67,7 @@ SplitNode::SplitNode(SplitType t_splitType) : nodeType{t_splitType} {}
 
 PanesManager::PanesManager() : activePaneId_{}, head_{nullptr} {}
 
-void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const AddedPaneRotation t_rotation) {
+void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const PaneDirection t_rotation) {
 	const auto pane = Pane{paneIdCounter_++, t_fileId};
 
 	if (head_ == nullptr) {
@@ -84,22 +84,22 @@ void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const
 			SplitType splitType;
 
 			switch (t_rotation) {
-			case AddedPaneRotation::Right:
+			case PaneDirection::Right:
 				leftChildPane = parentPane;
 				rightChildPane = pane;
 				splitType = SplitType::Vertical;
 				break;
-			case AddedPaneRotation::Left:
+			case PaneDirection::Left:
 				leftChildPane = pane;
 				rightChildPane = parentPane;
 				splitType = SplitType::Vertical;
 				break;
-			case AddedPaneRotation::Top:
+			case PaneDirection::Top:
 				leftChildPane = pane;
 				rightChildPane = parentPane;
 				splitType = SplitType::Horizontal;
 				break;
-			case AddedPaneRotation::Bottom:
+			case PaneDirection::Bottom:
 				leftChildPane = parentPane;
 				rightChildPane = pane;
 				splitType = SplitType::Horizontal;
@@ -254,11 +254,44 @@ std::vector<SplitNode*> PanesManager::getAllSplitNode() {
 	return splitNodes;
 }
 
-void PanesManager::moveToPaneUp(PaneId) {
+void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirection t_paneDirection) {
 
-}
+	const auto topPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
+		const bool heightPredicate = currPaneCoords.startY == paneCoords.endY;
+		const bool endsOutside = paneCoords.startX <= currPaneCoords.startX && currPaneCoords.endX <= paneCoords.endX;
+		const bool endsInside = (currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX)
+			|| (currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
 
-void PanesManager::moveToPaneDown(const int t_height, const int t_width) {
+		return heightPredicate && (endsOutside || endsInside);
+	};
+
+	const auto bottomPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
+		const bool heightPredicate = currPaneCoords.endY == paneCoords.startY;
+		const bool endsOutside = paneCoords.startX <= currPaneCoords.startX && currPaneCoords.endX <= paneCoords.endX;
+		const bool endsInside = (currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX)
+			|| (currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
+
+		return heightPredicate && (endsOutside || endsInside);
+	};
+
+	const auto leftPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
+		const bool heightPredicate = currPaneCoords.startX == paneCoords.endX;
+		const bool endsOutside = paneCoords.startY <= currPaneCoords.startY && currPaneCoords.endY <= paneCoords.endY;
+		const bool endsInside = (currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY)
+			|| (currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
+
+		return heightPredicate && (endsOutside || endsInside);
+	};
+
+	const auto rightPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
+		const bool heightPredicate = currPaneCoords.endX == paneCoords.startX;
+		const bool endsOutside = paneCoords.startY <= currPaneCoords.startY && currPaneCoords.endY <= paneCoords.endY;
+		const bool endsInside = (currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY)
+			|| (currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
+
+		return heightPredicate && (endsOutside || endsInside);
+	};
+
 	const auto panesCoords = getPaneCoordinates(t_height, t_width);
 
 	const auto paneIdPredicate = [&](const PaneInfo& t_pane) {
@@ -270,29 +303,24 @@ void PanesManager::moveToPaneDown(const int t_height, const int t_width) {
 
 	PaneId changedPaneId = activePaneId_;
 
-	for (const auto& paneInfo: panesCoords) {
+	for (const auto& paneInfo : panesCoords) {
 		const auto& paneCoords = std::get<4>(paneInfo);
 
-		const bool heightPredicate = currPaneCoords.endY == paneCoords.startY;
-		const bool one = paneCoords.startX <= currPaneCoords.startX && paneCoords.endX >= currPaneCoords.endX;
-		const bool two = paneCoords.startX >= currPaneCoords.startX && paneCoords.endX <= currPaneCoords.endX;
-		const bool right = paneCoords.startX <= currPaneCoords.startX && (paneCoords.endX >= currPaneCoords.startX && paneCoords.endX <= currPaneCoords.endX);
-		const bool left = (paneCoords.startX >= currPaneCoords.startX && paneCoords.startX <= currPaneCoords.endX) && currPaneCoords.endX <= paneCoords.endX;
+		bool flag{};
 
-		if (heightPredicate && (one | two | right | left)) {
+		switch (t_paneDirection) {
+			case PaneDirection::Top: flag = topPredicate(currPaneCoords, paneCoords); break;
+			case PaneDirection::Bottom: flag = bottomPredicate(currPaneCoords, paneCoords); break;
+			case PaneDirection::Left: flag = leftPredicate(currPaneCoords, paneCoords); break;
+			case PaneDirection::Right: flag = rightPredicate(currPaneCoords, paneCoords); break;
+		}
+
+		if (flag) {
 			changedPaneId = std::get<0>(paneInfo);
 		}
 	}
 
 	activePaneId_ = changedPaneId;
-}
-
-void PanesManager::moveToPaneRight(PaneId) {
-
-}
-
-void PanesManager::moveToPaneLeft(PaneId) {
-
 }
 
 void PanesManager::shiftPane(const PaneId t_paneId, const PaneSizeChange t_change) {
@@ -526,8 +554,8 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
 	const auto panesInfo = t_panesManager.getPaneCoordinates(h, w);
-	const auto& [paneId, fileId, textIndex, cursor, coords] =
-		*std::ranges::find_if(panesInfo, [&](const PaneInfo& t_paneInfo){ return std::get<0>(t_paneInfo) == t_panesManager.activePaneId_;});
+	const auto& [paneId, fileId, textIndex, cursor, coords] = *std::ranges::find_if(
+		panesInfo, [&](const PaneInfo& t_paneInfo) { return std::get<0>(t_paneInfo) == t_panesManager.activePaneId_; });
 
 	const auto& file = t_filesManager.getFile(fileId);
 

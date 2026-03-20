@@ -157,7 +157,8 @@ class NormalModeDistributor final {
 	NormalModeDistributor();
 	~NormalModeDistributor() noexcept = default;
 
-	void HandleKeyboardInput(PanesManager&, FilesManager&, Cursor&, EditorState&, EditorInputAndOutput&, WindowSettings&);
+	void HandleKeyboardInput(PanesManager&, FilesManager&, Cursor&, EditorState&, EditorInputAndOutput&,
+							 WindowSettings&);
 
   private:
 	bool pressedCtrl;

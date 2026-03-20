@@ -39,15 +39,12 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,51 +148,51 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "CMake Application.Text_Editor.executor": "Run",
-    "CMake Debug.Text_Editor.executor": "Debug",
-    "Google Test.CommandParsingTest-NormalModeCommandParsingTest.executor": "Run",
-    "Google Test.CommandStageTest-NormalModeCommandParsingTest.executor": "Debug",
-    "Google Test.FirstLineOperations-InsertModeTestWithParams.executor": "Run",
-    "Google Test.InsertKeyOperations-InsertModeTestWithParams.executor": "Run",
-    "Google Test.NormalModeCommandParsingTest.StageParsing.executor": "Run",
-    "Google Test.NormalModeCommandParsingTest.executor": "Run",
-    "Google Test.NormalModeInputs-NormalModeCommandParsingTest.executor": "Run",
-    "Google Test.OperationAndMotionParsing-NormalModeCommandParsingTest.executor": "Run",
-    "Google Test.StartOfAFileOperations-InsertModeTestWithParams.executor": "Run",
-    "Google Test.TextObjectParsingTest-NormalModeCommandParsingTest.executor": "Run",
-    "Google Test.WordMotionCommands-NormalModeMotionsTest.executor": "Debug",
-    "Google Test.WordMotionCommands-WordTests.executor": "Run",
-    "Google Test.backSpaceKeyOperations-InsertModeTestWithParams.executor": "Run",
-    "Google Test.editor_tests.executor": "Run",
-    "Google Test.insertKeyOperations-InsertModeTestWithParams.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.RadMigrateCodeStyle": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "RunOnceActivity.west.config.association.type.startup.service": "true",
-    "cf.advertisement.text.overridden": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "ctest.advertisement.all.test.configuration.is.created": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/matas/Repos/v",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "/home/matas/Repos/Text Editor/main.cpp",
-    "org.rust.first.attach.projects": "true",
-    "settings.editor.selected.configurable": "editor.preferences.completion",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;CMake Application.Text_Editor.executor&quot;: &quot;Run&quot;,
+    &quot;CMake Debug.Text_Editor.executor&quot;: &quot;Debug&quot;,
+    &quot;Google Test.CommandParsingTest-NormalModeCommandParsingTest.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.CommandStageTest-NormalModeCommandParsingTest.executor&quot;: &quot;Debug&quot;,
+    &quot;Google Test.FirstLineOperations-InsertModeTestWithParams.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.InsertKeyOperations-InsertModeTestWithParams.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.NormalModeCommandParsingTest.StageParsing.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.NormalModeCommandParsingTest.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.NormalModeInputs-NormalModeCommandParsingTest.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.OperationAndMotionParsing-NormalModeCommandParsingTest.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.StartOfAFileOperations-InsertModeTestWithParams.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.TextObjectParsingTest-NormalModeCommandParsingTest.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.WordMotionCommands-NormalModeMotionsTest.executor&quot;: &quot;Debug&quot;,
+    &quot;Google Test.WordMotionCommands-WordTests.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.backSpaceKeyOperations-InsertModeTestWithParams.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.editor_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.insertKeyOperations-InsertModeTestWithParams.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
+    &quot;cf.advertisement.text.overridden&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;ctest.advertisement.all.test.configuration.is.created&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/matas/Repos/v&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;/home/matas/Repos/Text Editor/main.cpp&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.completion&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/fonts" />
@@ -414,6 +411,8 @@
       <workItem from="1773389787225" duration="19693000" />
       <workItem from="1773476303594" duration="183000" />
       <workItem from="1773999421016" duration="9081000" />
+      <workItem from="1774009128209" duration="35000" />
+      <workItem from="1774022110103" duration="1192000" />
     </task>
     <servers />
   </component>
@@ -430,28 +429,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp</url>
-          <line>340</line>
+          <line>368</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp</url>
-          <line>338</line>
+          <line>366</line>
           <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp</url>
-          <line>286</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp</url>
-          <line>281</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp</url>
-          <line>282</line>
-          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
