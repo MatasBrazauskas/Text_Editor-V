@@ -4,6 +4,7 @@
 #include <optional>
 #include <variant>
 #include <vector>
+#include <array>
 
 using FileId = std::uint_fast64_t;
 using PaneId = uint_fast64_t;
@@ -95,6 +96,22 @@ class SplitNode final {
 
 using PaneInfo = std::tuple<PaneId, FileId, TextIndex, Cursor, Coordinates>;
 
+class PaneHistoryManager {
+public:
+	PaneHistoryManager();
+	~PaneHistoryManager() noexcept = default;
+
+	void addPaneId(PaneId);
+	void removePaneId(PaneId);
+	std::optional<PaneId> getLastPaneId();
+
+	auto begin() const { return std::make_reverse_iterator(historyArr.begin() + historyIndex); }
+	auto end() const { return std::make_reverse_iterator(historyArr.begin()); }
+private:
+	std::array<PaneId, 8> historyArr;
+	int historyIndex;
+};
+
 class PanesManager final {
   public:
 	PanesManager();
@@ -116,6 +133,7 @@ class PanesManager final {
 
   private:
 	inline static PaneId paneIdCounter_{};
+	PaneHistoryManager paneHistoryManager_;
 
 	SplitNode* head_;
 

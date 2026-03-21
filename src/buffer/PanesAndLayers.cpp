@@ -65,13 +65,14 @@ SplitNode::SplitNode(const Pane t_pane) : nodeType{t_pane} {}
 
 SplitNode::SplitNode(SplitType t_splitType) : nodeType{t_splitType} {}
 
-PanesManager::PanesManager() : activePaneId_{}, head_{nullptr} {}
+PanesManager::PanesManager() : activePaneId_{}, paneHistoryManager_{}, head_{nullptr} {}
 
 void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const PaneDirection t_rotation) {
 	const auto pane = Pane{paneIdCounter_++, t_fileId};
 
 	if (head_ == nullptr) {
 		head_ = new SplitNode(pane);
+		paneHistoryManager_.addPaneId(pane.paneId_);
 	} else {
 		auto parentOption = getPanePointer(t_parentId);
 
@@ -111,6 +112,7 @@ void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const
 			parent->leftChild = std::make_unique<SplitNode>(leftChildPane);
 			parent->rightChild = std::make_unique<SplitNode>(rightChildPane);
 
+			paneHistoryManager_.addPaneId(pane.paneId_);
 			return;
 		}
 
@@ -141,6 +143,8 @@ void PanesManager::removePane(const PaneId t_paneId) {
 
 	parent->leftChild.reset();
 	parent->rightChild.reset();
+
+	paneHistoryManager_.removePaneId(t_paneId);
 }
 
 std::optional<SplitNode*> PanesManager::getPaneParentPointer(const PaneId t_paneId) {
@@ -254,13 +258,44 @@ std::vector<SplitNode*> PanesManager::getAllSplitNode() {
 	return splitNodes;
 }
 
-void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirection t_paneDirection) {
+PaneHistoryManager::PaneHistoryManager(): historyArr{}, historyIndex{} {
 
+}
+
+void PaneHistoryManager::addPaneId(const PaneId t_paneId) {
+	removePaneId(t_paneId);
+
+	if (historyIndex >= historyArr.size()) {
+		std::shift_left(historyArr.begin(), historyArr.end(), 1);
+		historyIndex--;
+	}
+
+	historyArr[historyIndex++] = t_paneId;
+}
+
+void PaneHistoryManager::removePaneId(const PaneId t_paneId) {
+	const auto it = std::find(historyArr.begin(), historyArr.begin() + historyIndex, t_paneId);
+
+	if (it != historyArr.begin() + historyIndex) {
+		std::shift_left(it, historyArr.begin() + historyIndex, 1);
+		historyIndex--;
+	}
+}
+
+std::optional<PaneId> PaneHistoryManager::getLastPaneId() {
+	if (historyIndex <= 0) {
+		return std::nullopt;
+	}
+	return historyArr.at(historyIndex);
+}
+
+void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirection t_paneDirection) {
 	const auto topPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.startY == paneCoords.endY;
 		const bool endsOutside = paneCoords.startX <= currPaneCoords.startX && currPaneCoords.endX <= paneCoords.endX;
-		const bool endsInside = (currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX)
-			|| (currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
+		const bool endsInside =
+			(currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX) ||
+			(currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -268,8 +303,9 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto bottomPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.endY == paneCoords.startY;
 		const bool endsOutside = paneCoords.startX <= currPaneCoords.startX && currPaneCoords.endX <= paneCoords.endX;
-		const bool endsInside = (currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX)
-			|| (currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
+		const bool endsInside =
+			(currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX) ||
+			(currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -277,8 +313,9 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto leftPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.startX == paneCoords.endX;
 		const bool endsOutside = paneCoords.startY <= currPaneCoords.startY && currPaneCoords.endY <= paneCoords.endY;
-		const bool endsInside = (currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY)
-			|| (currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
+		const bool endsInside =
+			(currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY) ||
+			(currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -286,8 +323,9 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto rightPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.endX == paneCoords.startX;
 		const bool endsOutside = paneCoords.startY <= currPaneCoords.startY && currPaneCoords.endY <= paneCoords.endY;
-		const bool endsInside = (currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY)
-			|| (currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
+		const bool endsInside =
+			(currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY) ||
+			(currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -301,7 +339,7 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto it = std::ranges::find_if(panesCoords, paneIdPredicate);
 	const auto& currPaneCoords = std::get<4>(*it);
 
-	PaneId changedPaneId = activePaneId_;
+	std::vector borderingPanes = {activePaneId_};
 
 	for (const auto& paneInfo : panesCoords) {
 		const auto& paneCoords = std::get<4>(paneInfo);
@@ -309,18 +347,36 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 		bool flag{};
 
 		switch (t_paneDirection) {
-			case PaneDirection::Top: flag = topPredicate(currPaneCoords, paneCoords); break;
-			case PaneDirection::Bottom: flag = bottomPredicate(currPaneCoords, paneCoords); break;
-			case PaneDirection::Left: flag = leftPredicate(currPaneCoords, paneCoords); break;
-			case PaneDirection::Right: flag = rightPredicate(currPaneCoords, paneCoords); break;
+		case PaneDirection::Top:
+			flag = topPredicate(currPaneCoords, paneCoords);
+			break;
+		case PaneDirection::Bottom:
+			flag = bottomPredicate(currPaneCoords, paneCoords);
+			break;
+		case PaneDirection::Left:
+			flag = leftPredicate(currPaneCoords, paneCoords);
+			break;
+		case PaneDirection::Right:
+			flag = rightPredicate(currPaneCoords, paneCoords);
+			break;
 		}
 
 		if (flag) {
-			changedPaneId = std::get<0>(paneInfo);
+			borderingPanes.push_back(std::get<0>(paneInfo));
 		}
 	}
 
-	activePaneId_ = changedPaneId;
+	for (const auto& cachedPane: paneHistoryManager_) {
+		for (const auto& borderedPane : borderingPanes) {
+			if (borderedPane == cachedPane) {
+				activePaneId_ = cachedPane;
+				paneHistoryManager_.addPaneId(activePaneId_);
+				return;
+			}
+		}
+	}
+
+	activePaneId_ = borderingPanes.at(0);
 }
 
 void PanesManager::shiftPane(const PaneId t_paneId, const PaneSizeChange t_change) {
