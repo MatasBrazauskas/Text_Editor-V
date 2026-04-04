@@ -258,35 +258,34 @@ std::vector<SplitNode*> PanesManager::getAllSplitNode() {
 	return splitNodes;
 }
 
-PaneHistoryManager::PaneHistoryManager(): historyArr{}, historyIndex{} {
-
-}
+PaneHistoryManager::PaneHistoryManager() : historyArr{}, historySize{} {}
 
 void PaneHistoryManager::addPaneId(const PaneId t_paneId) {
 	removePaneId(t_paneId);
 
-	if (historyIndex >= historyArr.size()) {
+	if (historySize >= historyArr.size()) {
 		std::shift_left(historyArr.begin(), historyArr.end(), 1);
-		historyIndex--;
+		historySize--;
 	}
 
-	historyArr[historyIndex++] = t_paneId;
+	historyArr[historySize++] = t_paneId;
 }
 
 void PaneHistoryManager::removePaneId(const PaneId t_paneId) {
-	const auto it = std::find(historyArr.begin(), historyArr.begin() + historyIndex, t_paneId);
+	const auto it = std::find(historyArr.begin(), historyArr.begin() + historySize, t_paneId);
 
-	if (it != historyArr.begin() + historyIndex) {
-		std::shift_left(it, historyArr.begin() + historyIndex, 1);
-		historyIndex--;
+	if (it != historyArr.begin() + historySize) {
+		std::shift_left(it, historyArr.begin() + historySize, 1);
+		historyArr.at(historySize - 1) = 0;
+		historySize--;
 	}
 }
 
 std::optional<PaneId> PaneHistoryManager::getLastPaneId() {
-	if (historyIndex <= 0) {
+	if (historySize <= 0) {
 		return std::nullopt;
 	}
-	return historyArr.at(historyIndex);
+	return historyArr.at(historySize - 1);
 }
 
 void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirection t_paneDirection) {
@@ -339,7 +338,7 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto it = std::ranges::find_if(panesCoords, paneIdPredicate);
 	const auto& currPaneCoords = std::get<4>(*it);
 
-	std::vector borderingPanes = {activePaneId_};
+	std::vector<PaneId> borderingPanes;
 
 	for (const auto& paneInfo : panesCoords) {
 		const auto& paneCoords = std::get<4>(paneInfo);
@@ -366,9 +365,11 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 		}
 	}
 
-	for (const auto& cachedPane: paneHistoryManager_) {
-		for (const auto& borderedPane : borderingPanes) {
-			if (borderedPane == cachedPane) {
+
+
+	for (const auto& cachedPane : paneHistoryManager_) {
+		for (auto i = borderingPanes.rbegin(); i != borderingPanes.rend(); ++i) {
+			if (*i == cachedPane) {
 				activePaneId_ = cachedPane;
 				paneHistoryManager_.addPaneId(activePaneId_);
 				return;
