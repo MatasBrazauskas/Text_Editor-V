@@ -36,6 +36,8 @@ class Renderer final {
 
 	void RenderTabs(const TabLayout&) const;
 	void RenderPanes(const std::vector<PanesLayout>&) const;
+	void RenderRegularFile(const PanesLayout&) const;
+	void RenderFileExplorer(const PanesLayout&) const;
 	void RenderCursor(const CursorLayout&) const;
 	void RenderCommandLine(const CommandLineLayout&) const;
 };

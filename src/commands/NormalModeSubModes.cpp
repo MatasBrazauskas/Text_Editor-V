@@ -1,5 +1,6 @@
 #include "NormalModeSubModes.hpp"
 
+#include "core/EditorCore.hpp"
 #include "utils/ConfigAndSettings.hpp"
 
 WindowSubCommand::WindowSubCommand() {
@@ -54,19 +55,63 @@ void WindowSubCommand::equalizePanes(PanesManager& t_panesManager, WindowSetting
 
 FileSubCommand::FileSubCommand() {
 	functionMap_ = {
+		{'s', &FileSubCommand::openInHorizontal},
+		{'v', &FileSubCommand::openInVertical},
 		{'k', &FileSubCommand::moveUp},
 		{'j', &FileSubCommand::moveDown},
-		{'e', &FileSubCommand::open},
-		{'r', &FileSubCommand::refresh},
+		/*{static_cast<char>(SpecialKeys::Enter), &FileSubCommand::open},
+		{'r', &FileSubCommand::refresh},*/
 	};
 }
 
-void FileSubCommand::ExecuteCommand() const {}
+std::vector<std::string> getDirectoriesContent() {
+	std::vector dirContent = {"../"s};
 
-void FileSubCommand::moveUp() const {}
+	for (const auto& file : std::filesystem::directory_iterator{"."}) {
+		const auto filePath = file.path().string();
+		const auto index =filePath .find_last_of('/');
+		auto fileName = std::string(filePath.substr(index + 1));
 
-void FileSubCommand::moveDown() const {}
+		if (file.is_directory()) {
+			fileName.push_back('/');
+		}
+		dirContent.push_back(fileName);
+	}
 
-void FileSubCommand::open() const {}
+	return dirContent;
+}
 
-void FileSubCommand::refresh() const {}
+void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings& t_winSettings, const char t_inputChar) const {
+	const auto it = functionMap_.find(t_inputChar);
+	if (it != functionMap_.end()) {
+		(this->*it->second)(t_panesManager, t_filesManager, t_winSettings);
+	}
+}
+
+void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings& t_winSettings) const {
+	const auto dirContent = getDirectoriesContent();
+	const auto matrix = Matrix(dirContent);
+	const auto fileId = t_filesManager.addSpecialFile(matrix);
+
+	const auto& pane = t_panesManager.getCurrPane();
+	t_panesManager.addPane(pane->paneId_, fileId, PaneDirection::Left);
+}
+
+void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings& t_winSettings) const {
+	const auto dirContent = getDirectoriesContent();
+	const auto matrix = Matrix(dirContent);
+	const auto fileId = t_filesManager.addSpecialFile(matrix);
+
+	const auto& pane = t_panesManager.getCurrPane();
+	t_panesManager.addPane(pane->paneId_, fileId, PaneDirection::Bottom);
+}
+
+void FileSubCommand::moveUp(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
+	auto cursor = t_panesManager.getCurrPane()->cursor_;
+	cursor.decrementY();
+}
+
+void FileSubCommand::moveDown(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
+	auto cursor = t_panesManager.getCurrPane()->cursor_;
+	cursor.incrementY();
+}

@@ -172,12 +172,16 @@ class CommandLineLayout final {
 	std::string commandLineArgs;
 };
 
+enum class PanesSnippets {TextSnippet, FilesSnippet};
+
 class PanesLayout final {
   public:
 	PanesLayout() = default;
-	PanesLayout(int t_startX, int t_startY, int t_endX, int t_endY, int t_leftDataOffsetX,
+	PanesLayout(PanesSnippets t_panesSnippet, int t_startX, int t_startY, int t_endX, int t_endY, int t_leftDataOffsetX,
 				const std::vector<std::string>& t_leftData, const std::vector<std::string>& t_lines);
 	~PanesLayout() noexcept = default;
+
+	PanesSnippets panesSnippet;
 
 	int startX, startY;
 	int endX, endY;
@@ -187,17 +191,18 @@ class PanesLayout final {
 	std::vector<std::string> lines;
 };
 
-enum class CursorType { Line, Block };
+enum class CursorType { Stick, Block, Line };
 
 class CursorLayout final {
   public:
 	CursorLayout() = default;
-	CursorLayout(bool t_visible, int t_cursorX, int t_cursorY, char t_letter, CursorType);
+	CursorLayout(bool t_visible, int t_cursorX, int t_cursorY, std::string t_letters, int t_cursorWidth, CursorType);
 	~CursorLayout() noexcept = default;
 
 	bool visible;
 	int cursorX, cursorY;
-	char letter;
+	std::string letter;
+	int cursorWidth;
 	CursorType cursorType;
 };
 
@@ -219,7 +224,7 @@ class LayoutManager final {
 	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&,
 						int& t_left);
 	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager,
-						 int t_tabOffsetY, int t_leftSideOffsetX);
+						 int t_tabOffsetY, int t_leftSideOffsetX, const EditorState&);
 	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
 							  const EditorState& t_editorState, const EditorInputAndOutput& t_io,
 							  FilesManager& t_filesManager);

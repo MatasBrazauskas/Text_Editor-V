@@ -146,44 +146,92 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout) const {
 	}
 }
 
-void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
+void Renderer::RenderRegularFile(const PanesLayout& t_pane) const {
 	const auto& codeColor = config_.theme.codeText;
 	const auto& background = config_.theme.background;
 	const auto& foregound = config_.theme.foreground;
 	const auto& [charStg, winStg] = settings_;
 
+	const auto& [paneSnippet, startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = t_pane;
+
+	const SDL_Rect box = {startX, startY, endX - startX, endY - startY};
+
+	SDL_SetRenderDrawColor(renderer_, background.r, background.g, background.b, background.a);
+	SDL_RenderFillRect(renderer_, &box);
+
+	const SDL_Rect leftSideBox = {startX, startY, leftDataOffsetX, endY - startY};
+	SDL_SetRenderDrawColor(renderer_, foregound.r, foregound.g, foregound.b, foregound.a);
+	SDL_RenderFillRect(renderer_, &leftSideBox);
+
+	SDL_SetRenderDrawColor(renderer_, codeColor.r, codeColor.g, codeColor.b, codeColor.a);
+	SDL_RenderDrawRect(renderer_, &box);
+
+	for (auto i{0zu}; i < lines.size(); i++) {
+		std::string line = std::string{lines.at(i)};
+		line.insert(0, leftData.at(i));
+
+		SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), codeColor);
+		if (!surface)
+			continue;
+
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+
+		const int lineOffset = i * charStg.codeCharHeight;
+		const SDL_Rect dst{startX, startY + lineOffset, surface->w, surface->h};
+
+		SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+
+		SDL_FreeSurface(surface);
+		SDL_DestroyTexture(texture);
+	}
+}
+
+void Renderer::RenderFileExplorer(const PanesLayout& t_pane) const {
+	const auto& codeColor = config_.theme.codeText;
+	const auto& background = config_.theme.background;
+	const auto& foregound = config_.theme.foreground;
+	const auto& [charStg, winStg] = settings_;
+
+	const auto& [paneSnippet, startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = t_pane;
+
+	const SDL_Rect box = {startX, startY, endX - startX, endY - startY};
+
+	SDL_SetRenderDrawColor(renderer_, background.r, background.g, background.b, background.a);
+	SDL_RenderFillRect(renderer_, &box);
+
+	const SDL_Rect leftSideBox = {startX, startY, leftDataOffsetX, endY - startY};
+	SDL_SetRenderDrawColor(renderer_, foregound.r, foregound.g, foregound.b, foregound.a);
+	SDL_RenderFillRect(renderer_, &leftSideBox);
+
+	SDL_SetRenderDrawColor(renderer_, codeColor.r, codeColor.g, codeColor.b, codeColor.a);
+	SDL_RenderDrawRect(renderer_, &box);
+
+	for (auto i{0zu}; i < lines.size(); i++) {
+		const auto line = lines.at(i);
+
+		SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), codeColor);
+		if (!surface)
+			continue;
+
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
+
+		const int lineOffset = i * charStg.codeCharHeight;
+		const SDL_Rect dst{startX, startY + lineOffset, surface->w, surface->h};
+
+		SDL_RenderCopy(renderer_, texture, nullptr, &dst);
+
+		SDL_FreeSurface(surface);
+		SDL_DestroyTexture(texture);
+	}
+}
+
+void Renderer::RenderPanes(const std::vector<PanesLayout>& panes) const {
+
 	for (const auto& pane : panes) {
-		const auto& [startX, startY, endX, endY, leftDataOffsetX, leftData, lines] = pane;
-
-		const SDL_Rect box = {startX, startY, endX - startX, endY - startY};
-
-		SDL_SetRenderDrawColor(renderer_, background.r, background.g, background.b, background.a);
-		SDL_RenderFillRect(renderer_, &box);
-
-		const SDL_Rect leftSideBox = {startX, startY, leftDataOffsetX, endY - startY};
-		SDL_SetRenderDrawColor(renderer_, foregound.r, foregound.g, foregound.b, foregound.a);
-		SDL_RenderFillRect(renderer_, &leftSideBox);
-
-		SDL_SetRenderDrawColor(renderer_, codeColor.r, codeColor.g, codeColor.b, codeColor.a);
-		SDL_RenderDrawRect(renderer_, &box);
-
-		for (auto i{0zu}; i < lines.size(); i++) {
-			std::string line = std::string{lines.at(i)};
-			line.insert(0, leftData.at(i));
-
-			SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, line.c_str(), codeColor);
-			if (!surface)
-				continue;
-
-			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
-
-			const int lineOffset = i * charStg.codeCharHeight;
-			const SDL_Rect dst{startX, startY + lineOffset, surface->w, surface->h};
-
-			SDL_RenderCopy(renderer_, texture, nullptr, &dst);
-
-			SDL_FreeSurface(surface);
-			SDL_DestroyTexture(texture);
+		if (pane.panesSnippet == PanesSnippets::TextSnippet) {
+			RenderRegularFile(pane);
+		} else {
+			RenderFileExplorer(pane);
 		}
 	}
 }
@@ -192,25 +240,19 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 	const auto [cr, cg, cb, ca] = config_.theme.cursor;
 	const auto& cursorFg = config_.theme.highlight;
 
-	const auto& [active, cursorX, cursorY, letter, cursorType] = t_cursorLayout;
+	const auto& [active, cursorX, cursorY, letters, cursorWidth, cursorType] = t_cursorLayout;
 
 	SDL_SetRenderDrawColor(renderer_, cr, cg, cb, ca);
 	const auto& [charStg, winStg] = settings_;
 
 	if (active) {
-		if (cursorType == CursorType::Line) {
-			const auto rect = SDL_Rect{cursorX + 1, cursorY, 1, charStg.codeCharHeight};
+		const SDL_Rect cursorRect{cursorX, cursorY, cursorWidth, charStg.codeCharHeight};
+		SDL_RenderFillRect(renderer_, &cursorRect);
 
-			SDL_RenderFillRect(renderer_, &rect);
-		} else {
-			const SDL_Rect cursorRect{cursorX, cursorY, charStg.codeCharWidth, charStg.codeCharHeight};
-			SDL_RenderFillRect(renderer_, &cursorRect);
+		SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, letters.c_str(), cursorFg);
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
 
-			const char text[2] = {letter, '\0'};
-
-			SDL_Surface* surface = TTF_RenderText_Blended(codeFont_, text, cursorFg);
-			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
-
+		if (surface) {
 			const SDL_Rect dst{cursorX, cursorY, surface->w, surface->h};
 			SDL_RenderCopy(renderer_, texture, nullptr, &dst);
 

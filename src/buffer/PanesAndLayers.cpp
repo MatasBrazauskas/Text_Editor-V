@@ -365,8 +365,6 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 		}
 	}
 
-
-
 	for (const auto& cachedPane : paneHistoryManager_) {
 		for (auto i = borderingPanes.rbegin(); i != borderingPanes.rend(); ++i) {
 			if (*i == cachedPane) {
@@ -376,8 +374,6 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 			}
 		}
 	}
-
-	activePaneId_ = borderingPanes.at(0);
 }
 
 void PanesManager::shiftPane(const PaneId t_paneId, const PaneSizeChange t_change) {
@@ -453,15 +449,15 @@ CommandLineLayout::CommandLineLayout(const Modes mode_t, std::string t_modeName,
 	: mode{mode_t}, modeName{t_modeName}, commandInfo{t_commandInfo}, fileInfo{t_lineAndCharInfo},
 	  commandLineArgs{t_commandArgs} {}
 
-PanesLayout::PanesLayout(const int t_startX, const int t_startY, const int t_endX, const int t_endY,
+PanesLayout::PanesLayout(const PanesSnippets t_panesSnippet, const int t_startX, const int t_startY, const int t_endX, const int t_endY,
 						 const int t_leftDataOffsetX, const std::vector<std::string>& t_leftData,
 						 const std::vector<std::string>& t_lines)
-	: startX{t_startX}, startY{t_startY}, endX{t_endX}, endY{t_endY}, leftDataOffsetX{t_leftDataOffsetX},
+	: panesSnippet{t_panesSnippet}, startX{t_startX}, startY{t_startY}, endX{t_endX}, endY{t_endY}, leftDataOffsetX{t_leftDataOffsetX},
 	  leftData{t_leftData}, lines{t_lines} {}
 
-CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int t_cursorY, const char t_letter,
-						   const CursorType t_cursorType)
-	: visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letter}, cursorType{t_cursorType} {}
+CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int t_cursorY, const std::string t_letters,
+		const int t_cursorWidth, const CursorType t_cursorType)
+	: visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letters}, cursorWidth{t_cursorWidth}, cursorType{t_cursorType} {}
 
 LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, const Settings& t_settings)
 	: windowHeight{t_config.window.height}, windowWidth{t_config.window.width} {
@@ -473,7 +469,7 @@ LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, c
 	addTabLayout(fileManager, t_settings);
 	int left = 0;
 	addPanesLayout(fileManager, paneManager, t_settings, tabLayout.tabCapturedLinesOffsetY, t_config, left);
-	addCursorLayout(paneManager, t_settings, fileManager, tabLayout.tabCapturedLinesOffsetY, left);
+	addCursorLayout(paneManager, t_settings, fileManager, tabLayout.tabCapturedLinesOffsetY, left, editorState);
 	addCommandLineLayout(paneManager, t_settings, editorState, editorIO, fileManager);
 }
 
@@ -595,18 +591,26 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 			linesVec.emplace_back(subStrView);
 		}
 
-		const int leftSideOffset = leftSide.at(0).length();
+		int leftSideOffset = leftSide.at(0).length();
 		t_left = leftSideOffset * t_settings.charSettings.codeCharWidth;
+		PanesSnippets panesSnippets = PanesSnippets::TextSnippet;
+
+		if (t_filesManager.specialFile(file.fileId_)) {
+			leftSideOffset = 0;
+			leftSide.clear();
+			t_left = 0;
+			panesSnippets = PanesSnippets::FilesSnippet;
+		}
 
 		const auto& layoutPane =
-			PanesLayout(coords.startX, t_tabOffsetY + coords.startY, coords.endX, t_tabOffsetY + coords.endY,
+			PanesLayout(panesSnippets, coords.startX, t_tabOffsetY + coords.startY, coords.endX, t_tabOffsetY + coords.endY,
 						leftSideOffset * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
 		panesLayout.push_back(layoutPane);
 	}
 }
 
 void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings& t_settings,
-									FilesManager& t_filesManager, int t_tabOffsetY, int t_leftSideOffsetX) {
+									FilesManager& t_filesManager, int t_tabOffsetY, int t_leftSideOffsetX, const EditorState& t_editorState) {
 	const int w = t_settings.windowSettings.width;
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
@@ -617,12 +621,30 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	const auto& file = t_filesManager.getFile(fileId);
 
 	const bool visible{true};
+	if (t_filesManager.specialFile(fileId)) {
+		t_leftSideOffsetX = 0;
+	}
+
 	const int cursorX = coords.startX + t_leftSideOffsetX + cursor.getX() * t_settings.charSettings.codeCharWidth;
 	const int cursorY = coords.startY + t_tabOffsetY + cursor.getY() * t_settings.charSettings.codeCharHeight;
-	const char letter = file.textBuffer_.getLine(cursor.getY()).at(cursor.getX());
-	const auto cursorType = CursorType::Block;
 
-	cursorLayout = CursorLayout{visible, cursorX, cursorY, letter, cursorType};
+	auto letters = std::string{file.textBuffer_.getLine(cursor.getY()).at(cursor.getX())};
+	auto cursorType = CursorType::Block;
+	int cursorWidth = t_settings.charSettings.codeCharWidth;
+
+	if (t_editorState.currentMode_ == Modes::Insert) {
+		cursorType = CursorType::Stick;
+		cursorWidth = 1;
+		letters = "";
+	} else if (t_editorState.currentMode_ == Modes::Normal){
+		if (t_filesManager.specialFile(file.fileId_)) {
+			cursorType = CursorType::Line;
+			letters = file.textBuffer_.getLine(cursor.getY());
+			cursorWidth = letters.length() * t_settings.charSettings.codeCharWidth;
+		}
+	}
+
+	cursorLayout = CursorLayout{visible, cursorX, cursorY, letters, cursorWidth, cursorType};
 }
 
 void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,

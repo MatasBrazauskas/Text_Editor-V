@@ -34,15 +34,18 @@ class FileSubCommand final {
   public:
 	FileSubCommand();
 	~FileSubCommand() noexcept = default;
-	void ExecuteCommand() const;
+	void ExecuteCommand(PanesManager&, FilesManager&, WindowSettings&, char t_inputChar) const;
 
   private:
-	using Func = void (FileSubCommand::*)() const;
+	using Func = void (FileSubCommand::*)(PanesManager&, FilesManager&, WindowSettings&) const;
 
-	void moveUp() const;
-	void moveDown() const;
+	void openInVertical(PanesManager&, FilesManager&, WindowSettings&) const;
+	void openInHorizontal(PanesManager&, FilesManager&, WindowSettings&) const;
+	void moveUp(PanesManager&, FilesManager&, WindowSettings&) const;
+	void moveDown(PanesManager&, FilesManager&, WindowSettings&) const;
 
 	void open() const;
+	void close() const;
 	void refresh() const;
 
 	std::unordered_map<char, Func> functionMap_;

@@ -84,8 +84,8 @@ class FilesManager final {
 	FilesManager(const FileHandler&, int argc, char** argv);
 	~FilesManager() noexcept = default;
 
-	void addRegularFile(const Matrix&, const std::filesystem::path&);
-	void addSpecialFile(const Matrix&);
+	FileId addRegularFile(const Matrix&, const std::filesystem::path&);
+	FileId addSpecialFile(const Matrix&);
 
 	bool specialFile(FileId);
 	bool regularFile(FileId);

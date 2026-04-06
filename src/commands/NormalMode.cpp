@@ -159,7 +159,7 @@ NormalModeCommand NormalModeParser::getCommand() const {
 	return command;
 }
 
-void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState& state, EditorInputAndOutput& inOut) {
+void NormalMode::ExecuteCommand(File& file_t, Cursor& t_cursor, EditorState& state, EditorInputAndOutput& inOut) {
 	auto& [text, stack, path, id] = file_t;
 
 	parser.parseCommand(inOut.input_);
@@ -249,7 +249,35 @@ NormalModeTable::NormalModeTable() {
 				   {'r', &NormalModeTable::replaceChar}};
 }
 
-NormalModeDistributor::NormalModeDistributor() : pressedCtrl{}, windowMode{} {}
+NormalModeDistributor::NormalModeDistributor() : currentMode{} {}
+
+NormalModeModes NormalModeDistributor::modeSwitched(FilesManager& t_filesManager, EditorInputAndOutput& t_io) {
+	const auto& file = t_filesManager.getFile(t_filesManager.activeFileId_);
+
+	if (t_filesManager.specialFile(file.fileId_)) {
+		return NormalModeModes::FileSubMode;
+	}
+
+	if (static_cast<uint8_t>(t_io.input_.back()) == static_cast<uint8_t>(SpecialKeys::Control)) {
+		return NormalModeModes::Ctrl;
+	}
+
+	if (currentMode == NormalModeModes::Ctrl) {
+		const char pressedChar = t_io.input_.back();
+
+		if (pressedChar == 'w') {
+			return NormalModeModes::WindowSubMode;
+		}
+		else if (pressedChar == 'f') {
+			return NormalModeModes::FileSubMode;
+		}
+		else {
+			return NormalModeModes::NormalMode;
+		}
+	}
+
+	return currentMode;
+}
 
 void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, FilesManager& t_filesManager,
 												Cursor& t_cursor, EditorState& t_state, EditorInputAndOutput& t_io,
@@ -257,32 +285,20 @@ void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, Fi
 
 	auto& file = t_filesManager.getFile(t_filesManager.activeFileId_);
 
-	if (t_filesManager.specialFile(file.fileId_)) {
-		fileSubMode.ExecuteCommand();
-		return;
-	}
+	currentMode = modeSwitched(t_filesManager, t_io);
 
-	if (windowMode) {
-		winSubMode.ExecuteCommand(t_panesManager, t_winSettings, t_io.input_.back());
-		std::cout << "Execute window mode\n";
-		pressedCtrl = false;
-		windowMode = false;
-		t_io.input_.clear();
-		return;
+	switch (currentMode) {
+		case NormalModeModes::NormalMode:
+			normalMode.ExecuteCommand(file, t_cursor, t_state, t_io);
+			break;
+		case NormalModeModes::FileSubMode:
+			fileSubMode.ExecuteCommand(t_panesManager, t_filesManager, t_winSettings, t_io.input_.back());
+			break;
+		case NormalModeModes::WindowSubMode:
+			winSubMode.ExecuteCommand(t_panesManager, t_winSettings, t_io.input_.back());
+			break;
+		case NormalModeModes::Ctrl: break;
 	}
-
-	if (static_cast<uint8_t>(t_io.input_.back()) == static_cast<uint8_t>(SpecialKeys::Control)) {
-		std::cout << "Special window mode\n";
-		pressedCtrl = true;
-		return;
-	} else if (pressedCtrl && t_io.input_.back() == 'w') {
-		std::cout << "Switch to window mode\n";
-		windowMode = true;
-		return;
-	}
-
-	windowMode = false;
-	normalMode.HandleKeyboardInput(file, t_cursor, t_state, t_io);
 }
 
 void NormalModeTable::operationDeleteChar(FUNC_TYPES, const MotionRange& start, const MotionRange& end) const {
@@ -583,20 +599,6 @@ void NormalModeTable::motionLine(FUNC_TYPES, MotionRange& start, MotionRange& en
 	start.x = 0;
 	end.x = text.getLineLength(cursor.getY()) - 1;
 }
-
-/*void NormalMode::updateView(TextBufferView& view, const Cursor& cursor) const {
-	if (cursor.getX() < view.startX_) {
-		view.startX_ = cursor.getX();
-	} else if (cursor.getX() >= view.startX_ + view.visibleColumns_) {
-		view.startX_ = cursor.getX() - view.visibleColumns_ + 1;
-	}
-
-	if (cursor.getY() < view.startY_) {
-		view.startY_ = cursor.getY();
-	} else if (cursor.getY() >= view.startY_ + view.visibleLines_) {
-		view.startY_ = cursor.getY() - view.visibleLines_ + 1;
-	}
-}*/
 
 void NormalModeTable::motionMoveCursorLeft(FUNC_TYPES) const {
 	if (cursor.getX() > 0) {

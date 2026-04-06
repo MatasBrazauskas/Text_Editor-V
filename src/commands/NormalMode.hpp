@@ -142,15 +142,15 @@ class NormalMode final {
   public:
 	NormalMode();
 	~NormalMode() noexcept = default;
-	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&);
+	void ExecuteCommand(File&, Cursor&, EditorState&, EditorInputAndOutput&);
 
   private:
 	NormalModeTable table;
 	NormalModeParser parser;
 	NormalModeExecutor executor;
-
-	// void updateView(TextBufferView&, const Cursor&) const;
 };
+
+enum class NormalModeModes : char {NormalMode, WindowSubMode, FileSubMode, Ctrl};
 
 class NormalModeDistributor final {
   public:
@@ -161,8 +161,9 @@ class NormalModeDistributor final {
 							 WindowSettings&);
 
   private:
-	bool pressedCtrl;
-	bool windowMode;
+	NormalModeModes modeSwitched(FilesManager&, EditorInputAndOutput&);
+
+	NormalModeModes currentMode;
 
 	NormalMode normalMode;
 	WindowSubCommand winSubMode;

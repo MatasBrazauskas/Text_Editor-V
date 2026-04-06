@@ -147,18 +147,21 @@ FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char*
 	}
 }
 
-void FilesManager::addRegularFile(const Matrix& t_textBuffer, const std::filesystem::path& t_filePath) {
+FileId FilesManager::addRegularFile(const Matrix& t_textBuffer, const std::filesystem::path& t_filePath) {
 	const auto regularFile = File{std::move(t_textBuffer), t_filePath, fileIdCounter_};
 	files_.insert({fileIdCounter_, regularFile});
 	fileIdCounter_++;
+
+	return regularFile.fileId_;
 }
 
-void FilesManager::addSpecialFile(const Matrix& t_textBuffer) {
+FileId FilesManager::addSpecialFile(const Matrix& t_textBuffer) {
 	const auto specialFile = File{std::move(t_textBuffer), fileIdCounter_};
 	files_.insert({fileIdCounter_, specialFile});
 	fileIdCounter_++;
 
 	specialFiles_.push_back(specialFile.fileId_);
+	return specialFile.fileId_;
 }
 
 bool FilesManager::specialFile(const FileId t_fileId) {
