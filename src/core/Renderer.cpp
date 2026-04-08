@@ -7,7 +7,7 @@
 #include <format>
 #include <iostream>
 
-Renderer::Renderer(const Config& t_config, const Settings& t_settings): config_{t_config}, settings_{t_settings} {
+Renderer::Renderer(const Config& t_config, const Settings& t_settings) : config_{t_config}, settings_{t_settings} {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
 		throw std::runtime_error(SDL_GetError());
 	}
@@ -265,11 +265,23 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_layout) const {
 	const auto [w, h, tickRate] = winStg;
 	const auto& [mode, modeName, commandInfo, fileInfo, commandLineArgs] = t_layout;
 
-	SDL_Color modeBg = normalModeColor_;
-	if (mode == Modes::Insert) {
+	SDL_Color modeBg;
+	switch (mode) {
+	case Modes::Normal:
+		modeBg = normalModeColor_;
+		break;
+	case Modes::Insert:
 		modeBg = insertModeColor_;
-	} else if (mode == Modes::Command) {
+		break;
+	case Modes::Command:
 		modeBg = commandModeColor_;
+		break;
+	case Modes::FileMode:
+		modeBg = fileModeColor_;
+		break;
+	case Modes::WindowMode:
+		modeBg = windowModeColor_;
+		break;
 	}
 
 	const int barY = h - (2 * charStg.uiCharHeight);

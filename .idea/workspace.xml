@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="BackendCodeEditorMiscSettings">
-    <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="8" type="long" />
+    <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="4" type="long" />
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/OptionsDialog/SelectedPageId/@EntryValue" value="CppFormatterOtherPage" type="string" />
@@ -38,17 +38,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.clang-format" beforeDir="false" afterPath="$PROJECT_DIR$/.clang-format" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/ConfigAndSettings.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ConfigAndSettings.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/ConfigAndSettings.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ConfigAndSettings.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -381,7 +382,7 @@
       <workItem from="1775237691148" duration="2364000" />
       <workItem from="1775313209344" duration="957000" />
       <workItem from="1775477082713" duration="15377000" />
-      <workItem from="1775633427018" duration="1314000" />
+      <workItem from="1775633427018" duration="19009000" />
     </task>
     <servers />
   </component>

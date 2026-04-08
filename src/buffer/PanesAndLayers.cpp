@@ -462,10 +462,10 @@ CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int 
 
 LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, const Settings& t_settings)
 	: windowHeight{t_config.window.height}, windowWidth{t_config.window.width} {
-	auto& fileManager = t_editorCore.getFilesManager();
-	auto& paneManager = t_editorCore.getPanesManager();
-	const auto& editorState = t_editorCore.getEditorState();
-	const auto& editorIO = t_editorCore.getEditorInputAndOutput();
+	auto& fileManager = t_editorCore.filesManager_;
+	auto& paneManager = t_editorCore.panesManager_;
+	const auto& editorState = t_editorCore.editorState_;
+	const auto& editorIO = t_editorCore.editorInputAndOutput_;
 
 	addTabLayout(fileManager, t_settings);
 	int left = 0;
@@ -659,9 +659,13 @@ void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Set
 		modeText = "  Insert";
 	} else if (mode == Modes::Command) {
 		modeText = "  Command";
+	} else if (mode == Modes::WindowMode) {
+		modeText = "   Window";
+	} else if (mode == Modes::FileMode) {
+		modeText = "   Files";
 	}
 
-	const std::string commandInfo = std::format("{:<5}", t_io.input_);
+	const std::string commandInfo = std::format("{:^15}", t_io.input_);
 
 	const int charCount = t_filesManager.getFile().textBuffer_.getCharCount();
 	const int lineCount = t_filesManager.getFile().textBuffer_.getLinesCount();

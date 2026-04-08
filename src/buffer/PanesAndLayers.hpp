@@ -20,6 +20,8 @@ using FileId = std::uint_fast64_t;
 using PaneId = uint_fast64_t;
 
 enum class Modes : uint8_t;
+enum class NormalModeModes : char;
+
 enum class SplitType : char { Vertical, Horizontal };
 enum class PaneDirection : char { Top, Bottom, Right, Left };
 enum class PaneSizeChange : char { Expand, Contract };

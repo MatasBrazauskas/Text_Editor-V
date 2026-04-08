@@ -12,12 +12,12 @@ int main(const int argc, char** argv) {
 	const Uint64 freq = SDL_GetPerformanceFrequency();
 	Uint64 renderStart = SDL_GetPerformanceCounter();
 
-	while (editorCore.getEditorState().running_) {
+	while (editorCore.Running()) {
 
 		const Uint64 end = SDL_GetPerformanceCounter();
 		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
 
-		editorCore.HandleKeyboardInput(settings.windowSettings);
+		editorCore.HandleKeyboardInput();
 
 		if (renderTime >= settings.windowSettings.ticksPerFrame) {
 			renderStart = end;

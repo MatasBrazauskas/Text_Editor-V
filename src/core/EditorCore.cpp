@@ -3,101 +3,123 @@
 #include "utils/ConfigAndSettings.hpp"
 
 #include <SDL.h>
-#include <iostream>
 
-EditorState::EditorState(const FileId activeFileId_t)
-	: currentMode_{Modes::Normal}, activeFileId_{activeFileId_t}, running_{true} {}
+EditorState::EditorState(): currentMode_{Modes::FileMode}, running_{true} {}
 
-EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
-	: filesManager_{fileHandler_, argc, argv}, panesManager_{}, editorState_{0}, settings_{t_settings} {
+EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings) : filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
 	panesManager_.addPane(0, 0, PaneDirection::Top);
 }
 
-std::string EditorCore::EncodeInput(const SDL_Event& event) {
-	if (event.type == SDL_QUIT) {
-		editorState_.running_ = false;
-		return {};
+std::variant<SpecialCases, std::string> EditorCore::EncodeInput(const SDL_Event& t_event) {
+	if (t_event.type == SDL_QUIT) {
+		return SpecialCases::Quit;
 	}
 
-	if (event.type == SDL_KEYDOWN) {
-		const SDL_Keycode keyCode = event.key.keysym.sym;
+	if (t_event.type == SDL_KEYDOWN) {
+		const SDL_Keycode keyCode = t_event.key.keysym.sym;
 		if (keyCode == SDLK_ESCAPE) {
-			editorState_.currentMode_ = Modes::Normal;
-			editorInputAndOutput_.input_.clear();
-			return {};
+			return SpecialCases::SwitchToNormalMode;
+		} else if (keyCode == SDLK_LCTRL) {
+			editorInputAndOutput_.shift = true;
+			return SpecialCases::None;
+		} else if (keyCode == SDLK_RCTRL) {
+			editorInputAndOutput_.shift = true;
+			return SpecialCases::None;
 		}
 
 		if (const auto it = specialKeyMap.find(keyCode); it != specialKeyMap.end()) {
 			return std::string(1, it->second);
 		}
 
-	} else if (event.type == SDL_TEXTINPUT) {
-		if (event.text.text[0] == ':') {
-			editorState_.currentMode_ = Modes::Command;
-			editorInputAndOutput_.input_.clear();
-			return ":";
+	} else if (t_event.type == SDL_TEXTINPUT) {
+		if (t_event.text.text[0] == ':') {
+			return SpecialCases::SwitchToCommandMode;
 		}
-		return event.text.text;
+		return t_event.text.text;
+	} else if (t_event.type == SDL_WINDOWEVENT) {
+		if (t_event.window.event == SDL_WINDOWEVENT_RESIZED) {
+			return SpecialCases::WindowResize;
+		}
 	}
-	return {};
+	return SpecialCases::None;
 }
 
-void EditorCore::HandleKeyboardInput(WindowSettings& t_winSettings) {
+void EditorCore::HandleSpecialCases(const SpecialCases t_specialCase, const SDL_Event& t_event) {
+	const auto cleanUp = [this] {
+		editorInputAndOutput_.input_.clear();
+		editorInputAndOutput_.commandLineMessage_.clear();
+		editorInputAndOutput_.shift = false;
+	};
+
+	switch (t_specialCase) {
+		case SpecialCases::SwitchToNormalMode:
+			editorState_.currentMode_ = Modes::Normal;
+			cleanUp();
+			break;
+		case SpecialCases::SwitchToInsertMode:
+			editorState_.currentMode_ = Modes::Insert;
+			cleanUp();
+			break;
+		case SpecialCases::SwitchToCommandMode:
+			editorState_.currentMode_ = Modes::Command;
+			cleanUp();
+			break;
+		case SpecialCases::SwitchToFileMode:
+			editorState_.currentMode_ = Modes::FileMode;
+			cleanUp();
+			break;
+		case SpecialCases::SwitchToWindowMode:
+			editorState_.currentMode_ = Modes::WindowMode;
+			cleanUp();
+			break;
+		case SpecialCases::WindowResize:
+			settings_.windowSettings.width = t_event.window.data1;
+			settings_.windowSettings.height = t_event.window.data2;
+			break;
+		case SpecialCases::Quit:
+			editorState_.running_ = false;
+			break;
+		case SpecialCases::None: break;
+	}
+}
+
+void EditorCore::HandleKeyboardInput() {
 	SDL_Event event;
+	auto winSettings = settings_.windowSettings;
 
 	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_WINDOWEVENT) {
-			if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-				settings_.windowSettings.width = event.window.data1;
-				settings_.windowSettings.height = event.window.data2;
+		const auto input = EncodeInput(event);
+
+		if (std::holds_alternative<SpecialCases>(input)) {
+			const auto specialCase = std::get<SpecialCases>(input);
+			HandleSpecialCases(specialCase, event);
+		} else {
+			editorInputAndOutput_.input_.append(std::get<std::string>(input));
+
+			auto file = filesManager_.getFile();
+			auto cursor = panesManager_.getCurrPane()->cursor_;
+
+			switch (editorState_.currentMode_) {
+			case Modes::Normal:
+				normalMode_.HandleKeyboardInput(file, cursor, editorState_, editorInputAndOutput_);
+				break;
+			case Modes::Insert:
+				insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);
+				break;
+			case Modes::Command:
+				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_);
+				break;
+			case Modes::WindowMode:
+				windowSubCommand_.ExecuteCommand(panesManager_, winSettings, editorInputAndOutput_.input_.back());
+				break;
+			case Modes::FileMode:
+				fileSubCommand_.ExecuteCommand(panesManager_, filesManager_,winSettings, editorInputAndOutput_.input_.back());
+				break;
 			}
-		}
-
-		const std::string input = EncodeInput(event);
-
-		if (input.empty())
-			return;
-
-		editorInputAndOutput_.input_.append(input);
-		std::cout << "Input state: " << editorInputAndOutput_.input_ << '\n';
-
-		auto file = filesManager_.getFile(this->editorState_.activeFileId_);
-
-		const auto paneOpt = panesManager_.getCurrPane();
-
-		if (paneOpt == std::nullopt) {
-			throw std::runtime_error("No pane");
-		}
-
-		auto cursor = paneOpt.value().cursor_;
-
-		switch (editorState_.currentMode_) {
-		case Modes::Normal:
-			normalModeDistributor_.HandleKeyboardInput(panesManager_, filesManager_, cursor, editorState_,
-													   editorInputAndOutput_, t_winSettings);
-			break;
-		case Modes::Insert:
-			insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);
-			break;
-		case Modes::Command:
-			commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_);
-			break;
 		}
 	}
 }
 
-FilesManager& EditorCore::getFilesManager() {
-	return filesManager_;
-}
-
-PanesManager& EditorCore::getPanesManager() {
-	return panesManager_;
-}
-
-const EditorState& EditorCore::getEditorState() const {
-	return editorState_;
-}
-
-const EditorInputAndOutput& EditorCore::getEditorInputAndOutput() const {
-	return editorInputAndOutput_;
+bool EditorCore::Running() const {
+	return editorState_.running_;
 }

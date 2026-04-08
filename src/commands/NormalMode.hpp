@@ -20,6 +20,8 @@ using namespace std::string_view_literals;
 #define FUNC_TYPES Matrix &text, Cursor &cursor, EditorState &state
 constexpr char lineChar = static_cast<char>(128);
 
+enum class SpecialCases: char;
+
 struct MotionRange {
 	int x, y;
 };
@@ -84,11 +86,12 @@ enum class ParsingStages : char {
 	Finish,
 };
 
-struct NormalModeCommand {
-	NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar,
-					  bool ignoreCount, ParsingStages stage)
-		: count1(count1), operation(operation), count2(count2), motion(motion), textObject(textObject),
-		  targetChar(targetChar), ignoreCount(ignoreCount), stage(stage) {}
+class NormalModeCommand {
+public:
+	NormalModeCommand() = delete;
+	NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar, bool ignoreCount, ParsingStages);
+	~NormalModeCommand() noexcept = default;
+
 	int count1;
 	int count2;
 
@@ -110,7 +113,7 @@ class NormalModeParser {
 							  char textObject, char targetChar, bool ignoreCount, ParsingStages stage);
 	~NormalModeParser() noexcept = default;
 
-	void parseCommand(std::string& input);
+	void parseCommand(char);
 	[[nodiscard]] bool executeCommand() const;
 	void clear();
 	NormalModeCommand getCommand() const;
@@ -142,30 +145,10 @@ class NormalMode final {
   public:
 	NormalMode();
 	~NormalMode() noexcept = default;
-	void ExecuteCommand(File&, Cursor&, EditorState&, EditorInputAndOutput&);
+	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&);
 
   private:
 	NormalModeTable table;
 	NormalModeParser parser;
 	NormalModeExecutor executor;
-};
-
-enum class NormalModeModes : char { NormalMode, WindowSubMode, FileSubMode, Ctrl };
-
-class NormalModeDistributor final {
-  public:
-	NormalModeDistributor();
-	~NormalModeDistributor() noexcept = default;
-
-	void HandleKeyboardInput(PanesManager&, FilesManager&, Cursor&, EditorState&, EditorInputAndOutput&,
-							 WindowSettings&);
-
-  private:
-	NormalModeModes modeSwitched(FilesManager&, EditorInputAndOutput&);
-
-	NormalModeModes currentMode;
-
-	NormalMode normalMode;
-	WindowSubCommand winSubMode;
-	FileSubCommand fileSubMode;
 };
