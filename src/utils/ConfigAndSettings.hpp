@@ -185,7 +185,8 @@ class Config final {
 
 class CharSettings final {
   public:
-	CharSettings() = default;
+	CharSettings() = delete;
+	explicit CharSettings(const Config&);
 	~CharSettings() noexcept = default;
 
 	int codeCharWidth, codeCharHeight;
@@ -195,14 +196,17 @@ class CharSettings final {
 
 class WindowSettings final {
   public:
-	WindowSettings() = default;
+	WindowSettings() = delete;
+	explicit WindowSettings(const Config&);
 	~WindowSettings() noexcept = default;
 
 	int width, height;
+	float ticksPerFrame;
 };
 
 class Settings final {
   public:
+	Settings() = delete;
 	explicit Settings(const Config&);
 	~Settings() noexcept = default;
 

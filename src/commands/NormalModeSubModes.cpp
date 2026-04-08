@@ -69,7 +69,7 @@ std::vector<std::string> getDirectoriesContent() {
 
 	for (const auto& file : std::filesystem::directory_iterator{"."}) {
 		const auto filePath = file.path().string();
-		const auto index =filePath .find_last_of('/');
+		const auto index = filePath.find_last_of('/');
 		auto fileName = std::string(filePath.substr(index + 1));
 
 		if (file.is_directory()) {
@@ -81,14 +81,16 @@ std::vector<std::string> getDirectoriesContent() {
 	return dirContent;
 }
 
-void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings& t_winSettings, const char t_inputChar) const {
+void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& t_filesManager,
+									WindowSettings& t_winSettings, const char t_inputChar) const {
 	const auto it = functionMap_.find(t_inputChar);
 	if (it != functionMap_.end()) {
 		(this->*it->second)(t_panesManager, t_filesManager, t_winSettings);
 	}
 }
 
-void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings& t_winSettings) const {
+void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& t_filesManager,
+									WindowSettings& t_winSettings) const {
 	const auto dirContent = getDirectoriesContent();
 	const auto matrix = Matrix(dirContent);
 	const auto fileId = t_filesManager.addSpecialFile(matrix);
@@ -97,7 +99,8 @@ void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& 
 	t_panesManager.addPane(pane->paneId_, fileId, PaneDirection::Left);
 }
 
-void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings& t_winSettings) const {
+void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager& t_filesManager,
+									  WindowSettings& t_winSettings) const {
 	const auto dirContent = getDirectoriesContent();
 	const auto matrix = Matrix(dirContent);
 	const auto fileId = t_filesManager.addSpecialFile(matrix);

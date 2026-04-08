@@ -171,8 +171,14 @@ Config::Config() : window{}, editor{}, fonts{}, theme{} {
 	}
 }
 
-Settings::Settings(const Config& t_config) : charSettings{}, windowSettings{} {
-	TTF_Init();
+
+WindowSettings::WindowSettings(const Config& t_config): width{t_config.window.width}, height{t_config.window.height}, ticksPerFrame{1.0f / t_config.window.fps_limit} {}
+
+
+CharSettings::CharSettings(const Config& t_config): codeCharWidth{}, codeCharHeight{}, uiCharWidth{}, uiCharHeight{}, tabHeight{} {
+	if (TTF_Init() != 0) {
+		throw std::runtime_error("Can't initialize SDL ttf library.");
+	}
 
 	const auto& codeFont = t_config.fonts.code;
 	const auto& uiFont = t_config.fonts.ui;
@@ -186,15 +192,16 @@ Settings::Settings(const Config& t_config) : charSettings{}, windowSettings{} {
 	TTF_SetFontHinting(codeFont_, TTF_HINTING_MONO);
 	TTF_SetFontKerning(codeFont_, 0);
 
-	TTF_SizeText(codeFont_, "A", &charSettings.codeCharWidth, &charSettings.codeCharHeight);
+	TTF_SizeText(codeFont_, "A", &codeCharWidth, &codeCharHeight);
 
 	TTF_SetFontHinting(uiFont_, TTF_HINTING_MONO);
 	TTF_SetFontKerning(uiFont_, 0);
 
-	TTF_SizeText(uiFont_, "A", &charSettings.uiCharWidth, &charSettings.uiCharHeight);
+	TTF_SizeText(uiFont_, "A", &uiCharWidth, &uiCharHeight);
 
-	charSettings.tabHeight = charSettings.uiCharHeight + 5;
+	tabHeight = uiCharHeight + 5;
 
-	windowSettings.width = t_config.window.width;
-	windowSettings.height = t_config.window.height;
+	TTF_Quit();
 }
+
+Settings::Settings(const Config& t_config) : charSettings{t_config}, windowSettings{t_config} {}

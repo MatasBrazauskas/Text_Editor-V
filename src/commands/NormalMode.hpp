@@ -150,7 +150,7 @@ class NormalMode final {
 	NormalModeExecutor executor;
 };
 
-enum class NormalModeModes : char {NormalMode, WindowSubMode, FileSubMode, Ctrl};
+enum class NormalModeModes : char { NormalMode, WindowSubMode, FileSubMode, Ctrl };
 
 class NormalModeDistributor final {
   public:

@@ -7,9 +7,7 @@
 #include <format>
 #include <iostream>
 
-Renderer::Renderer(const Config& t_config, const Settings& t_settings)
-	: normalModeColor_{137, 180, 250}, insertModeColor_{195, 232, 141}, commandModeColor_{254, 198, 118},
-	  config_{t_config}, settings_{t_settings} {
+Renderer::Renderer(const Config& t_config, const Settings& t_settings): config_{t_config}, settings_{t_settings} {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
 		throw std::runtime_error(SDL_GetError());
 	}
@@ -34,9 +32,9 @@ Renderer::Renderer(const Config& t_config, const Settings& t_settings)
 
 	SDL_StartTextInput();
 
-	/*if (TTF_Init() == -1) {
+	if (TTF_Init() != 0) {
 		throw std::runtime_error("Failed to initialize TTF.");
-	}*/
+	}
 
 	const auto& codeFont = t_config.fonts.code;
 	const auto& uiFont = t_config.fonts.ui;
@@ -264,7 +262,7 @@ void Renderer::RenderCursor(const CursorLayout& t_cursorLayout) const {
 
 void Renderer::RenderCommandLine(const CommandLineLayout& t_layout) const {
 	const auto& [charStg, winStg] = settings_;
-	const auto [w, h] = winStg;
+	const auto [w, h, tickRate] = winStg;
 	const auto& [mode, modeName, commandInfo, fileInfo, commandLineArgs] = t_layout;
 
 	SDL_Color modeBg = normalModeColor_;

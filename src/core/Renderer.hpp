@@ -27,9 +27,10 @@ class Renderer final {
 	TTF_Font* codeFont_;
 	TTF_Font* uiFont_;
 
-	SDL_Color normalModeColor_;
-	SDL_Color insertModeColor_;
-	SDL_Color commandModeColor_;
+	const SDL_Color normalModeColor_ = {137,180,250};
+	const SDL_Color insertModeColor_ = {195,232, 141};
+	const SDL_Color commandModeColor_ = {254, 198, 118};
+
 
 	const Config& config_;
 	const Settings& settings_;

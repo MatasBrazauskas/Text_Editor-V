@@ -172,7 +172,7 @@ class CommandLineLayout final {
 	std::string commandLineArgs;
 };
 
-enum class PanesSnippets {TextSnippet, FilesSnippet};
+enum class PanesSnippets { TextSnippet, FilesSnippet };
 
 class PanesLayout final {
   public:

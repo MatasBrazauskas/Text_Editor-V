@@ -3,11 +3,8 @@
 #include "utils/ConfigAndSettings.hpp"
 
 int main(const int argc, char** argv) {
-
 	Config config{};
 	Settings settings{config};
-
-	const auto ticksPerFrame = 1.0l / config.window.fps_limit;
 
 	EditorCore editorCore{argc, argv, settings};
 	Renderer renderer{config, settings};
@@ -22,7 +19,7 @@ int main(const int argc, char** argv) {
 
 		editorCore.HandleKeyboardInput(settings.windowSettings);
 
-		if (renderTime >= ticksPerFrame) {
+		if (renderTime >= settings.windowSettings.ticksPerFrame) {
 			renderStart = end;
 
 			const LayoutManager layouts{editorCore, config, settings};

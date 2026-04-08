@@ -267,11 +267,9 @@ NormalModeModes NormalModeDistributor::modeSwitched(FilesManager& t_filesManager
 
 		if (pressedChar == 'w') {
 			return NormalModeModes::WindowSubMode;
-		}
-		else if (pressedChar == 'f') {
+		} else if (pressedChar == 'f') {
 			return NormalModeModes::FileSubMode;
-		}
-		else {
+		} else {
 			return NormalModeModes::NormalMode;
 		}
 	}
@@ -288,16 +286,17 @@ void NormalModeDistributor::HandleKeyboardInput(PanesManager& t_panesManager, Fi
 	currentMode = modeSwitched(t_filesManager, t_io);
 
 	switch (currentMode) {
-		case NormalModeModes::NormalMode:
-			normalMode.ExecuteCommand(file, t_cursor, t_state, t_io);
-			break;
-		case NormalModeModes::FileSubMode:
-			fileSubMode.ExecuteCommand(t_panesManager, t_filesManager, t_winSettings, t_io.input_.back());
-			break;
-		case NormalModeModes::WindowSubMode:
-			winSubMode.ExecuteCommand(t_panesManager, t_winSettings, t_io.input_.back());
-			break;
-		case NormalModeModes::Ctrl: break;
+	case NormalModeModes::NormalMode:
+		normalMode.ExecuteCommand(file, t_cursor, t_state, t_io);
+		break;
+	case NormalModeModes::FileSubMode:
+		fileSubMode.ExecuteCommand(t_panesManager, t_filesManager, t_winSettings, t_io.input_.back());
+		break;
+	case NormalModeModes::WindowSubMode:
+		winSubMode.ExecuteCommand(t_panesManager, t_winSettings, t_io.input_.back());
+		break;
+	case NormalModeModes::Ctrl:
+		break;
 	}
 }
 
