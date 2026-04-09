@@ -230,14 +230,14 @@ std::vector<PaneInfo> PanesManager::getPaneCoordinates(const int t_height, const
 	return coordinates;
 }
 
-std::optional<Pane> PanesManager::getPane(const PaneId t_paneId) {
-	if (const auto pane = getPanePointer(t_paneId); pane != nullptr) {
+std::optional<std::reference_wrapper<Pane>> PanesManager::getPane(const PaneId t_paneId) {
+	if (const auto pane = getPanePointer(t_paneId); pane != nullptr && pane.has_value()) {
 		return get<Pane>(pane.value()->nodeType);
 	}
 	return std::nullopt;
 }
 
-std::optional<Pane> PanesManager::getCurrPane() {
+std::optional<std::reference_wrapper<Pane>> PanesManager::getCurrPane() {
 	return getPane(this->activePaneId_);
 }
 
@@ -630,7 +630,9 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	const int cursorX = coords.startX + t_leftSideOffsetX + cursor.getX() * t_settings.charSettings.codeCharWidth;
 	const int cursorY = coords.startY + t_tabOffsetY + cursor.getY() * t_settings.charSettings.codeCharHeight;
 
-	auto letters = std::string{file.textBuffer_.getLine(cursor.getY()).at(cursor.getX())};
+	auto letters = std::string{" "};
+	if (auto line = file.textBuffer_.getLine(cursor.getY()); line.length() != 0)
+		letters = std::string{file.textBuffer_.getLine(cursor.getY()).at(cursor.getX())};
 	auto cursorType = CursorType::Block;
 	int cursorWidth = t_settings.charSettings.codeCharWidth;
 
@@ -665,7 +667,7 @@ void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Set
 		modeText = "   Files";
 	}
 
-	const std::string commandInfo = std::format("{:^15}", t_io.input_);
+	const std::string commandInfo = std::format("{:<15}", t_io.input_);
 
 	const int charCount = t_filesManager.getFile().textBuffer_.getCharCount();
 	const int lineCount = t_filesManager.getFile().textBuffer_.getLinesCount();

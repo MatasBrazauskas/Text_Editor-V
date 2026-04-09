@@ -1,8 +1,8 @@
 #include "utils/FileHandler.hpp"
 
-#include <fstream>
-
 #include "core/EditorCore.hpp"
+
+#include <fstream>
 
 std::vector<std::string> FileHandler::getContent(std::filesystem::path filesPath) const {
 	std::ifstream file_(filesPath, std::ios::in);
@@ -17,29 +17,29 @@ std::vector<std::string> FileHandler::getContent(std::filesystem::path filesPath
 }
 
 void FileHandler::writeToFile(const File& doc) const {
-    auto& [text, stack, path, id] = doc;
-    auto tempFilesPath = doc.filesPath_;
-    tempFilesPath += ".tmp";
+	auto& [text, stack, path, id] = doc;
+	auto tempFilesPath = doc.filesPath_;
+	tempFilesPath += ".tmp";
 
-    {
-        std::ofstream tempFile_(tempFilesPath, std::ios::binary | std::ios::trunc);
-        if (!tempFile_.is_open()) {
-            throw std::runtime_error("Failed to open file for writing");
-        }
+	{
+		std::ofstream tempFile_(tempFilesPath, std::ios::binary | std::ios::trunc);
+		if (!tempFile_.is_open()) {
+			throw std::runtime_error("Failed to open file for writing");
+		}
 
-        for (int i = 0; i < text.getLinesCount(); i++) {
-            tempFile_.write(text.getLine(i).data(), text.getLineLength(i));
-            tempFile_.put('\n');
-        }
+		for (int i = 0; i < text.getLinesCount(); i++) {
+			tempFile_.write(text.getLine(i).data(), text.getLineLength(i));
+			tempFile_.put('\n');
+		}
 
-        tempFile_.flush();
-    }
+		tempFile_.flush();
+	}
 
-    std::error_code errorCode;
-    std::filesystem::rename(tempFilesPath, doc.filesPath_, errorCode);
+	std::error_code errorCode;
+	std::filesystem::rename(tempFilesPath, doc.filesPath_, errorCode);
 
-    if (errorCode) {
-        std::filesystem::remove(tempFilesPath);
-        throw std::runtime_error("Failed to rename file");
-    }
+	if (errorCode) {
+		std::filesystem::remove(tempFilesPath);
+		throw std::runtime_error("Failed to rename file");
+	}
 }

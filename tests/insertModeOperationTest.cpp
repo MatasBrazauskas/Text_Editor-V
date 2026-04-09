@@ -16,7 +16,7 @@ struct Params {
 };
 
 class InsertModeTest : public testing::Test {
-      protected:
+	  protected:
 	InsertMode insertMode;
 	std::unique_ptr<ITextBuffer> matrix;
 	const std::filesystem::path inputPath{};

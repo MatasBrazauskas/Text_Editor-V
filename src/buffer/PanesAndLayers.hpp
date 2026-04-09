@@ -124,8 +124,8 @@ class PanesManager final {
 	PanesManager();
 	~PanesManager() noexcept = default;
 
-	std::optional<Pane> getPane(PaneId);
-	std::optional<Pane> getCurrPane();
+	std::optional<std::reference_wrapper<Pane>> getPane(PaneId);
+	std::optional<std::reference_wrapper<Pane>> getCurrPane();
 
 	void addPane(PaneId t_parent, FileId t_fileId, PaneDirection t_rotation);
 	void removePane(PaneId);

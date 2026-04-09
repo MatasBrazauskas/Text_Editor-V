@@ -9,98 +9,79 @@
 #include <ranges>
 
 NormalModeTable::NormalModeTable() {
-
-	operations = {{'d', &NormalModeTable::operationDeleteChar}, {'y', &NormalModeTable::operationCopyText}};
-
 	actions = {
-		{'O', &NormalModeTable::actionInsertLineAbove},	   {'o', &NormalModeTable::actionInsertLineBelow},
-		{'i', &NormalModeTable::actionSwitchToInsertLeft}, {'a', &NormalModeTable::actionSwitchToInsertRight},
+		{'O', &NormalModeTable::actionInsertLineAbove},
+		{'o', &NormalModeTable::actionInsertLineBelow},
+		{'i', &NormalModeTable::actionSwitchToInsertLeft},
+		{'a', &NormalModeTable::actionSwitchToInsertRight},
 		{'x', &NormalModeTable::actionDeleteChar},
 	};
 
-	motions = {{'h', &NormalModeTable::motionMoveCursorLeft},
-			   {'j', &NormalModeTable::motionMoveCursorDown},
-			   {'k', &NormalModeTable::motionMoveCursorUp},
-			   {'l', &NormalModeTable::motionMoveCursorRight},
-			   {'G', &NormalModeTable::motionMoveCursorBottomFile},
-			   {'$', &NormalModeTable::motionMoveRightMost},
-			   {'0', &NormalModeTable::motionMoveLeftMost},
-			   {'^', &NormalModeTable::motionMoveLeftMostChar},
-			   {'w', &NormalModeTable::motionStartOfNextWord},
-			   {'b', &NormalModeTable::motionStartOfPrevWord},
-			   {'W', &NormalModeTable::motionStartOfNextWORD},
-			   {'B', &NormalModeTable::motionStartOfPrevWORD},
-			   {'e', &NormalModeTable::motionEndOfWord},
-			   {'E', &NormalModeTable::motionEndOfWORD}};
+	operations = {
+		{'d', &NormalModeTable::operationDeleteChar},
+		{'y', &NormalModeTable::operationCopyText}
+	};
 
-	textObjects = {{'f', &NormalModeTable::findFirstCharLeft},
-				   {'F', &NormalModeTable::findFirstCharRight},
-				   {'r', &NormalModeTable::replaceChar}};
+	motions = {
+		{'h', &NormalModeTable::motionMoveCursorLeft},
+		{'j', &NormalModeTable::motionMoveCursorDown},
+		{'k', &NormalModeTable::motionMoveCursorUp},
+		{'l', &NormalModeTable::motionMoveCursorRight},
+		{'G', &NormalModeTable::motionMoveCursorBottomFile},
+		{'$', &NormalModeTable::motionMoveRightMost},
+		{'0', &NormalModeTable::motionMoveLeftMost},
+		{'^', &NormalModeTable::motionMoveLeftMostChar},
+		{'w', &NormalModeTable::motionStartOfNextWord},
+		{'b', &NormalModeTable::motionStartOfPrevWord},
+		{'W', &NormalModeTable::motionStartOfNextWORD},
+		{'B', &NormalModeTable::motionStartOfPrevWORD},
+		{'e', &NormalModeTable::motionEndOfWord},
+		{'E', &NormalModeTable::motionEndOfWORD}
+	};
+
+	targetMotions = {
+		{'f', &NormalModeTable::findFirstCharLeft},
+		{'F', &NormalModeTable::findFirstCharRight}
+	};
+
+	targetCommands = {
+		{'r', &NormalModeTable::replaceChar}
+	};
 }
 
-NormalModeCommand::NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar,
-				  bool ignoreCount, ParsingStages stage)
-	: count1(count1), operation(operation), count2(count2), motion(motion), textObject(textObject),
-	  targetChar(targetChar), ignoreCount(ignoreCount), stage(stage) {}
+NormalModeCommand::NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar,
+									 ParsingStages stage)
+	: operation(operation), motion(motion), targetMotion(targetMotion), targetCommand(targetCommand),
+	  targetChar(targetChar), stage(stage) {}
 
 NormalModeParser::NormalModeParser(const NormalModeTable& table_t)
-	: NormalModeParser(table_t, 0, ' ', 0, ' ', ' ', ' ', false, ParsingStages::Count1OperationMotionTextObject) {}
+	: NormalModeParser(table_t, ' ', ' ', ' ', ' ', ' ', ParsingStages::Start) {}
 
-NormalModeParser::NormalModeParser(const NormalModeTable& table_t, const int count1, const char operation,
-								   const int count2, const char motion, const char textObject, const char targetChar,
-								   const bool ignoreCount, const ParsingStages stage)
-	: table{table_t}, command{count1, operation, count2, motion, textObject, targetChar, ignoreCount, stage} {}
-
-bool NormalModeParser::parseCount1(const char inputChar) const {
-	if (!std::isdigit(inputChar))
-		return false;
-
-	if (inputChar == '0' && command.count1 == 0)
-		return false;
-
-	return true;
-}
-
-bool NormalModeParser::parseCount2(const char inputChar) const {
-	if (!std::isdigit(inputChar))
-		return false;
-
-	if (inputChar == '0' && command.count2 == 0)
-		return false;
-
-	return true;
-}
+NormalModeParser::NormalModeParser(const NormalModeTable& table_t, char operation, char motion, char targetMotion,
+								   char targetCommand, char targetChar, ParsingStages stage)
+	: table{table_t}, command{operation, motion, targetMotion, targetCommand, targetChar, stage} {}
 
 bool NormalModeParser::parseAction(const char inputChar) const {
 	return table.actions.contains(inputChar);
 }
 
 bool NormalModeParser::parseOperation(const char inputChar) const {
-	if (inputChar == 'r') {
-		return true;
-	}
 	return table.operations.contains(inputChar);
 }
 
 bool NormalModeParser::parseMotion(const char inputChar) const {
-	if (command.operation == inputChar && (inputChar == 'y' || inputChar == 'd')) {
-		return true;
-	}
 	return table.motions.contains(inputChar);
 }
 
-bool NormalModeParser::parseTextObject(const char inputChar) const {
-	return table.textObjects.contains(inputChar);
+bool NormalModeParser::parseTargetMotion(const char inputChar) const {
+	return table.targetMotions.contains(inputChar);
 }
 
+bool NormalModeParser::parseTargetCommand(const char inputChar) const {
+	return table.targetCommands.contains(inputChar);
+}
 
 void NormalModeParser::parseCommand(char inputChar) {
-
-	auto addCount = [&, inputChar](int& cnt) {
-		cnt *= 10;
-		cnt += inputChar - '0';
-	};
-
 	const auto addAction = [&] {
 		command.operation = inputChar;
 		command.stage = ParsingStages::Finish;
@@ -108,28 +89,27 @@ void NormalModeParser::parseCommand(char inputChar) {
 
 	const auto addOperation = [&] {
 		command.operation = inputChar;
-		command.stage = ParsingStages::Count2MotionTextObject;
-
-		if (inputChar == 'r') {
-			command.ignoreCount = true;
-			command.textObject = inputChar;
-			command.operation = ' ';
-			command.stage = ParsingStages::WaitingForTargetChar;
-		}
+		command.stage = ParsingStages::WaitingForMotion;
 	};
 
 	const auto addMotion = [&] {
-		if (command.operation == inputChar && (inputChar == 'y' || inputChar == 'd')) {
-			command.motion = lineChar;
-		} else {
-			command.motion = inputChar;
-		}
+		command.motion = inputChar;
 		command.stage = ParsingStages::Finish;
 	};
 
-	const auto addTextObject = [&] {
-		command.textObject = inputChar;
-		command.stage = ParsingStages::WaitingForTargetChar;
+	const auto addLineMotion = [&] {
+		command.motion = lineChar;
+		command.stage = ParsingStages::Finish;
+	};
+
+	const auto addTargetMotion = [&] {
+		command.targetMotion = inputChar;
+		command.stage = ParsingStages::WaitingForMotionTarget;
+	};
+
+	const auto addTargetCommand = [&] {
+		command.targetCommand = inputChar;
+		command.stage = ParsingStages::WaitingForCommandTarget;
 	};
 
 	const auto addTargetChar = [&] {
@@ -137,34 +117,37 @@ void NormalModeParser::parseCommand(char inputChar) {
 		command.stage = ParsingStages::Finish;
 	};
 
-	const bool count1 = parseCount1(inputChar);
 	const bool action = parseAction(inputChar);
 	const bool operation = parseOperation(inputChar);
-	const bool count2 = parseCount2(inputChar);
 	const bool motion = parseMotion(inputChar);
-	const bool textObject = parseTextObject(inputChar);
+	const bool targetMotion = parseTargetMotion(inputChar);
+	const bool targetCommand = parseTargetCommand(inputChar);
+	const bool repeatedOperationAsLineMotion =
+		command.stage == ParsingStages::WaitingForMotion && command.operation == inputChar &&
+		(inputChar == 'd' || inputChar == 'y');
 
-	if (command.stage == ParsingStages::Count1OperationMotionTextObject) {
-		if (count1) {
-			addCount(command.count1);
-		} else if (action) {
+	if (command.stage == ParsingStages::Start) {
+		if (action) {
 			addAction();
 		} else if (operation) {
 			addOperation();
 		} else if (motion) {
 			addMotion();
-		} else if (textObject) {
-			addTextObject();
+		} else if (targetMotion) {
+			addTargetMotion();
+		} else if (targetCommand) {
+			addTargetCommand();
 		}
-	} else if (command.stage == ParsingStages::Count2MotionTextObject) {
-		if (count2) {
-			addCount(command.count2);
+	} else if (command.stage == ParsingStages::WaitingForMotion) {
+		if (repeatedOperationAsLineMotion) {
+			addLineMotion();
 		} else if (motion) {
 			addMotion();
-		} else if (textObject) {
-			addTextObject();
+		} else if (targetMotion) {
+			addTargetMotion();
 		}
-	} else if (command.stage == ParsingStages::WaitingForTargetChar) {
+	} else if (command.stage == ParsingStages::WaitingForMotionTarget ||
+			   command.stage == ParsingStages::WaitingForCommandTarget) {
 		addTargetChar();
 	}
 }
@@ -174,14 +157,12 @@ bool NormalModeParser::executeCommand() const {
 }
 
 void NormalModeParser::clear() {
-	command.count1 = 0;
-	command.count2 = 0;
 	command.operation = ' ';
 	command.motion = ' ';
-	command.textObject = ' ';
+	command.targetMotion = ' ';
+	command.targetCommand = ' ';
 	command.targetChar = ' ';
-	command.ignoreCount = false;
-	command.stage = ParsingStages::Count1OperationMotionTextObject;
+	command.stage = ParsingStages::Start;
 }
 
 NormalModeCommand NormalModeParser::getCommand() const {
@@ -195,24 +176,29 @@ void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& t_cursor
 	const auto action = table.actions.find(command.operation);
 	const auto operation = table.operations.find(command.operation);
 	const auto motion = table.motions.find(command.motion);
-	const auto textObject = table.textObjects.find(command.textObject);
+	const auto targetMotion = table.targetMotions.find(command.targetMotion);
+	const auto targetCommand = table.targetCommands.find(command.targetCommand);
 
-	const auto startRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
+	auto startRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
+	auto endRange = startRange;
 
-	const std::size_t loopCount = command.ignoreCount ? 1 : std::max(1, command.count1) * std::max(1, command.count2);
-
-	for (auto i{0zu}; i < loopCount; ++i) {
-		if (action != table.actions.end()) {
-			(table.*action->second)(text, t_cursor, state);
-		}
-		if (motion != table.motions.end()) {
-			(table.*motion->second)(text, t_cursor, state);
-		} else if (textObject != table.textObjects.end()) {
-			(table.*textObject->second)(text, t_cursor, state, command.targetChar);
-		}
+	if (action != table.actions.end()) {
+		(table.*action->second)(text, t_cursor, state);
+		endRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
 	}
 
-	const auto endRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
+	if (command.motion == lineChar) {
+		table.motionLine(text, t_cursor, state, startRange, endRange);
+	} else if (motion != table.motions.end()) {
+		(table.*motion->second)(text, t_cursor, state);
+		endRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
+	} else if (targetMotion != table.targetMotions.end()) {
+		(table.*targetMotion->second)(text, t_cursor, state, command.targetChar);
+		endRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
+	} else if (targetCommand != table.targetCommands.end()) {
+		(table.*targetCommand->second)(text, t_cursor, state, command.targetChar);
+		endRange = MotionRange{.x = t_cursor.getX(), .y = t_cursor.getY()};
+	}
 
 	const auto trueStart = MotionRange{.x = std::min(startRange.x, endRange.x), .y = std::min(startRange.y, endRange.y)};
 	const auto trueEnd = MotionRange{.x = std::max(startRange.x, endRange.x), .y = std::max(startRange.y, endRange.y)};
@@ -229,28 +215,41 @@ void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& t_cursor
 
 NormalMode::NormalMode() : parser{table}, executor{table} {}
 
-
 void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState& state, EditorInputAndOutput& inOut) {
 	auto& [text, stack, path, id] = file_t;
 
-	if (inOut.shift) {
-		switch (inOut.input_.back()) {
-			case 'f': state.currentMode_ = Modes::FileMode; break;
-			case 'w': state.currentMode_ = Modes::WindowMode; break;
-		}
-		inOut.shift = false;
+	if (not shift && inOut.input_.back() == static_cast<char>(SpecialKeys::Shift)) {
+		shift = true;
 		return;
 	}
+
+	if (shift) {
+		switch (inOut.input_.back()) {
+		case 'f':
+			state.currentMode_ = Modes::FileMode;
+			break;
+		case 'w':
+			state.currentMode_ = Modes::WindowMode;
+			break;
+		}
+		shift = false;
+		inOut.input_.clear();
+		inOut.commandLineMessage_.clear();
+		return;
+	}
+
 	parser.parseCommand(inOut.input_.back());
 
 	const auto command = parser.getCommand();
 
-	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ". Count1: " << command.count1
-			  << ", operation: " << command.operation << ", count2: " << command.count2 << ", motion: " << command.motion
-			  << ", text object: " << command.textObject << ", target char: " << command.targetChar << '\n';
+	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ", operation: " << command.operation << ", motion: " << command.motion
+			  << ", target motion: " << command.targetMotion << ", target command: " << command.targetCommand
+			  << ", target char: " << command.targetChar << '\n';
 
 	if (parser.executeCommand()) {
 		executor.executeNormalModeCommand(text, t_cursor, state, command);
+		inOut.input_.clear();
+		inOut.commandLineMessage_.clear();
 		parser.clear();
 	}
 }
@@ -551,7 +550,7 @@ void NormalModeTable::motionStartOfPrevWORD(FUNC_TYPES) const {
 
 void NormalModeTable::motionLine(FUNC_TYPES, MotionRange& start, MotionRange& end) const {
 	start.x = 0;
-	end.x = text.getLineLength(cursor.getY()) - 1;
+	end.x = text.getLineLength(cursor.getY());
 }
 
 void NormalModeTable::motionMoveCursorLeft(FUNC_TYPES) const {

@@ -18,15 +18,13 @@ static SDL_Color HexToSDL(std::string hex) {
 		hex.erase(0, 1);
 
 	const uint32_t v = std::stoul(hex, nullptr, 16);
-	return {static_cast<Uint8>((v >> 16) & 0xFF), static_cast<Uint8>((v >> 8) & 0xFF), static_cast<Uint8>(v & 0xFF), 255};
+	return {static_cast<Uint8>((v >> 16) & 0xFF), static_cast<Uint8>((v >> 8) & 0xFF), static_cast<Uint8>(v & 0xFF),
+			255};
 }
 
 static LineNumberModes getLineNumber(const std::string& t_lineNumber) {
 	static const std::unordered_map<std::string, LineNumberModes> lineNumberModes = {
-		{"none", LineNumberModes::None},
-		{"relative", LineNumberModes::Relative},
-		{"number", LineNumberModes::Number}
-	};
+		{"none", LineNumberModes::None}, {"relative", LineNumberModes::Relative}, {"number", LineNumberModes::Number}};
 
 	if (const auto it = lineNumberModes.find(t_lineNumber); it != lineNumberModes.end()) {
 		return it->second;
@@ -36,10 +34,8 @@ static LineNumberModes getLineNumber(const std::string& t_lineNumber) {
 }
 
 static IndentType getIndentType(const std::string& t_indentType) {
-	static const std::unordered_map<std::string, IndentType> indentTypeMap = {
-		{"space", IndentType::Space},
-		{"tabs", IndentType::Tabs}
-	};
+	static const std::unordered_map<std::string, IndentType> indentTypeMap = {{"space", IndentType::Space},
+																			  {"tabs", IndentType::Tabs}};
 
 	if (const auto it = indentTypeMap.find(t_indentType); it != indentTypeMap.end()) {
 		return it->second;
@@ -178,7 +174,8 @@ Config::Config() : window{}, editor{}, fonts{}, theme{} {
 WindowSettings::WindowSettings(const Config& t_config)
 	: width{t_config.window.width}, height{t_config.window.height}, ticksPerFrame{1.0f / t_config.window.fps_limit} {}
 
-CharSettings::CharSettings(const Config& t_config): codeCharWidth{}, codeCharHeight{}, uiCharWidth{}, uiCharHeight{}, tabHeight{} {
+CharSettings::CharSettings(const Config& t_config)
+	: codeCharWidth{}, codeCharHeight{}, uiCharWidth{}, uiCharHeight{}, tabHeight{} {
 	if (TTF_Init() != 0) {
 		throw std::runtime_error("Can't initialize SDL TTF library.");
 	}

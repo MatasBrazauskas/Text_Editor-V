@@ -20,12 +20,12 @@ void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, WindowSettin
 
 void WindowSubCommand::verticalSplit(PanesManager& t_panesManager, WindowSettings&) const {
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->paneId_, pane->fileId_, PaneDirection::Left);
+	t_panesManager.addPane(pane->get().paneId_, pane->get().fileId_, PaneDirection::Left);
 }
 
 void WindowSubCommand::horizontalSplit(PanesManager& t_panesManager, WindowSettings&) const {
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->paneId_, pane->fileId_, PaneDirection::Bottom);
+	t_panesManager.addPane(pane->get().paneId_, pane->get().fileId_, PaneDirection::Bottom);
 }
 
 void WindowSubCommand::movePaneLeft(PanesManager& t_panesManager, WindowSettings& t_winSettings) const {
@@ -45,7 +45,7 @@ void WindowSubCommand::movePaneUp(PanesManager& t_panesManager, WindowSettings& 
 }
 
 void WindowSubCommand::closePane(PanesManager& t_panesManager, WindowSettings&) const {
-	const auto paneId = t_panesManager.getCurrPane()->paneId_;
+	const auto paneId = t_panesManager.getCurrPane()->get().paneId_;
 	t_panesManager.removePane(paneId);
 }
 
@@ -96,7 +96,7 @@ void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& 
 	const auto fileId = t_filesManager.addSpecialFile(matrix);
 
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->paneId_, fileId, PaneDirection::Left);
+	t_panesManager.addPane(pane->get().paneId_, fileId, PaneDirection::Left);
 }
 
 void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager& t_filesManager,
@@ -106,15 +106,15 @@ void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager
 	const auto fileId = t_filesManager.addSpecialFile(matrix);
 
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->paneId_, fileId, PaneDirection::Bottom);
+	t_panesManager.addPane(pane->get().paneId_, fileId, PaneDirection::Bottom);
 }
 
 void FileSubCommand::moveUp(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
-	auto cursor = t_panesManager.getCurrPane()->cursor_;
+	auto cursor = t_panesManager.getCurrPane()->get().cursor_;
 	cursor.decrementY();
 }
 
 void FileSubCommand::moveDown(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
-	auto cursor = t_panesManager.getCurrPane()->cursor_;
+	auto cursor = t_panesManager.getCurrPane()->get().cursor_;
 	cursor.incrementY();
 }

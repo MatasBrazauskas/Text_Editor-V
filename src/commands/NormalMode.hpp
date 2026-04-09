@@ -34,11 +34,12 @@ class NormalModeTable {
 	using Func2 = void (NormalModeTable::*)(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
 	using Func3 = void (NormalModeTable::*)(FUNC_TYPES, char newChar) const;
 
-	std::unordered_map<char, Func2> operations;
 	std::unordered_map<char, Func> actions;
-
+	std::unordered_map<char, Func2> operations;
 	std::unordered_map<char, Func> motions;
-	std::unordered_map<char, Func3> textObjects;
+
+	std::unordered_map<char, Func3> targetMotions;
+	std::unordered_map<char, Func3> targetCommands;
 
 	void operationDeleteChar(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
 	void operationCopyText(FUNC_TYPES, const MotionRange&, const MotionRange&) const;
@@ -80,28 +81,24 @@ class NormalModeTable {
 };
 
 enum class ParsingStages : char {
-	Count1OperationMotionTextObject,
-	Count2MotionTextObject,
-	WaitingForTargetChar,
-	Finish,
+	Start,
+	WaitingForMotion,
+	WaitingForMotionTarget,
+	WaitingForCommandTarget,
+	Finish
 };
 
 class NormalModeCommand {
 public:
 	NormalModeCommand() = delete;
-	NormalModeCommand(int count1, char operation, int count2, char motion, char textObject, char targetChar, bool ignoreCount, ParsingStages);
+	NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar, ParsingStages);
 	~NormalModeCommand() noexcept = default;
 
-	int count1;
-	int count2;
-
 	char operation;
-
 	char motion;
-	char textObject;
-
+	char targetMotion;
+	char targetCommand;
 	char targetChar;
-	bool ignoreCount;
 
 	ParsingStages stage;
 };
@@ -109,8 +106,8 @@ public:
 class NormalModeParser {
   public:
 	explicit NormalModeParser(const NormalModeTable&);
-	explicit NormalModeParser(const NormalModeTable&, int count1, char operation, int count2, char motion,
-							  char textObject, char targetChar, bool ignoreCount, ParsingStages stage);
+	explicit NormalModeParser(const NormalModeTable&, char operation, char motion, char targetMotion, char targetCommand,
+							  char targetChar, ParsingStages stage);
 	~NormalModeParser() noexcept = default;
 
 	void parseCommand(char);
@@ -119,12 +116,11 @@ class NormalModeParser {
 	NormalModeCommand getCommand() const;
 
   private:
-	bool parseCount1(char inputChar) const;
-	bool parseCount2(char inputChar) const;
 	bool parseAction(char inputChar) const;
 	bool parseOperation(char inputChar) const;
 	bool parseMotion(char inputChar) const;
-	bool parseTextObject(char inputChar) const;
+	bool parseTargetMotion(char inputChar) const;
+	bool parseTargetCommand(char inputChar) const;
 
 	const NormalModeTable& table;
 	NormalModeCommand command;
@@ -148,6 +144,7 @@ class NormalMode final {
 	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&);
 
   private:
+	bool shift{};
 	NormalModeTable table;
 	NormalModeParser parser;
 	NormalModeExecutor executor;

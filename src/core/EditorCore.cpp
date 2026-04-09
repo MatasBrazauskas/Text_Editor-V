@@ -4,9 +4,10 @@
 
 #include <SDL.h>
 
-EditorState::EditorState(): currentMode_{Modes::FileMode}, running_{true} {}
+EditorState::EditorState() : currentMode_{Modes::FileMode}, running_{true} {}
 
-EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings) : filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
+EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
+	: filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
 	panesManager_.addPane(0, 0, PaneDirection::Top);
 }
 
@@ -19,12 +20,8 @@ std::variant<SpecialCases, std::string> EditorCore::EncodeInput(const SDL_Event&
 		const SDL_Keycode keyCode = t_event.key.keysym.sym;
 		if (keyCode == SDLK_ESCAPE) {
 			return SpecialCases::SwitchToNormalMode;
-		} else if (keyCode == SDLK_LCTRL) {
-			editorInputAndOutput_.shift = true;
-			return SpecialCases::None;
-		} else if (keyCode == SDLK_RCTRL) {
-			editorInputAndOutput_.shift = true;
-			return SpecialCases::None;
+		} else if (keyCode == SDLK_LCTRL || keyCode == SDLK_RCTRL) {
+			return std::string(1, static_cast<char>(SpecialKeys::Shift));
 		}
 
 		if (const auto it = specialKeyMap.find(keyCode); it != specialKeyMap.end()) {
@@ -44,42 +41,42 @@ std::variant<SpecialCases, std::string> EditorCore::EncodeInput(const SDL_Event&
 	return SpecialCases::None;
 }
 
-void EditorCore::HandleSpecialCases(const SpecialCases t_specialCase, const SDL_Event& t_event) {
+;void EditorCore::HandleSpecialCases(const SpecialCases t_specialCase, const SDL_Event& t_event) {
 	const auto cleanUp = [this] {
 		editorInputAndOutput_.input_.clear();
 		editorInputAndOutput_.commandLineMessage_.clear();
-		editorInputAndOutput_.shift = false;
 	};
 
 	switch (t_specialCase) {
-		case SpecialCases::SwitchToNormalMode:
-			editorState_.currentMode_ = Modes::Normal;
-			cleanUp();
-			break;
-		case SpecialCases::SwitchToInsertMode:
-			editorState_.currentMode_ = Modes::Insert;
-			cleanUp();
-			break;
-		case SpecialCases::SwitchToCommandMode:
-			editorState_.currentMode_ = Modes::Command;
-			cleanUp();
-			break;
-		case SpecialCases::SwitchToFileMode:
-			editorState_.currentMode_ = Modes::FileMode;
-			cleanUp();
-			break;
-		case SpecialCases::SwitchToWindowMode:
-			editorState_.currentMode_ = Modes::WindowMode;
-			cleanUp();
-			break;
-		case SpecialCases::WindowResize:
-			settings_.windowSettings.width = t_event.window.data1;
-			settings_.windowSettings.height = t_event.window.data2;
-			break;
-		case SpecialCases::Quit:
-			editorState_.running_ = false;
-			break;
-		case SpecialCases::None: break;
+	case SpecialCases::SwitchToNormalMode:
+		editorState_.currentMode_ = Modes::Normal;
+		cleanUp();
+		break;
+	case SpecialCases::SwitchToInsertMode:
+		editorState_.currentMode_ = Modes::Insert;
+		cleanUp();
+		break;
+	case SpecialCases::SwitchToCommandMode:
+		editorState_.currentMode_ = Modes::Command;
+		cleanUp();
+		break;
+	case SpecialCases::SwitchToFileMode:
+		editorState_.currentMode_ = Modes::FileMode;
+		cleanUp();
+		break;
+	case SpecialCases::SwitchToWindowMode:
+		editorState_.currentMode_ = Modes::WindowMode;
+		cleanUp();
+		break;
+	case SpecialCases::WindowResize:
+		settings_.windowSettings.width = t_event.window.data1;
+		settings_.windowSettings.height = t_event.window.data2;
+		break;
+	case SpecialCases::Quit:
+		editorState_.running_ = false;
+		break;
+	case SpecialCases::None:
+		break;
 	}
 }
 
@@ -96,8 +93,8 @@ void EditorCore::HandleKeyboardInput() {
 		} else {
 			editorInputAndOutput_.input_.append(std::get<std::string>(input));
 
-			auto file = filesManager_.getFile();
-			auto cursor = panesManager_.getCurrPane()->cursor_;
+			auto& file = filesManager_.getFile();
+			auto& cursor = panesManager_.getCurrPane()->get().cursor_;
 
 			switch (editorState_.currentMode_) {
 			case Modes::Normal:
@@ -113,7 +110,8 @@ void EditorCore::HandleKeyboardInput() {
 				windowSubCommand_.ExecuteCommand(panesManager_, winSettings, editorInputAndOutput_.input_.back());
 				break;
 			case Modes::FileMode:
-				fileSubCommand_.ExecuteCommand(panesManager_, filesManager_,winSettings, editorInputAndOutput_.input_.back());
+				fileSubCommand_.ExecuteCommand(panesManager_, filesManager_, winSettings,
+											   editorInputAndOutput_.input_.back());
 				break;
 			}
 		}

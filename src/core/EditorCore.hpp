@@ -21,7 +21,8 @@ enum class SpecialKeys : char {
 	DownArrow = static_cast<char>(134),
 	Tab = static_cast<char>(135),
 	Escape = static_cast<char>(136),
-	Control = static_cast<char>(137)
+	Control = static_cast<char>(137),
+	Shift = static_cast<char>(138),
 };
 
 static const std::unordered_map<SDL_Keycode, char> specialKeyMap = {
@@ -53,7 +54,6 @@ class EditorInputAndOutput final {
 	EditorInputAndOutput() = default;
 	~EditorInputAndOutput() noexcept = default;
 
-	bool shift;
 	std::string input_;
 	std::string commandLineMessage_;
 };
