@@ -4,7 +4,7 @@
 
 #include <SDL.h>
 
-EditorState::EditorState() : currentMode_{Modes::FileMode}, running_{true} {}
+EditorState::EditorState() : currentMode_{Modes::Normal}, running_{true} {}
 
 EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
 	: filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
@@ -29,9 +29,6 @@ std::variant<SpecialCases, std::string> EditorCore::EncodeInput(const SDL_Event&
 		}
 
 	} else if (t_event.type == SDL_TEXTINPUT) {
-		if (t_event.text.text[0] == ':') {
-			return SpecialCases::SwitchToCommandMode;
-		}
 		return t_event.text.text;
 	} else if (t_event.type == SDL_WINDOWEVENT) {
 		if (t_event.window.event == SDL_WINDOWEVENT_RESIZED) {
@@ -41,7 +38,8 @@ std::variant<SpecialCases, std::string> EditorCore::EncodeInput(const SDL_Event&
 	return SpecialCases::None;
 }
 
-;void EditorCore::HandleSpecialCases(const SpecialCases t_specialCase, const SDL_Event& t_event) {
+;
+void EditorCore::HandleSpecialCases(const SpecialCases t_specialCase, const SDL_Event& t_event) {
 	const auto cleanUp = [this] {
 		editorInputAndOutput_.input_.clear();
 		editorInputAndOutput_.commandLineMessage_.clear();
@@ -104,7 +102,7 @@ void EditorCore::HandleKeyboardInput() {
 				insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);
 				break;
 			case Modes::Command:
-				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_);
+				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_, panesManager_);
 				break;
 			case Modes::WindowMode:
 				windowSubCommand_.ExecuteCommand(panesManager_, winSettings, editorInputAndOutput_.input_.back());

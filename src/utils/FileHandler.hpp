@@ -11,7 +11,7 @@ public :
 	FileHandler() = default;
     ~FileHandler() = default;
 
-	std::vector<std::string> getContent(std::filesystem::path) const;
+	std::vector<std::string> readFile(std::filesystem::path) const;
 
     void writeToFile(const File&) const;
 

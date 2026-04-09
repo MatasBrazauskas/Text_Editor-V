@@ -485,8 +485,7 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 		return sv;
 	};
 
-	const auto fileVec = files.files_ | std::views::values;
-	const auto temp = fileVec | std::views::transform(to_filename_view);
+	const auto temp = files.files_ | std::views::transform(to_filename_view);
 
 	const std::vector<std::string> tabVec{temp.begin(), temp.end()};
 
@@ -506,9 +505,9 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	}
 
 	int activePane{};
-	const auto it = std::ranges::find(fileVec, 0, &File::fileId_);
-	if (it != fileVec.end()) {
-		activePane = std::distance(fileVec.begin(), it);
+	const auto it = std::ranges::find(files.files_, files.activeFileId_, &File::fileId_);
+	if (it != files.files_.end()) {
+		activePane = std::distance(files.files_.begin(), it);
 	}
 
 	this->tabLayout.activeTab = activePane;
@@ -631,7 +630,7 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	const int cursorY = coords.startY + t_tabOffsetY + cursor.getY() * t_settings.charSettings.codeCharHeight;
 
 	auto letters = std::string{" "};
-	if (auto line = file.textBuffer_.getLine(cursor.getY()); line.length() != 0)
+	if (auto line = file.textBuffer_.getLine(cursor.getY()); line.length() != 0 && cursor.getX() < line.length())
 		letters = std::string{file.textBuffer_.getLine(cursor.getY()).at(cursor.getX())};
 	auto cursorType = CursorType::Block;
 	int cursorWidth = t_settings.charSettings.codeCharWidth;
@@ -640,12 +639,10 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 		cursorType = CursorType::Stick;
 		cursorWidth = 1;
 		letters = "";
-	} else if (t_editorState.currentMode_ == Modes::Normal) {
-		if (t_filesManager.specialFile(file.fileId_)) {
-			cursorType = CursorType::Line;
-			letters = file.textBuffer_.getLine(cursor.getY());
-			cursorWidth = letters.length() * t_settings.charSettings.codeCharWidth;
-		}
+	} else if (t_editorState.currentMode_ == Modes::FileMode) {
+		cursorType = CursorType::Line;
+		letters = file.textBuffer_.getLine(cursor.getY());
+		cursorWidth = letters.length() * t_settings.charSettings.codeCharWidth;
 	}
 
 	cursorLayout = CursorLayout{visible, cursorX, cursorY, letters, cursorWidth, cursorType};

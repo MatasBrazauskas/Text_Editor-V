@@ -5,13 +5,12 @@
 #include <iostream>
 #include <sstream>
 
-CommandStructure CommandMode::parseCommand(std::string input) {
+CommandStructure CommandMode::parseCommand(std::string input) const {
 	if (input.empty()) {
 		abort();
 	}
 
 	input.pop_back();
-	input.erase(0, 1);
 
 	std::stringstream ss{input};
 	CommandStructure com;
@@ -31,11 +30,17 @@ CommandStructure CommandMode::parseCommand(std::string input) {
 }
 
 CommandMode::CommandMode() {
-	commands_ = {{"q", &CommandMode::closeProgramme}, {"w", &CommandMode::writeToFile}, {"e", &CommandMode::openFile}};
+	commands_ = {
+		{"q", &CommandMode::closeProgramme},
+		{"w", &CommandMode::writeToFile},
+		{"e", &CommandMode::openFile},
+		{"bn", &CommandMode::switchToNextBuffer},
+		{"bp", &CommandMode::switchToPrevBuffer},
+	};
 }
 
 void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FileHandler& fileHandler,
-									  FilesManager& files) {
+									  FilesManager& files, PanesManager& t_panesManager) {
 	if (t_io.input_.empty())
 		return;
 
@@ -52,7 +57,7 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 
 		if (const auto it = commands_.find(com.command_); it != commands_.end()) {
 			const auto& func = it->second;
-			(this->*func)(state, t_io, fileHandler, files, com);
+			(this->*func)(state, t_io, fileHandler, files, t_panesManager, com);
 
 			t_io.input_.clear();
 			state.currentMode_ = Modes::Normal;
@@ -62,19 +67,20 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 	}
 }
 
-void CommandMode::writeToFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files,
+void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& t_fileHandler, FilesManager& t_filesManager, PanesManager&,
 							  const CommandStructure& com) {
 	std::cout << "Writing to file...\n";
-	std::cout << "Implement this shit\n";
-	/*if (com.args_.empty()) {
-		fileHandler.writeToFile(files.getDocument(state.activeTab_).value());
+	if (com.args_.empty()) {
+		const auto& currentFile = t_filesManager.getFile();
+		t_fileHandler.writeToFile(currentFile);
 	} else {
-		for (const auto& fileNames : com.args_) {
+		for (const auto& file : t_filesManager.files_) {
+			t_fileHandler.writeToFile(file);
 		}
-	}*/
+	}
 }
 
-void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files,
+void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files, PanesManager&,
 						   const CommandStructure& com) {
 	std::cout << "Opening file...\n";
 
@@ -85,16 +91,28 @@ void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandle
 	for (const auto& fileNames : com.args_) {
 		const auto path = std::filesystem::path(fileNames);
 
-		const auto& file = fileHandler.getContent(path);
+		const auto& file = fileHandler.readFile(path);
 		files.addRegularFile(Matrix(std::move(file)), std::move(path));
 	}
 }
 
-void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&,
+void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&, PanesManager&,
 								 const CommandStructure& com) {
 	if (!com.args_.empty()) {
 		t_io.commandLineMessage_ = "Trailing characters";
 	} else {
 		state.running_ = false;
 	}
+}
+
+void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager& t_fileManager, PanesManager& t_panesManager, const CommandStructure&) {
+	const auto nextFileId = t_fileManager.switchToNextFile();
+	const auto& currPane = t_panesManager.getCurrPane();
+	currPane->get().fileId_ = nextFileId;
+}
+
+void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager& t_fileManager, PanesManager& t_panesManager, const CommandStructure&) {
+	const auto prevFileId = t_fileManager.switchToPrevFile();
+	const auto& currPane = t_panesManager.getCurrPane();
+	currPane->get().fileId_ = prevFileId;
 }

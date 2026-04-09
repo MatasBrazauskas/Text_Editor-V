@@ -35,14 +35,14 @@ bool MatrixIterator::end(const size_t endIndex_t) const {
 	return this->index_ < endIndex_t;
 }
 
-Matrix::Matrix(const std::vector<std::string>& t_lines) : lines_{std::move(t_lines)}, charsCount_{}, dirty{true} {
+Matrix::Matrix(const std::vector<std::string>& t_lines) : lines_{std::move(t_lines)}, charsCount_{}, dirty{false} {
 	if (lines_.size() == 1 && lines_.at(0).empty()) {
 		this->insertLine(0, "");
 	}
 
 	lineInfo_.reserve(lines_.size());
 	for (int i = 0; i < lines_.size(); ++i) {
-		lineInfo_.emplace_back(LineInfo::Changed);
+		lineInfo_.emplace_back(LineInfo::None);
 	}
 }
 
@@ -139,7 +139,7 @@ FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char*
 		this->addRegularFile(std::move(ptr), "Untitled");
 	} else {
 		for (const auto& path : filePaths) {
-			const auto lines = fileHandler.getContent(path.data());
+			const auto lines = fileHandler.readFile(path.data());
 			auto ptr = Matrix(lines);
 
 			this->addRegularFile(std::move(ptr), path);
@@ -149,7 +149,7 @@ FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char*
 
 FileId FilesManager::addRegularFile(const Matrix& t_textBuffer, const std::filesystem::path& t_filePath) {
 	const auto regularFile = File{std::move(t_textBuffer), t_filePath, fileIdCounter_};
-	files_.insert({fileIdCounter_, regularFile});
+	files_.push_back(std::move(regularFile));
 	fileIdCounter_++;
 
 	return regularFile.fileId_;
@@ -157,7 +157,7 @@ FileId FilesManager::addRegularFile(const Matrix& t_textBuffer, const std::files
 
 FileId FilesManager::addSpecialFile(const Matrix& t_textBuffer) {
 	const auto specialFile = File{std::move(t_textBuffer), fileIdCounter_};
-	files_.insert({fileIdCounter_, specialFile});
+	files_.push_back(std::move(specialFile));
 	fileIdCounter_++;
 
 	specialFiles_.push_back(specialFile.fileId_);
@@ -178,4 +178,30 @@ File& FilesManager::getFile(const FileId t_fileId) {
 
 File& FilesManager::getFile() {
 	return files_.at(activeFileId_);
+}
+
+FileId FilesManager::switchToNextFile() {
+	const auto predicate = [this](const File& file) {
+		return file.fileId_ == activeFileId_;
+	};
+	const auto it = std::ranges::find_if(files_, predicate);
+	const auto index = (std::distance(files_.begin(), it) + 1) % (files_.size());
+
+	activeFileId_ = files_.at(index).fileId_;
+	return activeFileId_;
+}
+
+FileId FilesManager::switchToPrevFile() {
+	const auto predicate = [this](const File& file) {
+		return file.fileId_ == activeFileId_;
+	};
+	const auto it = std::ranges::find_if(files_, predicate);
+	auto index = static_cast<int>(std::distance(files_.begin(), it) - 1);
+
+	if (index < 0) {
+		index = files_.size() - 1;
+	}
+
+	activeFileId_ = files_.at(index).fileId_;
+	return activeFileId_;
 }

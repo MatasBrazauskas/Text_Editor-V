@@ -93,7 +93,10 @@ class FilesManager final {
 	[[nodiscard]] File& getFile(FileId);
 	[[nodiscard]] File& getFile();
 
-	std::unordered_map<FileId, File> files_;
+	[[nodiscard]] FileId switchToNextFile();
+	[[nodiscard]] FileId switchToPrevFile();
+
+	std::vector<File> files_;
 	FileId activeFileId_;
 	inline static FileId fileIdCounter_{0};
 

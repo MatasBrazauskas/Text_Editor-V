@@ -10,43 +10,31 @@
 
 NormalModeTable::NormalModeTable() {
 	actions = {
-		{'O', &NormalModeTable::actionInsertLineAbove},
-		{'o', &NormalModeTable::actionInsertLineBelow},
-		{'i', &NormalModeTable::actionSwitchToInsertLeft},
-		{'a', &NormalModeTable::actionSwitchToInsertRight},
-		{'x', &NormalModeTable::actionDeleteChar},
+		{'O', &NormalModeTable::actionInsertLineAbove},	   {'o', &NormalModeTable::actionInsertLineBelow},
+		{'i', &NormalModeTable::actionSwitchToInsertLeft}, {'a', &NormalModeTable::actionSwitchToInsertRight},
+		{':', &NormalModeTable::actionSwitchToCommandMode}, {'x', &NormalModeTable::actionDeleteChar},
 	};
 
-	operations = {
-		{'d', &NormalModeTable::operationDeleteChar},
-		{'y', &NormalModeTable::operationCopyText}
-	};
+	operations = {{'d', &NormalModeTable::operationDeleteChar}, {'y', &NormalModeTable::operationCopyText}};
 
-	motions = {
-		{'h', &NormalModeTable::motionMoveCursorLeft},
-		{'j', &NormalModeTable::motionMoveCursorDown},
-		{'k', &NormalModeTable::motionMoveCursorUp},
-		{'l', &NormalModeTable::motionMoveCursorRight},
-		{'G', &NormalModeTable::motionMoveCursorBottomFile},
-		{'$', &NormalModeTable::motionMoveRightMost},
-		{'0', &NormalModeTable::motionMoveLeftMost},
-		{'^', &NormalModeTable::motionMoveLeftMostChar},
-		{'w', &NormalModeTable::motionStartOfNextWord},
-		{'b', &NormalModeTable::motionStartOfPrevWord},
-		{'W', &NormalModeTable::motionStartOfNextWORD},
-		{'B', &NormalModeTable::motionStartOfPrevWORD},
-		{'e', &NormalModeTable::motionEndOfWord},
-		{'E', &NormalModeTable::motionEndOfWORD}
-	};
+	motions = {{'h', &NormalModeTable::motionMoveCursorLeft},
+			   {'j', &NormalModeTable::motionMoveCursorDown},
+			   {'k', &NormalModeTable::motionMoveCursorUp},
+			   {'l', &NormalModeTable::motionMoveCursorRight},
+			   {'G', &NormalModeTable::motionMoveCursorBottomFile},
+			   {'$', &NormalModeTable::motionMoveRightMost},
+			   {'0', &NormalModeTable::motionMoveLeftMost},
+			   {'^', &NormalModeTable::motionMoveLeftMostChar},
+			   {'w', &NormalModeTable::motionStartOfNextWord},
+			   {'b', &NormalModeTable::motionStartOfPrevWord},
+			   {'W', &NormalModeTable::motionStartOfNextWORD},
+			   {'B', &NormalModeTable::motionStartOfPrevWORD},
+			   {'e', &NormalModeTable::motionEndOfWord},
+			   {'E', &NormalModeTable::motionEndOfWORD}};
 
-	targetMotions = {
-		{'f', &NormalModeTable::findFirstCharLeft},
-		{'F', &NormalModeTable::findFirstCharRight}
-	};
+	targetMotions = {{'f', &NormalModeTable::findFirstCharLeft}, {'F', &NormalModeTable::findFirstCharRight}};
 
-	targetCommands = {
-		{'r', &NormalModeTable::replaceChar}
-	};
+	targetCommands = {{'r', &NormalModeTable::replaceChar}};
 }
 
 NormalModeCommand::NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar,
@@ -122,9 +110,8 @@ void NormalModeParser::parseCommand(char inputChar) {
 	const bool motion = parseMotion(inputChar);
 	const bool targetMotion = parseTargetMotion(inputChar);
 	const bool targetCommand = parseTargetCommand(inputChar);
-	const bool repeatedOperationAsLineMotion =
-		command.stage == ParsingStages::WaitingForMotion && command.operation == inputChar &&
-		(inputChar == 'd' || inputChar == 'y');
+	const bool repeatedOperationAsLineMotion = command.stage == ParsingStages::WaitingForMotion &&
+											   command.operation == inputChar && (inputChar == 'd' || inputChar == 'y');
 
 	if (command.stage == ParsingStages::Start) {
 		if (action) {
@@ -242,9 +229,9 @@ void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState
 
 	const auto command = parser.getCommand();
 
-	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ", operation: " << command.operation << ", motion: " << command.motion
-			  << ", target motion: " << command.targetMotion << ", target command: " << command.targetCommand
-			  << ", target char: " << command.targetChar << '\n';
+	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ", operation: " << command.operation
+			  << ", motion: " << command.motion << ", target motion: " << command.targetMotion
+			  << ", target command: " << command.targetCommand << ", target char: " << command.targetChar << '\n';
 
 	if (parser.executeCommand()) {
 		executor.executeNormalModeCommand(text, t_cursor, state, command);
@@ -560,7 +547,7 @@ void NormalModeTable::motionMoveCursorLeft(FUNC_TYPES) const {
 }
 
 void NormalModeTable::motionMoveCursorRight(FUNC_TYPES) const {
-	if (text.getLineLength(cursor.getY()) - 1 > cursor.getX()) {
+	if (text.getLineLength(cursor.getY()) > cursor.getX()) {
 		cursor.incrementX();
 	}
 }
@@ -686,4 +673,8 @@ void NormalModeTable::actionSwitchToInsertLeft(FUNC_TYPES) const {
 void NormalModeTable::actionSwitchToInsertRight(FUNC_TYPES) const {
 	motionMoveCursorRight(text, cursor, state);
 	state.currentMode_ = Modes::Insert;
+}
+
+void NormalModeTable::actionSwitchToCommandMode(FUNC_TYPES) const {
+	state.currentMode_ = Modes::Command;
 }

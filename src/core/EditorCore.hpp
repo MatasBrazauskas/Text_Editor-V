@@ -10,7 +10,7 @@
 #include <SDL2/SDL_events.h>
 
 enum class Modes : uint8_t { Normal, Insert, Command, WindowMode, FileMode };
-enum class NormalModeModes: char;
+enum class NormalModeModes : char;
 
 enum class SpecialKeys : char {
 	Backspace = static_cast<char>(129),
@@ -34,8 +34,7 @@ static const std::unordered_map<SDL_Keycode, char> specialKeyMap = {
 	{SDLK_DOWN, static_cast<char>(SpecialKeys::DownArrow)},
 	{SDLK_TAB, static_cast<char>(SpecialKeys::Tab)},
 	{SDLK_ESCAPE, static_cast<char>(SpecialKeys::Escape)},
-	{SDLK_LCTRL, static_cast<char>(SpecialKeys::Control)}
-};
+	{SDLK_LCTRL, static_cast<char>(SpecialKeys::Control)}};
 
 using FileId = uint_fast64_t;
 using PaneId = uint_fast64_t;
@@ -58,7 +57,16 @@ class EditorInputAndOutput final {
 	std::string commandLineMessage_;
 };
 
-enum class SpecialCases: char {Quit, SwitchToNormalMode, SwitchToInsertMode, SwitchToCommandMode, SwitchToFileMode, SwitchToWindowMode, WindowResize, None};
+enum class SpecialCases : char {
+	Quit,
+	SwitchToNormalMode,
+	SwitchToInsertMode,
+	SwitchToCommandMode,
+	SwitchToFileMode,
+	SwitchToWindowMode,
+	WindowResize,
+	None
+};
 
 class EditorCore final {
   public:

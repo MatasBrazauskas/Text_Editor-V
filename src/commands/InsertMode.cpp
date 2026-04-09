@@ -5,10 +5,8 @@
 #include <utility>
 
 InsertMode::InsertMode() {
-	commands_ = {
-		{static_cast<char>(SpecialKeys::Enter), &InsertMode::handleEnter},
-		{static_cast<char>(SpecialKeys::Backspace), &InsertMode::handleBackspace}
-	};
+	commands_ = {{static_cast<char>(SpecialKeys::Enter), &InsertMode::handleEnter},
+				 {static_cast<char>(SpecialKeys::Backspace), &InsertMode::handleBackspace}};
 }
 
 void InsertMode::handleEnter(File& t_file, Cursor& t_cursor) const {
@@ -41,7 +39,8 @@ void InsertMode::handleBackspace(File& t_file, Cursor& t_cursor) const {
 	}
 }
 
-void InsertMode::HandleKeyboardInput(EditorState& t_state, EditorInputAndOutput& t_io, File& t_file, Cursor& t_cursor) const {
+void InsertMode::HandleKeyboardInput(EditorState& t_state, EditorInputAndOutput& t_io, File& t_file,
+									 Cursor& t_cursor) const {
 	if (t_io.input_.empty())
 		return;
 

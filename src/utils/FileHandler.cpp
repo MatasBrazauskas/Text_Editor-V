@@ -4,7 +4,7 @@
 
 #include <fstream>
 
-std::vector<std::string> FileHandler::getContent(std::filesystem::path filesPath) const {
+std::vector<std::string> FileHandler::readFile(std::filesystem::path filesPath) const {
 	std::ifstream file_(filesPath, std::ios::in);
 
 	std::vector<std::string> lines;

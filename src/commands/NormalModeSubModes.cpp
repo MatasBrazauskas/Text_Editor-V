@@ -110,11 +110,11 @@ void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager
 }
 
 void FileSubCommand::moveUp(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
-	auto cursor = t_panesManager.getCurrPane()->get().cursor_;
+	auto& cursor = t_panesManager.getCurrPane()->get().cursor_;
 	cursor.decrementY();
 }
 
 void FileSubCommand::moveDown(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
-	auto cursor = t_panesManager.getCurrPane()->get().cursor_;
+	auto& cursor = t_panesManager.getCurrPane()->get().cursor_;
 	cursor.incrementY();
 }

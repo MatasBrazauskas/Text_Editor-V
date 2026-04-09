@@ -20,7 +20,7 @@ using namespace std::string_view_literals;
 #define FUNC_TYPES Matrix &text, Cursor &cursor, EditorState &state
 constexpr char lineChar = static_cast<char>(128);
 
-enum class SpecialCases: char;
+enum class SpecialCases : char;
 
 struct MotionRange {
 	int x, y;
@@ -68,6 +68,8 @@ class NormalModeTable {
 	void actionSwitchToInsertLeft(FUNC_TYPES) const;
 	void actionSwitchToInsertRight(FUNC_TYPES) const;
 
+	void actionSwitchToCommandMode(FUNC_TYPES) const;
+
 	void motionStartOfNextWord(FUNC_TYPES) const;
 	void motionStartOfNextWORD(FUNC_TYPES) const;
 
@@ -80,18 +82,13 @@ class NormalModeTable {
 	void motionLine(FUNC_TYPES, MotionRange&, MotionRange&) const;
 };
 
-enum class ParsingStages : char {
-	Start,
-	WaitingForMotion,
-	WaitingForMotionTarget,
-	WaitingForCommandTarget,
-	Finish
-};
+enum class ParsingStages : char { Start, WaitingForMotion, WaitingForMotionTarget, WaitingForCommandTarget, Finish };
 
 class NormalModeCommand {
-public:
+  public:
 	NormalModeCommand() = delete;
-	NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar, ParsingStages);
+	NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar,
+					  ParsingStages);
 	~NormalModeCommand() noexcept = default;
 
 	char operation;
