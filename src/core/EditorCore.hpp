@@ -55,6 +55,7 @@ class EditorInputAndOutput final {
 
 	std::string input_;
 	std::string commandLineMessage_;
+	bool commandLineError_{};
 };
 
 enum class SpecialCases : char {

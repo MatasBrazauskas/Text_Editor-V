@@ -6,8 +6,7 @@
 
 EditorState::EditorState() : currentMode_{Modes::Normal}, running_{true} {}
 
-EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings)
-	: filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
+EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings): filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
 	panesManager_.addPane(0, 0, PaneDirection::Top);
 }
 
@@ -20,7 +19,9 @@ std::variant<SpecialCases, std::string> EditorCore::EncodeInput(const SDL_Event&
 		const SDL_Keycode keyCode = t_event.key.keysym.sym;
 		if (keyCode == SDLK_ESCAPE) {
 			return SpecialCases::SwitchToNormalMode;
-		} else if (keyCode == SDLK_LCTRL || keyCode == SDLK_RCTRL) {
+		}
+
+		if (keyCode == SDLK_LCTRL || keyCode == SDLK_RCTRL) {
 			return std::string(1, static_cast<char>(SpecialKeys::Shift));
 		}
 
@@ -90,6 +91,7 @@ void EditorCore::HandleKeyboardInput() {
 			HandleSpecialCases(specialCase, event);
 		} else {
 			editorInputAndOutput_.input_.append(std::get<std::string>(input));
+			editorInputAndOutput_.commandLineMessage_.append(std::get<std::string>(input));
 
 			auto& file = filesManager_.getFile();
 			auto& cursor = panesManager_.getCurrPane()->get().cursor_;
@@ -102,7 +104,8 @@ void EditorCore::HandleKeyboardInput() {
 				insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);
 				break;
 			case Modes::Command:
-				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_, panesManager_);
+				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_,
+												 panesManager_);
 				break;
 			case Modes::WindowMode:
 				windowSubCommand_.ExecuteCommand(panesManager_, winSettings, editorInputAndOutput_.input_.back());

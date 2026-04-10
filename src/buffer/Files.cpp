@@ -7,8 +7,14 @@
 #include <numeric>
 
 MatrixIterator::MatrixIterator(const std::vector<std::string>& t_matrix, const int t_index, const bool t_flag)
-	: matrix_{t_matrix}, index_{t_index}, forwarded_{t_flag} {
-	this->currLine_ = matrix_.at(index_);
+	: index_{t_index}, matrix_{t_matrix}, forwarded_{t_flag} {
+	const int temp = matrix_.size();
+
+	if (matrix_.size() == 0) {
+		matrix_.
+	}
+
+	this->currLine_ = temp == 0 ? std::string_view{""} : matrix_.at(index_);
 }
 
 void MatrixIterator::next() {
@@ -181,9 +187,7 @@ File& FilesManager::getFile() {
 }
 
 FileId FilesManager::switchToNextFile() {
-	const auto predicate = [this](const File& file) {
-		return file.fileId_ == activeFileId_;
-	};
+	const auto predicate = [this](const File& file) { return file.fileId_ == activeFileId_; };
 	const auto it = std::ranges::find_if(files_, predicate);
 	const auto index = (std::distance(files_.begin(), it) + 1) % (files_.size());
 
@@ -192,9 +196,7 @@ FileId FilesManager::switchToNextFile() {
 }
 
 FileId FilesManager::switchToPrevFile() {
-	const auto predicate = [this](const File& file) {
-		return file.fileId_ == activeFileId_;
-	};
+	const auto predicate = [this](const File& file) { return file.fileId_ == activeFileId_; };
 	const auto it = std::ranges::find_if(files_, predicate);
 	auto index = static_cast<int>(std::distance(files_.begin(), it) - 1);
 

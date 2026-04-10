@@ -575,7 +575,7 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 		std::vector<std::string> leftSide =
 			leftSideNumbers(startIndexY, endIndexY, cursor.getY(), t_config.editor.view.lineNumberMode, file, t_config);
 
-		const int endIndexX = startIndexX + charWidthCount - leftSide.at(0).length();
+		const int endIndexX = leftSide.empty() ? 0 : startIndexX + charWidthCount - leftSide.at(0).length();
 
 		for (auto it = file.textBuffer_.forwardIterator(startIndexY); !it.end(endIndexY); it.next()) {
 			const std::string_view strView = it.getLine();
@@ -591,7 +591,7 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 			linesVec.emplace_back(subStrView);
 		}
 
-		int leftSideOffset = leftSide.at(0).length();
+		int leftSideOffset = leftSide.empty() ? 0 : leftSide.at(0).length();
 		t_left = leftSideOffset * t_settings.charSettings.codeCharWidth;
 		PanesSnippets panesSnippets = PanesSnippets::TextSnippet;
 
@@ -664,7 +664,7 @@ void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Set
 		modeText = "   Files";
 	}
 
-	const std::string commandInfo = std::format("{:<15}", t_io.input_);
+	const std::string commandInfo = std::format("{:<15}", t_io.commandLineMessage_);
 
 	const int charCount = t_filesManager.getFile().textBuffer_.getCharCount();
 	const int lineCount = t_filesManager.getFile().textBuffer_.getLinesCount();

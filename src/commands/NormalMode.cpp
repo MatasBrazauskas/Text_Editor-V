@@ -10,8 +10,8 @@
 
 NormalModeTable::NormalModeTable() {
 	actions = {
-		{'O', &NormalModeTable::actionInsertLineAbove},	   {'o', &NormalModeTable::actionInsertLineBelow},
-		{'i', &NormalModeTable::actionSwitchToInsertLeft}, {'a', &NormalModeTable::actionSwitchToInsertRight},
+		{'O', &NormalModeTable::actionInsertLineAbove},		{'o', &NormalModeTable::actionInsertLineBelow},
+		{'i', &NormalModeTable::actionSwitchToInsertLeft},	{'a', &NormalModeTable::actionSwitchToInsertRight},
 		{':', &NormalModeTable::actionSwitchToCommandMode}, {'x', &NormalModeTable::actionDeleteChar},
 	};
 

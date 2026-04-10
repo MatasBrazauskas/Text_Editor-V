@@ -16,7 +16,7 @@ CommandStructure CommandMode::parseCommand(std::string input) const {
 	CommandStructure com;
 
 	std::string arg;
-	if (!(ss >> arg)) {
+	if (not (ss >> arg)) {
 		abort();
 	}
 
@@ -62,14 +62,20 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 			t_io.input_.clear();
 			state.currentMode_ = Modes::Normal;
 		} else {
-			t_io.input_ = "Unknown command: " + com.command_;
+			t_io.commandLineMessage_ = UnknownCommand + com.command_;
+			t_io.commandLineError_ = true;
+		}
+	} else {
+		if (t_io.commandLineError_) {
+			t_io.commandLineMessage_ = t_io.input_;
 		}
 	}
 }
 
-void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& t_fileHandler, FilesManager& t_filesManager, PanesManager&,
-							  const CommandStructure& com) {
+void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& t_fileHandler,
+							  FilesManager& t_filesManager, PanesManager&, const CommandStructure& com) const {
 	std::cout << "Writing to file...\n";
+
 	if (com.args_.empty()) {
 		const auto& currentFile = t_filesManager.getFile();
 		t_fileHandler.writeToFile(currentFile);
@@ -80,12 +86,14 @@ void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& 
 	}
 }
 
-void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandler& fileHandler, FilesManager& files, PanesManager&,
-						   const CommandStructure& com) {
+void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FileHandler& fileHandler, FilesManager& files,
+						   PanesManager&, const CommandStructure& com) const {
 	std::cout << "Opening file...\n";
 
 	if (com.args_.empty()) {
-		throw new std::runtime_error("No arguments for open command");
+		t_io.commandLineMessage_ = NotEnoughArguments;
+		t_io.commandLineError_ = true;
+		return;
 	}
 
 	for (const auto& fileNames : com.args_) {
@@ -96,22 +104,37 @@ void CommandMode::openFile(EditorState& state, EditorInputAndOutput&, FileHandle
 	}
 }
 
-void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&, PanesManager&,
-								 const CommandStructure& com) {
-	if (!com.args_.empty()) {
-		t_io.commandLineMessage_ = "Trailing characters";
-	} else {
-		state.running_ = false;
+void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&,
+								 PanesManager&, const CommandStructure& com) const {
+	if (not com.args_.empty()) {
+		t_io.commandLineMessage_ = TooMuchArguments;
+		t_io.commandLineError_ = true;
+		return;
 	}
+	state.running_ = false;
 }
 
-void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager& t_fileManager, PanesManager& t_panesManager, const CommandStructure&) {
+void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput& t_io, FileHandler&, FilesManager& t_fileManager,
+									 PanesManager& t_panesManager, const CommandStructure& t_com) const {
+
+	if (not t_com.args_.empty()) {
+		t_io.commandLineMessage_ = TooMuchArguments;
+		t_io.commandLineError_ = true;
+		return;
+	}
+
 	const auto nextFileId = t_fileManager.switchToNextFile();
 	const auto& currPane = t_panesManager.getCurrPane();
 	currPane->get().fileId_ = nextFileId;
 }
 
-void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager& t_fileManager, PanesManager& t_panesManager, const CommandStructure&) {
+void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, FileHandler&, FilesManager& t_fileManager,
+									 PanesManager& t_panesManager, const CommandStructure& t_com) const {
+	if (not t_com.args_.empty()) {
+		t_io.commandLineMessage_ = TooMuchArguments;
+		t_io.commandLineError_ = true;
+		return;
+	}
 	const auto prevFileId = t_fileManager.switchToPrevFile();
 	const auto& currPane = t_panesManager.getCurrPane();
 	currPane->get().fileId_ = prevFileId;

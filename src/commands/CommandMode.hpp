@@ -11,8 +11,14 @@ class Document;
 class FilesManager;
 class PanesManager;
 
+using namespace std::string_literals;
+
+constexpr auto NotEnoughArguments = "Not enough arguments.";
+constexpr auto UnknownCommand = "Unknown command:";
+constexpr auto TooMuchArguments = "Too much arguments.";
+
 class CommandStructure final {
-      public:
+  public:
 	CommandStructure() = default;
 	~CommandStructure() noexcept = default;
 	std::string command_;
@@ -20,21 +26,27 @@ class CommandStructure final {
 };
 
 class CommandMode final {
-      public:
+  public:
 	CommandMode();
 	~CommandMode() noexcept = default;
 	void HandleKeyboardInput(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&);
 
-	using Func = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&);
+	using Func = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
+									   const CommandStructure&) const;
 
-	void writeToFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&);
-	void openFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&);
-	void closeProgramme(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&);
+	void writeToFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
+					 const CommandStructure&) const;
+	void openFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
+				  const CommandStructure&) const;
+	void closeProgramme(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
+						const CommandStructure&) const;
 
-	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&);
-	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&);
+	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
+							const CommandStructure&) const;
+	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
+							const CommandStructure&) const;
 
-      private:
+  private:
 	CommandStructure parseCommand(std::string input) const;
 	std::unordered_map<std::string, Func> commands_;
 };
