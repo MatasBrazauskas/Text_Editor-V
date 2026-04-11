@@ -8,13 +8,7 @@
 
 MatrixIterator::MatrixIterator(const std::vector<std::string>& t_matrix, const int t_index, const bool t_flag)
 	: index_{t_index}, matrix_{t_matrix}, forwarded_{t_flag} {
-	const int temp = matrix_.size();
-
-	if (matrix_.size() == 0) {
-		matrix_.
-	}
-
-	this->currLine_ = temp == 0 ? std::string_view{""} : matrix_.at(index_);
+	this->currLine_ = matrix_.at(index_);
 }
 
 void MatrixIterator::next() {
@@ -41,8 +35,8 @@ bool MatrixIterator::end(const size_t endIndex_t) const {
 	return this->index_ < endIndex_t;
 }
 
-Matrix::Matrix(const std::vector<std::string>& t_lines) : lines_{std::move(t_lines)}, charsCount_{}, dirty{false} {
-	if (lines_.size() == 1 && lines_.at(0).empty()) {
+Matrix::Matrix(const std::vector<std::string>& t_lines) : dirty{false}, lines_{std::move(t_lines)}, charsCount_{} {
+	if (lines_.size() == 0) {
 		this->insertLine(0, "");
 	}
 
@@ -50,6 +44,10 @@ Matrix::Matrix(const std::vector<std::string>& t_lines) : lines_{std::move(t_lin
 	for (int i = 0; i < lines_.size(); ++i) {
 		lineInfo_.emplace_back(LineInfo::None);
 	}
+
+	const auto addLineCharCount = [](int t_sum, const std::string& t_line) { return t_sum + t_line.length(); };
+
+	charsCount_ = std::accumulate(lines_.begin(), lines_.end(), 0, addLineCharCount);
 }
 
 std::string_view Matrix::getLine(const int row) const {
@@ -80,6 +78,7 @@ int Matrix::getCharCount() const {
 }
 
 void Matrix::deleteLine(const int row) {
+	charsCount_ -= lines_.at(row).length();
 	lines_.erase(lines_.begin() + row);
 	lineInfo_.erase(lineInfo_.begin() + row);
 
@@ -93,24 +92,28 @@ void Matrix::deleteLine(const int row) {
 void Matrix::insertLine(const int row, const std::string line) {
 	lines_.insert(lines_.begin() + row, line);
 	lineInfo_.insert(lineInfo_.begin() + row, LineInfo::Insert);
+	charsCount_ += line.length();
 	dirty = true;
 }
 
 void Matrix::deleteCharacter(const int row, const int col) {
 	lines_.at(row).erase(col, 1);
 	lineInfo_[row] = LineInfo::Changed;
+	charsCount_--;
 	dirty = true;
 }
 
 void Matrix::insertCharacter(const int row, const int col, const char c) {
 	lines_.at(row).insert(col, 1, c);
 	lineInfo_[row] = LineInfo::Changed;
+	charsCount_++;
 	dirty = true;
 }
 
 void Matrix::deleteRange(const int row, const int startCol, const int len) {
 	auto& line = lines_.at(row);
 	line.erase(startCol, len);
+	charsCount_ -= len;
 	dirty = true;
 }
 
@@ -118,6 +121,7 @@ void Matrix::insertRange(const int row, const int startCol, const std::string_vi
 	auto& line = lines_.at(row);
 	line.insert(startCol, std::string(range));
 	lineInfo_[startCol] = LineInfo::Changed;
+	charsCount_ += range.length();
 	dirty = true;
 }
 MatrixIterator Matrix::forwardIterator(const size_t startCount_t) const {

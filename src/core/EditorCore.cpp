@@ -6,7 +6,20 @@
 
 EditorState::EditorState() : currentMode_{Modes::Normal}, running_{true} {}
 
-EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings): filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
+EditorInputAndOutput::EditorInputAndOutput() : commandLineError_{} {}
+
+void EditorInputAndOutput::cleanInputs() {
+	input_.clear();
+	commandLineMessage_.clear();
+	commandLineError_ = false;
+}
+
+void EditorInputAndOutput::removeLastInputChar() {
+	input_.erase(input_.end() - 2, input_.end());
+	commandLineMessage_.erase(commandLineMessage_.end() - 2, commandLineMessage_.end());
+}
+
+EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings) : filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
 	panesManager_.addPane(0, 0, PaneDirection::Top);
 }
 
@@ -79,7 +92,7 @@ void EditorCore::HandleSpecialCases(const SpecialCases t_specialCase, const SDL_
 	}
 }
 
-void EditorCore::HandleKeyboardInput() {
+void EditorCore::HandleKeyboardInput(const Config& t_config) {
 	SDL_Event event;
 	auto winSettings = settings_.windowSettings;
 
@@ -101,18 +114,16 @@ void EditorCore::HandleKeyboardInput() {
 				normalMode_.HandleKeyboardInput(file, cursor, editorState_, editorInputAndOutput_);
 				break;
 			case Modes::Insert:
-				insertMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, file, cursor);
+				insertMode_.HandleKeyboardInput(editorInputAndOutput_, file, cursor, t_config);
 				break;
 			case Modes::Command:
-				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_,
-												 panesManager_);
+				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_, panesManager_);
 				break;
 			case Modes::WindowMode:
 				windowSubCommand_.ExecuteCommand(panesManager_, winSettings, editorInputAndOutput_.input_.back());
 				break;
 			case Modes::FileMode:
-				fileSubCommand_.ExecuteCommand(panesManager_, filesManager_, winSettings,
-											   editorInputAndOutput_.input_.back());
+				fileSubCommand_.ExecuteCommand(panesManager_, filesManager_, winSettings, editorInputAndOutput_.input_.back());
 				break;
 			}
 		}

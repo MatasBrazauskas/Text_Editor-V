@@ -12,7 +12,7 @@
   {
     "feel": 
     {
-      "indent_type": "tabs",
+      "indent_type": "space",
       "indent_size": 8,
       "auto_save":
       {
@@ -29,7 +29,7 @@
         "enabled": true,
         "column": 80 
       },
-      "line_number_mode": "number"
+      "line_number_mode": "relative"
     }
   },
   "fonts": 

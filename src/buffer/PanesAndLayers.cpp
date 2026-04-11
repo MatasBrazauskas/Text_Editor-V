@@ -58,8 +58,7 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-Pane::Pane(const PaneId t_paneId, const FileId t_fileId)
-	: paneId_{t_paneId}, fileId_{t_fileId}, textIndex_{0, 0}, cursor_{} {}
+Pane::Pane(const PaneId t_paneId, const FileId t_fileId) : paneId_{t_paneId}, fileId_{t_fileId}, textIndex_{0, 0}, cursor_{} {}
 
 SplitNode::SplitNode(const Pane t_pane) : nodeType{t_pane} {}
 
@@ -156,8 +155,8 @@ std::optional<SplitNode*> PanesManager::getPaneParentPointer(const PaneId t_pane
 			return false;
 		}
 
-		const bool parentToLeafPredicate = std::holds_alternative<Pane>(splitNode->leftChild->nodeType) &&
-										   std::holds_alternative<Pane>(splitNode->rightChild->nodeType);
+		const bool parentToLeafPredicate =
+			std::holds_alternative<Pane>(splitNode->leftChild->nodeType) && std::holds_alternative<Pane>(splitNode->rightChild->nodeType);
 		return parentToLeafPredicate;
 	};
 
@@ -193,8 +192,7 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 				Coordinates rightCoords = t_cords;
 
 				const int widthDiff = t_cords.endX - t_cords.startX;
-				const int leftDiff =
-					static_cast<int>(std::round(static_cast<float>(widthDiff) * t_splitNode->leftChildRation));
+				const int leftDiff = static_cast<int>(std::round(static_cast<float>(widthDiff) * t_splitNode->leftChildRation));
 				// const int rightDiff = widthDiff - leftDiff;
 
 				leftCoords.endX = leftCoords.startX + leftDiff;
@@ -207,8 +205,7 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 				Coordinates bottomCoords = t_cords;
 
 				const int heightDiff = t_cords.endY - t_cords.startY;
-				const int topDiff =
-					static_cast<int>(std::round(static_cast<float>(heightDiff) * t_splitNode->leftChildRation));
+				const int topDiff = static_cast<int>(std::round(static_cast<float>(heightDiff) * t_splitNode->leftChildRation));
 				// const int bottomDiff = heightDiff - topDiff;
 
 				topCoords.endY = topCoords.startY + topDiff;
@@ -292,9 +289,8 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto topPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.startY == paneCoords.endY;
 		const bool endsOutside = paneCoords.startX <= currPaneCoords.startX && currPaneCoords.endX <= paneCoords.endX;
-		const bool endsInside =
-			(currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX) ||
-			(currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
+		const bool endsInside = (currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX) ||
+								(currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -302,9 +298,8 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto bottomPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.endY == paneCoords.startY;
 		const bool endsOutside = paneCoords.startX <= currPaneCoords.startX && currPaneCoords.endX <= paneCoords.endX;
-		const bool endsInside =
-			(currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX) ||
-			(currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
+		const bool endsInside = (currPaneCoords.startX <= paneCoords.startX && paneCoords.startX <= currPaneCoords.endX) ||
+								(currPaneCoords.startX <= paneCoords.endX && paneCoords.endX <= currPaneCoords.endX);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -312,9 +307,8 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto leftPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.startX == paneCoords.endX;
 		const bool endsOutside = paneCoords.startY <= currPaneCoords.startY && currPaneCoords.endY <= paneCoords.endY;
-		const bool endsInside =
-			(currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY) ||
-			(currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
+		const bool endsInside = (currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY) ||
+								(currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -322,9 +316,8 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 	const auto rightPredicate = [](const Coordinates& currPaneCoords, const Coordinates& paneCoords) {
 		const bool heightPredicate = currPaneCoords.endX == paneCoords.startX;
 		const bool endsOutside = paneCoords.startY <= currPaneCoords.startY && currPaneCoords.endY <= paneCoords.endY;
-		const bool endsInside =
-			(currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY) ||
-			(currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
+		const bool endsInside = (currPaneCoords.startY <= paneCoords.startY && paneCoords.startY <= currPaneCoords.endY) ||
+								(currPaneCoords.startY <= paneCoords.endY && paneCoords.endY <= currPaneCoords.endY);
 
 		return heightPredicate && (endsOutside || endsInside);
 	};
@@ -444,21 +437,18 @@ std::optional<SplitNode*> PanesManager::getPanePointer(const PaneId t_paneId) {
 TabLayout::TabLayout(const int activeTab_t, const int t_tabCapLines, const std::vector<std::string>& tabs_t)
 	: activeTab{activeTab_t}, tabCapturedLinesOffsetY{t_tabCapLines}, tabs{tabs_t} {}
 
-CommandLineLayout::CommandLineLayout(const Modes mode_t, std::string t_modeName, std::string t_commandInfo,
-									 std::string t_lineAndCharInfo, std::string t_commandArgs)
-	: mode{mode_t}, modeName{t_modeName}, commandInfo{t_commandInfo}, fileInfo{t_lineAndCharInfo},
-	  commandLineArgs{t_commandArgs} {}
+CommandLineLayout::CommandLineLayout(const Modes mode_t, std::string t_modeName, std::string t_commandInfo, std::string t_lineAndCharInfo,
+									 std::string t_commandArgs)
+	: mode{mode_t}, modeName{t_modeName}, commandInfo{t_commandInfo}, fileInfo{t_lineAndCharInfo}, commandLineArgs{t_commandArgs} {}
 
-PanesLayout::PanesLayout(const PanesSnippets t_panesSnippet, const int t_startX, const int t_startY, const int t_endX,
-						 const int t_endY, const int t_leftDataOffsetX, const std::vector<std::string>& t_leftData,
-						 const std::vector<std::string>& t_lines)
-	: panesSnippet{t_panesSnippet}, startX{t_startX}, startY{t_startY}, endX{t_endX}, endY{t_endY},
-	  leftDataOffsetX{t_leftDataOffsetX}, leftData{t_leftData}, lines{t_lines} {}
+PanesLayout::PanesLayout(const PanesSnippets t_panesSnippet, const int t_startX, const int t_startY, const int t_endX, const int t_endY,
+						 const int t_leftDataOffsetX, const std::vector<std::string>& t_leftData, const std::vector<std::string>& t_lines)
+	: panesSnippet{t_panesSnippet}, startX{t_startX}, startY{t_startY}, endX{t_endX}, endY{t_endY}, leftDataOffsetX{t_leftDataOffsetX},
+	  leftData{t_leftData}, lines{t_lines} {}
 
 CursorLayout::CursorLayout(const bool t_visible, const int t_cursorX, const int t_cursorY, const std::string t_letters,
 						   const int t_cursorWidth, const CursorType t_cursorType)
-	: visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letters}, cursorWidth{t_cursorWidth},
-	  cursorType{t_cursorType} {}
+	: visible{t_visible}, cursorX{t_cursorX}, cursorY{t_cursorY}, letter{t_letters}, cursorWidth{t_cursorWidth}, cursorType{t_cursorType} {}
 
 LayoutManager::LayoutManager(EditorCore& t_editorCore, const Config& t_config, const Settings& t_settings)
 	: windowHeight{t_config.window.height}, windowWidth{t_config.window.width} {
@@ -515,14 +505,14 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 	this->tabLayout.tabs = tabVec;
 }
 
-static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, int cursorY, LineNumberModes lineMode,
-												const File& t_file, const Config& t_config) {
+static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, int cursorY, LineNumberModes lineMode, const File& t_file,
+												const Config& t_config) {
 	std::vector<std::string> leftSide;
 
 	const auto addNumber = [](const int lineNumber) { return std::format("{:^5}", lineNumber); };
 	const auto addRelativeNumber = [](const int lineNumber, const int cursorY) {
 		const int lineIndex = lineNumber == cursorY ? cursorY : std::abs(lineNumber - cursorY);
-		return std::format("{:>4}", lineIndex);
+		return std::format("{:^5}", lineIndex);
 	};
 
 	for (auto it = t_file.textBuffer_.forwardIterator(startIndex); !it.end(endIndex); it.next()) {
@@ -551,9 +541,8 @@ static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, in
 	return leftSide;
 }
 
-void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesManager,
-								   const Settings& t_settings, const int t_tabOffsetY, const Config& t_config,
-								   int& t_left) {
+void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesManager, const Settings& t_settings,
+								   const int t_tabOffsetY, const Config& t_config, int& t_left) {
 	const int w = t_settings.windowSettings.width;
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
@@ -602,16 +591,15 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 			panesSnippets = PanesSnippets::FilesSnippet;
 		}
 
-		const auto& layoutPane = PanesLayout(panesSnippets, coords.startX, t_tabOffsetY + coords.startY, coords.endX,
-											 t_tabOffsetY + coords.endY,
-											 leftSideOffset * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
+		const auto& layoutPane =
+			PanesLayout(panesSnippets, coords.startX, t_tabOffsetY + coords.startY, coords.endX, t_tabOffsetY + coords.endY,
+						leftSideOffset * t_settings.charSettings.codeCharWidth, leftSide, linesVec);
 		panesLayout.push_back(layoutPane);
 	}
 }
 
-void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings& t_settings,
-									FilesManager& t_filesManager, int t_tabOffsetY, int t_leftSideOffsetX,
-									const EditorState& t_editorState) {
+void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings& t_settings, FilesManager& t_filesManager,
+									int t_tabOffsetY, int t_leftSideOffsetX, const EditorState& t_editorState) {
 	const int w = t_settings.windowSettings.width;
 	const int h = t_settings.windowSettings.height - t_tabOffsetY - 2 * t_settings.charSettings.uiCharHeight;
 
@@ -648,9 +636,8 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	cursorLayout = CursorLayout{visible, cursorX, cursorY, letters, cursorWidth, cursorType};
 }
 
-void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
-										 const EditorState& t_editorState, const EditorInputAndOutput& t_io,
-										 FilesManager& t_filesManager) {
+void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig, const EditorState& t_editorState,
+										 const EditorInputAndOutput& t_io, FilesManager& t_filesManager) {
 	const Modes mode = t_editorState.currentMode_;
 	std::string modeText = "  Normal";
 

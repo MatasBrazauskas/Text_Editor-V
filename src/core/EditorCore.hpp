@@ -25,16 +25,15 @@ enum class SpecialKeys : char {
 	Shift = static_cast<char>(138),
 };
 
-static const std::unordered_map<SDL_Keycode, char> specialKeyMap = {
-	{SDLK_BACKSPACE, static_cast<char>(SpecialKeys::Backspace)},
-	{SDLK_RETURN, static_cast<char>(SpecialKeys::Enter)},
-	{SDLK_LEFT, static_cast<char>(SpecialKeys::LeftArrow)},
-	{SDLK_UP, static_cast<char>(SpecialKeys::UpArrow)},
-	{SDLK_RIGHT, static_cast<char>(SpecialKeys::RightArrow)},
-	{SDLK_DOWN, static_cast<char>(SpecialKeys::DownArrow)},
-	{SDLK_TAB, static_cast<char>(SpecialKeys::Tab)},
-	{SDLK_ESCAPE, static_cast<char>(SpecialKeys::Escape)},
-	{SDLK_LCTRL, static_cast<char>(SpecialKeys::Control)}};
+static const std::unordered_map<SDL_Keycode, char> specialKeyMap = {{SDLK_BACKSPACE, static_cast<char>(SpecialKeys::Backspace)},
+																	{SDLK_RETURN, static_cast<char>(SpecialKeys::Enter)},
+																	{SDLK_LEFT, static_cast<char>(SpecialKeys::LeftArrow)},
+																	{SDLK_UP, static_cast<char>(SpecialKeys::UpArrow)},
+																	{SDLK_RIGHT, static_cast<char>(SpecialKeys::RightArrow)},
+																	{SDLK_DOWN, static_cast<char>(SpecialKeys::DownArrow)},
+																	{SDLK_TAB, static_cast<char>(SpecialKeys::Tab)},
+																	{SDLK_ESCAPE, static_cast<char>(SpecialKeys::Escape)},
+																	{SDLK_LCTRL, static_cast<char>(SpecialKeys::Control)}};
 
 using FileId = uint_fast64_t;
 using PaneId = uint_fast64_t;
@@ -50,12 +49,15 @@ class EditorState final {
 
 class EditorInputAndOutput final {
   public:
-	EditorInputAndOutput() = default;
+	EditorInputAndOutput();
 	~EditorInputAndOutput() noexcept = default;
 
 	std::string input_;
 	std::string commandLineMessage_;
-	bool commandLineError_{};
+	bool commandLineError_;
+
+	void cleanInputs();
+	void removeLastInputChar();
 };
 
 enum class SpecialCases : char {
@@ -75,7 +77,7 @@ class EditorCore final {
 	EditorCore(int argc, char** argv, Settings&);
 	~EditorCore() noexcept = default;
 
-	void HandleKeyboardInput();
+	void HandleKeyboardInput(const Config&);
 	bool Running() const;
 
 	FilesManager filesManager_;

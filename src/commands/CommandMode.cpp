@@ -16,7 +16,7 @@ CommandStructure CommandMode::parseCommand(std::string input) const {
 	CommandStructure com;
 
 	std::string arg;
-	if (not (ss >> arg)) {
+	if (not(ss >> arg)) {
 		abort();
 	}
 
@@ -31,24 +31,21 @@ CommandStructure CommandMode::parseCommand(std::string input) const {
 
 CommandMode::CommandMode() {
 	commands_ = {
-		{"q", &CommandMode::closeProgramme},
-		{"w", &CommandMode::writeToFile},
-		{"e", &CommandMode::openFile},
-		{"bn", &CommandMode::switchToNextBuffer},
-		{"bp", &CommandMode::switchToPrevBuffer},
+		{"q", &CommandMode::closeProgramme},	  {"w", &CommandMode::writeToFile},			{"e", &CommandMode::openFile},
+		{"bn", &CommandMode::switchToNextBuffer}, {"bp", &CommandMode::switchToPrevBuffer},
 	};
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FileHandler& fileHandler,
-									  FilesManager& files, PanesManager& t_panesManager) {
+void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FileHandler& fileHandler, FilesManager& files,
+									  PanesManager& t_panesManager) {
 	if (t_io.input_.empty())
 		return;
 
 	if (t_io.input_.back() == static_cast<char>(SpecialKeys::Backspace)) {
 		if (t_io.input_.length() > 2) {
-			t_io.input_.erase(t_io.input_.end() - 2, t_io.input_.end());
+			t_io.removeLastInputChar();
 		} else {
-			t_io.input_.clear();
+			t_io.cleanInputs();
 			state.currentMode_ = Modes::Normal;
 		}
 
@@ -59,7 +56,7 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 			const auto& func = it->second;
 			(this->*func)(state, t_io, fileHandler, files, t_panesManager, com);
 
-			t_io.input_.clear();
+			t_io.cleanInputs();
 			state.currentMode_ = Modes::Normal;
 		} else {
 			t_io.commandLineMessage_ = UnknownCommand + com.command_;
@@ -67,13 +64,14 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 		}
 	} else {
 		if (t_io.commandLineError_) {
-			t_io.commandLineMessage_ = t_io.input_;
+			t_io.cleanInputs();
+			t_io.commandLineError_ = false;
 		}
 	}
 }
 
-void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& t_fileHandler,
-							  FilesManager& t_filesManager, PanesManager&, const CommandStructure& com) const {
+void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& t_fileHandler, FilesManager& t_filesManager, PanesManager&,
+							  const CommandStructure& com) const {
 	std::cout << "Writing to file...\n";
 
 	if (com.args_.empty()) {
@@ -86,8 +84,8 @@ void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& 
 	}
 }
 
-void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FileHandler& fileHandler, FilesManager& files,
-						   PanesManager&, const CommandStructure& com) const {
+void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FileHandler& fileHandler, FilesManager& files, PanesManager&,
+						   const CommandStructure& com) const {
 	std::cout << "Opening file...\n";
 
 	if (com.args_.empty()) {
@@ -104,8 +102,8 @@ void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FileHandler
 	}
 }
 
-void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&,
-								 PanesManager&, const CommandStructure& com) const {
+void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&, PanesManager&,
+								 const CommandStructure& com) const {
 	if (not com.args_.empty()) {
 		t_io.commandLineMessage_ = TooMuchArguments;
 		t_io.commandLineError_ = true;

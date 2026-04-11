@@ -34,17 +34,12 @@ class CommandMode final {
 	using Func = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
 									   const CommandStructure&) const;
 
-	void writeToFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
-					 const CommandStructure&) const;
-	void openFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
-				  const CommandStructure&) const;
-	void closeProgramme(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
-						const CommandStructure&) const;
+	void writeToFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void openFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void closeProgramme(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
 
-	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
-							const CommandStructure&) const;
-	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
-							const CommandStructure&) const;
+	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
 
   private:
 	CommandStructure parseCommand(std::string input) const;

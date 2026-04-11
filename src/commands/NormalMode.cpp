@@ -39,14 +39,14 @@ NormalModeTable::NormalModeTable() {
 
 NormalModeCommand::NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar,
 									 ParsingStages stage)
-	: operation(operation), motion(motion), targetMotion(targetMotion), targetCommand(targetCommand),
-	  targetChar(targetChar), stage(stage) {}
+	: operation(operation), motion(motion), targetMotion(targetMotion), targetCommand(targetCommand), targetChar(targetChar), stage(stage) {
+}
 
 NormalModeParser::NormalModeParser(const NormalModeTable& table_t)
 	: NormalModeParser(table_t, ' ', ' ', ' ', ' ', ' ', ParsingStages::Start) {}
 
-NormalModeParser::NormalModeParser(const NormalModeTable& table_t, char operation, char motion, char targetMotion,
-								   char targetCommand, char targetChar, ParsingStages stage)
+NormalModeParser::NormalModeParser(const NormalModeTable& table_t, char operation, char motion, char targetMotion, char targetCommand,
+								   char targetChar, ParsingStages stage)
 	: table{table_t}, command{operation, motion, targetMotion, targetCommand, targetChar, stage} {}
 
 bool NormalModeParser::parseAction(const char inputChar) const {
@@ -110,8 +110,8 @@ void NormalModeParser::parseCommand(char inputChar) {
 	const bool motion = parseMotion(inputChar);
 	const bool targetMotion = parseTargetMotion(inputChar);
 	const bool targetCommand = parseTargetCommand(inputChar);
-	const bool repeatedOperationAsLineMotion = command.stage == ParsingStages::WaitingForMotion &&
-											   command.operation == inputChar && (inputChar == 'd' || inputChar == 'y');
+	const bool repeatedOperationAsLineMotion =
+		command.stage == ParsingStages::WaitingForMotion && command.operation == inputChar && (inputChar == 'd' || inputChar == 'y');
 
 	if (command.stage == ParsingStages::Start) {
 		if (action) {
@@ -133,8 +133,7 @@ void NormalModeParser::parseCommand(char inputChar) {
 		} else if (targetMotion) {
 			addTargetMotion();
 		}
-	} else if (command.stage == ParsingStages::WaitingForMotionTarget ||
-			   command.stage == ParsingStages::WaitingForCommandTarget) {
+	} else if (command.stage == ParsingStages::WaitingForMotionTarget || command.stage == ParsingStages::WaitingForCommandTarget) {
 		addTargetChar();
 	}
 }
@@ -158,8 +157,7 @@ NormalModeCommand NormalModeParser::getCommand() const {
 
 NormalModeExecutor::NormalModeExecutor(const NormalModeTable& table) : table{table} {}
 
-void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& t_cursor, EditorState& state,
-												  const NormalModeCommand command) {
+void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& t_cursor, EditorState& state, const NormalModeCommand command) {
 	const auto action = table.actions.find(command.operation);
 	const auto operation = table.operations.find(command.operation);
 	const auto motion = table.motions.find(command.motion);
@@ -229,9 +227,9 @@ void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState
 
 	const auto command = parser.getCommand();
 
-	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ", operation: " << command.operation
-			  << ", motion: " << command.motion << ", target motion: " << command.targetMotion
-			  << ", target command: " << command.targetCommand << ", target char: " << command.targetChar << '\n';
+	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ", operation: " << command.operation << ", motion: " << command.motion
+			  << ", target motion: " << command.targetMotion << ", target command: " << command.targetCommand
+			  << ", target char: " << command.targetChar << '\n';
 
 	if (parser.executeCommand()) {
 		executor.executeNormalModeCommand(text, t_cursor, state, command);
