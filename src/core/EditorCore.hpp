@@ -88,7 +88,6 @@ class EditorCore final {
 
   private:
 	Settings& settings_;
-	FileHandler fileHandler_;
 
 	NormalMode normalMode_;
 	InsertMode insertMode_;

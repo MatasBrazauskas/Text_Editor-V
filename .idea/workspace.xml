@@ -39,19 +39,18 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="Temp">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DONE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/Files.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/Files.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/InsertMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/InsertMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/NormalMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalMode.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/FileHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/FileHandler.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/FileHandler.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/FileHandler.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +65,10 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -99,7 +102,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "CMake Application.Text_Editor.executor": "Run",
+    "CMake Application.Text_Editor.executor": "Debug",
     "CMake Debug.Text_Editor.executor": "Debug",
     "Google Test.CommandParsingTest-NormalModeCommandParsingTest.executor": "Run",
     "Google Test.CommandStageTest-NormalModeCommandParsingTest.executor": "Debug",
@@ -371,6 +374,8 @@
       <workItem from="1775733340649" duration="16580000" />
       <workItem from="1775799592435" duration="2857000" />
       <workItem from="1775919454794" duration="3490000" />
+      <workItem from="1776000401096" duration="932000" />
+      <workItem from="1776018979842" duration="5086000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />
@@ -403,6 +408,52 @@
     <MESSAGE value="Merge branch 'main' of https://github.com/MatasBrazauskas/Text_Editor&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml" />
     <MESSAGE value="Temp" />
     <option name="LAST_COMMIT_MESSAGE" value="Temp" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>107</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>106</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>105</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>103</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>102</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>101</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>100</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
+          <line>99</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

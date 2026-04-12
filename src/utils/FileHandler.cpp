@@ -18,11 +18,10 @@ std::vector<std::string> FileHandler::readFile(std::filesystem::path filesPath) 
 
 void FileHandler::writeToFile(const File& doc) const {
 	auto& [text, stack, path, id] = doc;
-	auto tempFilesPath = doc.filesPath_;
-	tempFilesPath += ".tmp";
+	const auto paths = doc.filesPath_.string() + ".tmp";
 
 	{
-		std::ofstream tempFile_(tempFilesPath, std::ios::binary | std::ios::trunc);
+		std::ofstream tempFile_(paths, std::ios::binary | std::ios::trunc);
 		if (!tempFile_.is_open()) {
 			throw std::runtime_error("Failed to open file for writing");
 		}
@@ -36,10 +35,27 @@ void FileHandler::writeToFile(const File& doc) const {
 	}
 
 	std::error_code errorCode;
-	std::filesystem::rename(tempFilesPath, doc.filesPath_, errorCode);
+	std::filesystem::rename(paths, doc.filesPath_, errorCode);
 
 	if (errorCode) {
-		std::filesystem::remove(tempFilesPath);
+		std::filesystem::remove(paths);
 		throw std::runtime_error("Failed to rename file");
 	}
+}
+
+std::vector<std::string> FileHandler::readDirectory(const std::filesystem::path t_path) const {
+	std::vector dirContent = {"../"s};
+
+	for (const auto& file : std::filesystem::directory_iterator{t_path}) {
+		const auto filePath = file.path().string();
+		const auto index = filePath.find_last_of('/');
+		auto fileName = std::string(filePath.substr(index + 1));
+
+		if (file.is_directory()) {
+			fileName.push_back('/');
+		}
+		dirContent.push_back(fileName);
+	}
+
+	return dirContent;
 }

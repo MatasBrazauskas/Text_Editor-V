@@ -36,7 +36,7 @@ CommandMode::CommandMode() {
 	};
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FileHandler& fileHandler, FilesManager& files,
+void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FilesManager& files,
 									  PanesManager& t_panesManager) {
 	if (t_io.input_.empty())
 		return;
@@ -54,7 +54,7 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 
 		if (const auto it = commands_.find(com.command_); it != commands_.end()) {
 			const auto& func = it->second;
-			(this->*func)(state, t_io, fileHandler, files, t_panesManager, com);
+			(this->*func)(state, t_io, files, t_panesManager, com);
 
 			t_io.cleanInputs();
 			state.currentMode_ = Modes::Normal;
@@ -70,22 +70,20 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 	}
 }
 
-void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FileHandler& t_fileHandler, FilesManager& t_filesManager, PanesManager&,
+void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FilesManager& t_filesManager, PanesManager&,
 							  const CommandStructure& com) const {
 	std::cout << "Writing to file...\n";
 
 	if (com.args_.empty()) {
-		const auto& currentFile = t_filesManager.getFile();
-		t_fileHandler.writeToFile(currentFile);
+		t_filesManager.saveCurrentFile();
 	} else {
-		for (const auto& file : t_filesManager.files_) {
-			t_fileHandler.writeToFile(file);
+		for (const auto& filename: com.args_) {
+			
 		}
 	}
 }
 
-void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FileHandler& fileHandler, FilesManager& files, PanesManager&,
-						   const CommandStructure& com) const {
+void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FilesManager& files, PanesManager&, const CommandStructure& com) const {
 	std::cout << "Opening file...\n";
 
 	if (com.args_.empty()) {
@@ -97,12 +95,11 @@ void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FileHandler
 	for (const auto& fileNames : com.args_) {
 		const auto path = std::filesystem::path(fileNames);
 
-		const auto& file = fileHandler.readFile(path);
-		files.addRegularFile(Matrix(std::move(file)), std::move(path));
+		files.addRegularFile(std::move(path));
 	}
 }
 
-void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FileHandler&, FilesManager&, PanesManager&,
+void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FilesManager&, PanesManager&,
 								 const CommandStructure& com) const {
 	if (not com.args_.empty()) {
 		t_io.commandLineMessage_ = TooMuchArguments;
@@ -112,7 +109,7 @@ void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io,
 	state.running_ = false;
 }
 
-void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput& t_io, FileHandler&, FilesManager& t_fileManager,
+void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput& t_io, FilesManager& t_fileManager,
 									 PanesManager& t_panesManager, const CommandStructure& t_com) const {
 
 	if (not t_com.args_.empty()) {
@@ -122,11 +119,11 @@ void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput& t_io, F
 	}
 
 	const auto nextFileId = t_fileManager.switchToNextFile();
-	const auto& currPane = t_panesManager.getCurrPane();
-	currPane->get().fileId_ = nextFileId;
+	auto& currPane = t_panesManager.getCurrPane();
+	currPane.switchFileId(nextFileId);
 }
 
-void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, FileHandler&, FilesManager& t_fileManager,
+void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, FilesManager& t_fileManager,
 									 PanesManager& t_panesManager, const CommandStructure& t_com) const {
 	if (not t_com.args_.empty()) {
 		t_io.commandLineMessage_ = TooMuchArguments;
@@ -134,6 +131,6 @@ void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, F
 		return;
 	}
 	const auto prevFileId = t_fileManager.switchToPrevFile();
-	const auto& currPane = t_panesManager.getCurrPane();
-	currPane->get().fileId_ = prevFileId;
+	auto& currPane = t_panesManager.getCurrPane();
+	currPane.switchFileId(prevFileId);
 }

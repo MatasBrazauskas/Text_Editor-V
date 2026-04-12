@@ -19,7 +19,7 @@ void EditorInputAndOutput::removeLastInputChar() {
 	commandLineMessage_.erase(commandLineMessage_.end() - 2, commandLineMessage_.end());
 }
 
-EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings) : filesManager_{fileHandler_, argc, argv}, settings_{t_settings} {
+EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings) : filesManager_{argc, argv}, settings_{t_settings} {
 	panesManager_.addPane(0, 0, PaneDirection::Top);
 }
 
@@ -107,7 +107,7 @@ void EditorCore::HandleKeyboardInput(const Config& t_config) {
 			editorInputAndOutput_.commandLineMessage_.append(std::get<std::string>(input));
 
 			auto& file = filesManager_.getFile();
-			auto& cursor = panesManager_.getCurrPane()->get().cursor_;
+			auto& cursor = panesManager_.getCurrPane().getCursor();
 
 			switch (editorState_.currentMode_) {
 			case Modes::Normal:
@@ -117,7 +117,7 @@ void EditorCore::HandleKeyboardInput(const Config& t_config) {
 				insertMode_.HandleKeyboardInput(editorInputAndOutput_, file, cursor, t_config);
 				break;
 			case Modes::Command:
-				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, fileHandler_, filesManager_, panesManager_);
+				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, filesManager_, panesManager_);
 				break;
 			case Modes::WindowMode:
 				windowSubCommand_.ExecuteCommand(panesManager_, winSettings, editorInputAndOutput_.input_.back());

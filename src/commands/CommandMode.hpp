@@ -29,17 +29,16 @@ class CommandMode final {
   public:
 	CommandMode();
 	~CommandMode() noexcept = default;
-	void HandleKeyboardInput(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&);
+	void HandleKeyboardInput(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&);
 
-	using Func = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&,
-									   const CommandStructure&) const;
+	using Func = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 
-	void writeToFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
-	void openFile(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
-	void closeProgramme(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void writeToFile(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void openFile(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void closeProgramme(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 
-	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
-	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FileHandler&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 
   private:
 	CommandStructure parseCommand(std::string input) const;

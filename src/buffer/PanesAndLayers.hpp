@@ -5,6 +5,7 @@
 #include <optional>
 #include <variant>
 #include <vector>
+#include <unordered_map>
 
 using FileId = std::uint_fast64_t;
 using PaneId = uint_fast64_t;
@@ -17,7 +18,7 @@ class Config;
 class FilesManager;
 
 using FileId = std::uint_fast64_t;
-using PaneId = uint_fast64_t;
+using PaneId = std::uint_fast64_t;
 
 enum class Modes : uint8_t;
 enum class NormalModeModes : char;
@@ -76,10 +77,13 @@ class Pane final {
 	Pane(PaneId, FileId);
 	~Pane() noexcept = default;
 
+	Cursor& getCursor();
+	void switchFileId(FileId);
+
 	PaneId paneId_;
 	FileId fileId_;
 	TextIndex textIndex_;
-	Cursor cursor_;
+	std::unordered_map<FileId, Cursor> cursors_;
 };
 
 class SplitNode final {
@@ -103,9 +107,11 @@ class PaneHistoryManager {
 	PaneHistoryManager();
 	~PaneHistoryManager() noexcept = default;
 
-	void addPaneId(PaneId);
-	void removePaneId(PaneId);
-	std::optional<PaneId> getLastPaneId();
+	bool containsPane(PaneId) const;
+	void addPane(PaneId);
+	void pushUpPane(PaneId);
+	void removePane(PaneId);
+	PaneId getLastPaneId() const;
 
 	auto begin() const {
 		return std::make_reverse_iterator(historyArr.begin() + historySize);
@@ -114,7 +120,6 @@ class PaneHistoryManager {
 		return std::make_reverse_iterator(historyArr.begin());
 	}
 
-  private:
 	std::array<PaneId, 8> historyArr;
 	int historySize;
 };
@@ -124,8 +129,8 @@ class PanesManager final {
 	PanesManager();
 	~PanesManager() noexcept = default;
 
-	std::optional<std::reference_wrapper<Pane>> getPane(PaneId);
-	std::optional<std::reference_wrapper<Pane>> getCurrPane();
+	Pane& getPane(PaneId);
+	Pane& getCurrPane();
 
 	void addPane(PaneId t_parent, FileId t_fileId, PaneDirection t_rotation);
 	void removePane(PaneId);

@@ -44,7 +44,7 @@ class FileSubCommand final {
 	void moveUp(PanesManager&, FilesManager&, WindowSettings&) const;
 	void moveDown(PanesManager&, FilesManager&, WindowSettings&) const;
 
-	void open() const;
+	void open(PanesManager&, FilesManager&, WindowSettings&) const;
 	void close() const;
 	void refresh() const;
 

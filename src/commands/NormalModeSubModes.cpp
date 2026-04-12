@@ -20,12 +20,12 @@ void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, WindowSettin
 
 void WindowSubCommand::verticalSplit(PanesManager& t_panesManager, WindowSettings&) const {
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->get().paneId_, pane->get().fileId_, PaneDirection::Left);
+	t_panesManager.addPane(pane.paneId_, pane.fileId_, PaneDirection::Left);
 }
 
 void WindowSubCommand::horizontalSplit(PanesManager& t_panesManager, WindowSettings&) const {
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->get().paneId_, pane->get().fileId_, PaneDirection::Bottom);
+	t_panesManager.addPane(pane.paneId_, pane.fileId_, PaneDirection::Bottom);
 }
 
 void WindowSubCommand::movePaneLeft(PanesManager& t_panesManager, WindowSettings& t_winSettings) const {
@@ -45,7 +45,7 @@ void WindowSubCommand::movePaneUp(PanesManager& t_panesManager, WindowSettings& 
 }
 
 void WindowSubCommand::closePane(PanesManager& t_panesManager, WindowSettings&) const {
-	const auto paneId = t_panesManager.getCurrPane()->get().paneId_;
+	const auto paneId = t_panesManager.getCurrPane().paneId_;
 	t_panesManager.removePane(paneId);
 }
 
@@ -59,26 +59,9 @@ FileSubCommand::FileSubCommand() {
 		{'v', &FileSubCommand::openInVertical},
 		{'k', &FileSubCommand::moveUp},
 		{'j', &FileSubCommand::moveDown},
-		/*{static_cast<char>(SpecialKeys::Enter), &FileSubCommand::open},
-		{'r', &FileSubCommand::refresh},*/
+		{static_cast<char>(SpecialKeys::Enter), &FileSubCommand::open},
+		/*{'r', &FileSubCommand::refresh},*/
 	};
-}
-
-std::vector<std::string> getDirectoriesContent() {
-	std::vector dirContent = {"../"s};
-
-	for (const auto& file : std::filesystem::directory_iterator{"."}) {
-		const auto filePath = file.path().string();
-		const auto index = filePath.find_last_of('/');
-		auto fileName = std::string(filePath.substr(index + 1));
-
-		if (file.is_directory()) {
-			fileName.push_back('/');
-		}
-		dirContent.push_back(fileName);
-	}
-
-	return dirContent;
 }
 
 void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& t_filesManager,
@@ -89,32 +72,38 @@ void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& 
 	}
 }
 
-void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& t_filesManager,
-									WindowSettings& t_winSettings) const {
-	const auto dirContent = getDirectoriesContent();
-	const auto matrix = Matrix(dirContent);
-	const auto fileId = t_filesManager.addSpecialFile(matrix);
-
+void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
+	const auto fileId = t_filesManager.addSpecialFile();
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->get().paneId_, fileId, PaneDirection::Left);
+
+	t_panesManager.addPane(pane.paneId_, fileId, PaneDirection::Left);
 }
 
-void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager& t_filesManager,
-									  WindowSettings& t_winSettings) const {
-	const auto dirContent = getDirectoriesContent();
-	const auto matrix = Matrix(dirContent);
-	const auto fileId = t_filesManager.addSpecialFile(matrix);
-
+void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
+	const auto fileId = t_filesManager.addSpecialFile();
 	const auto& pane = t_panesManager.getCurrPane();
-	t_panesManager.addPane(pane->get().paneId_, fileId, PaneDirection::Bottom);
+
+	t_panesManager.addPane(pane.paneId_, fileId, PaneDirection::Bottom);
 }
 
 void FileSubCommand::moveUp(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
-	auto& cursor = t_panesManager.getCurrPane()->get().cursor_;
+	auto& cursor = t_panesManager.getCurrPane().getCursor();
 	cursor.decrementY();
 }
 
 void FileSubCommand::moveDown(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
-	auto& cursor = t_panesManager.getCurrPane()->get().cursor_;
+	auto& cursor = t_panesManager.getCurrPane().getCursor();
 	cursor.incrementY();
+}
+
+void FileSubCommand::open(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
+	const auto buffer = t_filesManager.getFile().textBuffer_;
+
+	auto& pane = t_panesManager.getCurrPane();
+	const auto cursor = t_panesManager.getCurrPane().getCursor();
+
+	const auto filepath = buffer.getLine(cursor.getY());
+
+	const auto fileId = t_filesManager.addRegularFile(filepath);
+	pane.fileId_ = fileId;
 }

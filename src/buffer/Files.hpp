@@ -81,14 +81,17 @@ class File final {
 
 class FilesManager final {
   public:
-	FilesManager(const FileHandler&, int argc, char** argv);
+	FilesManager(int argc, char** argv);
 	~FilesManager() noexcept = default;
 
-	FileId addRegularFile(const Matrix&, const std::filesystem::path&);
-	FileId addSpecialFile(const Matrix&);
+	FileId addRegularFile(const std::filesystem::path&);
+	FileId addSpecialFile();
+	FileId addEmptyFile();
 
 	bool specialFile(FileId);
 	bool regularFile(FileId);
+
+	void saveCurrentFile();
 
 	[[nodiscard]] File& getFile(FileId);
 	[[nodiscard]] File& getFile();
@@ -100,5 +103,6 @@ class FilesManager final {
 	FileId activeFileId_;
 	inline static FileId fileIdCounter_{0};
 
+	FileHandler fileHandler_;
 	std::vector<FileId> specialFiles_;
 };

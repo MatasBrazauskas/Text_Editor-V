@@ -58,7 +58,21 @@ void Cursor::setVisible(const bool visible) {
 	visible_ = visible;
 }
 
-Pane::Pane(const PaneId t_paneId, const FileId t_fileId) : paneId_{t_paneId}, fileId_{t_fileId}, textIndex_{0, 0}, cursor_{} {}
+Pane::Pane(const PaneId t_paneId, const FileId t_fileId) : paneId_{t_paneId}, fileId_{t_fileId}, textIndex_{0, 0}, cursors_{} {
+	cursors_.insert({fileId_, Cursor()});
+}
+
+Cursor& Pane::getCursor() {
+	return cursors_[fileId_];
+}
+
+void Pane::switchFileId(const FileId t_fileId) {
+	if (not cursors_.contains(t_fileId)) {
+		cursors_.insert({t_fileId, Cursor()});
+	}
+
+	fileId_ = t_fileId;
+}
 
 SplitNode::SplitNode(const Pane t_pane) : nodeType{t_pane} {}
 
@@ -71,7 +85,7 @@ void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const
 
 	if (head_ == nullptr) {
 		head_ = new SplitNode(pane);
-		paneHistoryManager_.addPaneId(pane.paneId_);
+		paneHistoryManager_.addPane(pane.paneId_);
 	} else {
 		auto parentOption = getPanePointer(t_parentId);
 
@@ -111,7 +125,12 @@ void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const
 			parent->leftChild = std::make_unique<SplitNode>(leftChildPane);
 			parent->rightChild = std::make_unique<SplitNode>(rightChildPane);
 
-			paneHistoryManager_.addPaneId(pane.paneId_);
+			if (paneHistoryManager_.containsPane(pane.paneId_)) {
+				paneHistoryManager_.pushUpPane(pane.paneId_);
+			} else {
+				paneHistoryManager_.addPane(pane.paneId_);
+			}
+
 			return;
 		}
 
@@ -123,7 +142,7 @@ void PanesManager::removePane(const PaneId t_paneId) {
 	const auto parentOpt = getPaneParentPointer(t_paneId);
 
 	if (parentOpt == std::nullopt) {
-		throw std::runtime_error{"No split node found, child or parent"};
+		return;
 	}
 
 	const auto parent = parentOpt.value();
@@ -143,7 +162,8 @@ void PanesManager::removePane(const PaneId t_paneId) {
 	parent->leftChild.reset();
 	parent->rightChild.reset();
 
-	paneHistoryManager_.removePaneId(t_paneId);
+	paneHistoryManager_.removePane(t_paneId);
+	activePaneId_ = paneHistoryManager_.historyArr.at(paneHistoryManager_.historySize - 1);
 }
 
 std::optional<SplitNode*> PanesManager::getPaneParentPointer(const PaneId t_paneId) {
@@ -193,7 +213,6 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 
 				const int widthDiff = t_cords.endX - t_cords.startX;
 				const int leftDiff = static_cast<int>(std::round(static_cast<float>(widthDiff) * t_splitNode->leftChildRation));
-				// const int rightDiff = widthDiff - leftDiff;
 
 				leftCoords.endX = leftCoords.startX + leftDiff;
 				rightCoords.startX = leftCoords.endX;
@@ -206,7 +225,6 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 
 				const int heightDiff = t_cords.endY - t_cords.startY;
 				const int topDiff = static_cast<int>(std::round(static_cast<float>(heightDiff) * t_splitNode->leftChildRation));
-				// const int bottomDiff = heightDiff - topDiff;
 
 				topCoords.endY = topCoords.startY + topDiff;
 				bottomCoords.startY = topCoords.endY;
@@ -216,7 +234,7 @@ static void addCoordinates(std::vector<PaneInfo>& t_coordinates, SplitNode* t_sp
 			}
 		} else if (std::holds_alternative<Pane>(t_splitNode->nodeType)) {
 			const auto pane = get<Pane>(t_splitNode->nodeType);
-			t_coordinates.emplace_back(pane.paneId_, pane.fileId_, pane.textIndex_, pane.cursor_, t_cords);
+			t_coordinates.emplace_back(pane.paneId_, pane.fileId_, pane.textIndex_, pane.cursors_.at(pane.fileId_), t_cords);
 		}
 	}
 }
@@ -227,14 +245,12 @@ std::vector<PaneInfo> PanesManager::getPaneCoordinates(const int t_height, const
 	return coordinates;
 }
 
-std::optional<std::reference_wrapper<Pane>> PanesManager::getPane(const PaneId t_paneId) {
-	if (const auto pane = getPanePointer(t_paneId); pane != nullptr && pane.has_value()) {
-		return get<Pane>(pane.value()->nodeType);
-	}
-	return std::nullopt;
+Pane& PanesManager::getPane(const PaneId t_paneId) {
+	const auto pane = getPanePointer(t_paneId);
+	return get<Pane>(pane.value()->nodeType);
 }
 
-std::optional<std::reference_wrapper<Pane>> PanesManager::getCurrPane() {
+Pane& PanesManager::getCurrPane() {
 	return getPane(this->activePaneId_);
 }
 
@@ -257,9 +273,11 @@ std::vector<SplitNode*> PanesManager::getAllSplitNode() {
 
 PaneHistoryManager::PaneHistoryManager() : historyArr{}, historySize{} {}
 
-void PaneHistoryManager::addPaneId(const PaneId t_paneId) {
-	removePaneId(t_paneId);
+bool PaneHistoryManager::containsPane(const PaneId t_paneId) const {
+	return std::find(historyArr.begin(), historyArr.end(), t_paneId) != historyArr.end();
+}
 
+void PaneHistoryManager::addPane(const PaneId t_paneId) {
 	if (historySize >= historyArr.size()) {
 		std::shift_left(historyArr.begin(), historyArr.end(), 1);
 		historySize--;
@@ -268,7 +286,12 @@ void PaneHistoryManager::addPaneId(const PaneId t_paneId) {
 	historyArr[historySize++] = t_paneId;
 }
 
-void PaneHistoryManager::removePaneId(const PaneId t_paneId) {
+void PaneHistoryManager::pushUpPane(const PaneId t_paneId){
+	removePane(t_paneId);
+	historyArr[historySize++] = t_paneId;
+}
+
+void PaneHistoryManager::removePane(const PaneId t_paneId) {
 	const auto it = std::find(historyArr.begin(), historyArr.begin() + historySize, t_paneId);
 
 	if (it != historyArr.begin() + historySize) {
@@ -278,10 +301,7 @@ void PaneHistoryManager::removePaneId(const PaneId t_paneId) {
 	}
 }
 
-std::optional<PaneId> PaneHistoryManager::getLastPaneId() {
-	if (historySize <= 0) {
-		return std::nullopt;
-	}
+PaneId PaneHistoryManager::getLastPaneId() const {
 	return historyArr.at(historySize - 1);
 }
 
@@ -362,7 +382,13 @@ void PanesManager::moveToPane(const int t_height, const int t_width, PaneDirecti
 		for (auto i = borderingPanes.rbegin(); i != borderingPanes.rend(); ++i) {
 			if (*i == cachedPane) {
 				activePaneId_ = cachedPane;
-				paneHistoryManager_.addPaneId(activePaneId_);
+
+				if (paneHistoryManager_.containsPane(activePaneId_)) {
+					paneHistoryManager_.pushUpPane(activePaneId_);
+				} else {
+					paneHistoryManager_.addPane(activePaneId_);
+				}
+
 				return;
 			}
 		}

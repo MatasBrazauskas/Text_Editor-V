@@ -137,7 +137,7 @@ File::File(const Matrix& text_t, std::filesystem::path path_t, const FileId t_fi
 
 File::File(const Matrix& t_matrix, const FileId t_fileId) : textBuffer_{t_matrix}, fileId_{t_fileId} {}
 
-FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char** argv) : activeFileId_{} {
+FilesManager::FilesManager(const int argc, char** argv) : activeFileId_{} {
 	if (argc < 1 || argv == nullptr) {
 		return;
 	}
@@ -146,32 +146,45 @@ FilesManager::FilesManager(const FileHandler& fileHandler, const int argc, char*
 
 	if (filePaths.empty()) {
 		auto ptr = Matrix({});
-		this->addRegularFile(std::move(ptr), "Untitled");
+		this->addEmptyFile();
 	} else {
 		for (const auto& path : filePaths) {
-			const auto lines = fileHandler.readFile(path.data());
+			const auto lines = fileHandler_.readFile(path.data());
 			auto ptr = Matrix(lines);
 
-			this->addRegularFile(std::move(ptr), path);
+			this->addRegularFile(path);
 		}
 	}
 }
 
-FileId FilesManager::addRegularFile(const Matrix& t_textBuffer, const std::filesystem::path& t_filePath) {
-	const auto regularFile = File{std::move(t_textBuffer), t_filePath, fileIdCounter_};
+FileId FilesManager::addRegularFile(const std::filesystem::path& t_filePath) {
+	auto fileContents = Matrix{fileHandler_.readFile(t_filePath)};
+	const auto regularFile = File{std::move(fileContents), t_filePath, fileIdCounter_};
 	files_.push_back(std::move(regularFile));
-	fileIdCounter_++;
 
+	fileIdCounter_++;
 	return regularFile.fileId_;
 }
 
-FileId FilesManager::addSpecialFile(const Matrix& t_textBuffer) {
-	const auto specialFile = File{std::move(t_textBuffer), fileIdCounter_};
+FileId FilesManager::addSpecialFile() {
+	auto dirContents = Matrix{fileHandler_.readDirectory()};
+	const auto specialFile = File{std::move(dirContents), fileIdCounter_};
 	files_.push_back(std::move(specialFile));
-	fileIdCounter_++;
 
+	fileIdCounter_++;
 	specialFiles_.push_back(specialFile.fileId_);
 	return specialFile.fileId_;
+}
+
+FileId FilesManager::addEmptyFile() {
+	auto emptyText = Matrix{{""}};
+	const std::filesystem::path someFilePath = "Un";
+
+	const auto regularFile = File{std::move(emptyText), someFilePath, fileIdCounter_};
+	files_.push_back(std::move(regularFile));
+
+	fileIdCounter_++;
+	return regularFile.fileId_;
 }
 
 bool FilesManager::specialFile(const FileId t_fileId) {
@@ -180,6 +193,11 @@ bool FilesManager::specialFile(const FileId t_fileId) {
 
 bool FilesManager::regularFile(const FileId t_fileId) {
 	return !specialFile(t_fileId);
+}
+
+void FilesManager::saveCurrentFile() {
+	const auto file = getFile();
+	fileHandler_.writeToFile(file);
 }
 
 File& FilesManager::getFile(const FileId t_fileId) {
