@@ -40,6 +40,9 @@ class CommandMode final {
 	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 
+	void moveCursorRight(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void moveCursorLeft(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
+
   private:
 	CommandStructure parseCommand(std::string input) const;
 	std::unordered_map<std::string, Func> commands_;

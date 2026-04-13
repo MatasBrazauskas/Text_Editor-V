@@ -46,11 +46,8 @@
       <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/FileHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/FileHandler.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/FileHandler.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/FileHandler.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,11 +62,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -102,7 +94,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "CMake Application.Text_Editor.executor": "Debug",
+    "CMake Application.Text_Editor.executor": "Run",
     "CMake Debug.Text_Editor.executor": "Debug",
     "Google Test.CommandParsingTest-NormalModeCommandParsingTest.executor": "Run",
     "Google Test.CommandStageTest-NormalModeCommandParsingTest.executor": "Debug",
@@ -198,7 +190,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Text_Editor" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="main.cpp" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/cmake-build-debug/Text_Editor" EXPLICIT_BUILD_TARGET_NAME="all">
+    <configuration name="Text_Editor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/cmake-build-debug/Text_Editor" EXPLICIT_BUILD_TARGET_NAME="all">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -375,7 +367,8 @@
       <workItem from="1775799592435" duration="2857000" />
       <workItem from="1775919454794" duration="3490000" />
       <workItem from="1776000401096" duration="932000" />
-      <workItem from="1776018979842" duration="5086000" />
+      <workItem from="1776018979842" duration="5136000" />
+      <workItem from="1776061832707" duration="4369000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />
@@ -414,42 +407,42 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>107</line>
+          <line>106</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>106</line>
+          <line>105</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>105</line>
+          <line>104</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>103</line>
+          <line>102</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>102</line>
+          <line>101</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>101</line>
+          <line>100</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>100</line>
+          <line>99</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp</url>
-          <line>99</line>
+          <line>98</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>

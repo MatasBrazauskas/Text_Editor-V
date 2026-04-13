@@ -47,17 +47,23 @@ class EditorState final {
 	bool running_;
 };
 
+enum class CommandLineState: char {None, Error, Info};
+
 class EditorInputAndOutput final {
   public:
 	EditorInputAndOutput();
 	~EditorInputAndOutput() noexcept = default;
 
 	std::string input_;
+
+	int cursorIndexX;
 	std::string commandLineMessage_;
-	bool commandLineError_;
+	CommandLineState commandLineState_;
 
 	void cleanInputs();
 	void removeLastInputChar();
+	void setError(std::string);
+	void setInfo(std::string);
 };
 
 enum class SpecialCases : char {

@@ -6,17 +6,33 @@
 
 EditorState::EditorState() : currentMode_{Modes::Normal}, running_{true} {}
 
-EditorInputAndOutput::EditorInputAndOutput() : commandLineError_{} {}
+EditorInputAndOutput::EditorInputAndOutput() : cursorIndexX{}, commandLineState_{CommandLineState::None} {}
 
 void EditorInputAndOutput::cleanInputs() {
 	input_.clear();
+
+	cursorIndexX = 0;
 	commandLineMessage_.clear();
-	commandLineError_ = false;
+	commandLineState_ = CommandLineState::None;
 }
 
 void EditorInputAndOutput::removeLastInputChar() {
 	input_.erase(input_.end() - 2, input_.end());
 	commandLineMessage_.erase(commandLineMessage_.end() - 2, commandLineMessage_.end());
+
+	cursorIndexX = std::min(static_cast<int>(commandLineMessage_.size()), cursorIndexX);
+}
+
+void EditorInputAndOutput::setError(const std::string t_error) {
+	cursorIndexX = 0;
+	commandLineMessage_ = t_error;
+	commandLineState_ = CommandLineState::Error;
+}
+
+void EditorInputAndOutput::setInfo(const std::string t_info) {
+	cursorIndexX = 0;
+	commandLineMessage_ = t_info;
+	commandLineState_ = CommandLineState::Info;
 }
 
 EditorCore::EditorCore(const int argc, char** argv, Settings& t_settings) : filesManager_{argc, argv}, settings_{t_settings} {

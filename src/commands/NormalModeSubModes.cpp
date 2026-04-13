@@ -9,8 +9,7 @@ WindowSubCommand::WindowSubCommand() {
 					{'k', &WindowSubCommand::movePaneUp},	 {'l', &WindowSubCommand::movePaneRight},
 					{'c', &WindowSubCommand::closePane},	 {'=', &WindowSubCommand::equalizePanes}};
 }
-void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, WindowSettings& t_winSettings,
-									  const char t_inputChar) const {
+void WindowSubCommand::ExecuteCommand(PanesManager& t_panesManager, WindowSettings& t_winSettings, const char t_inputChar) const {
 
 	const auto it = functionMap_.find(t_inputChar);
 	if (it != functionMap_.end()) {
@@ -64,8 +63,8 @@ FileSubCommand::FileSubCommand() {
 	};
 }
 
-void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& t_filesManager,
-									WindowSettings& t_winSettings, const char t_inputChar) const {
+void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings& t_winSettings,
+									const char t_inputChar) const {
 	const auto it = functionMap_.find(t_inputChar);
 	if (it != functionMap_.end()) {
 		(this->*it->second)(t_panesManager, t_filesManager, t_winSettings);

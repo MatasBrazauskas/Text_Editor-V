@@ -1,6 +1,5 @@
 #include "Files.hpp"
 
-#include "utils/FileHandler.hpp"
 
 #include <SDL.h>
 #include <algorithm>
@@ -45,7 +44,7 @@ Matrix::Matrix(const std::vector<std::string>& t_lines) : dirty{false}, lines_{s
 		lineInfo_.emplace_back(LineInfo::None);
 	}
 
-	const auto addLineCharCount = [](int t_sum, const std::string& t_line) { return t_sum + t_line.length(); };
+	const auto addLineCharCount = [](const int t_sum, const std::string& t_line) { return t_sum + t_line.length(); };
 
 	charsCount_ = std::accumulate(lines_.begin(), lines_.end(), 0, addLineCharCount);
 }
@@ -89,10 +88,10 @@ void Matrix::deleteLine(const int row) {
 	dirty = true;
 }
 
-void Matrix::insertLine(const int row, const std::string line) {
-	lines_.insert(lines_.begin() + row, line);
+void Matrix::insertLine(const int row, const std::string t_line) {
+	lines_.insert(lines_.begin() + row, t_line);
 	lineInfo_.insert(lineInfo_.begin() + row, LineInfo::Insert);
-	charsCount_ += line.length();
+	charsCount_ += t_line.length();
 	dirty = true;
 }
 
@@ -206,6 +205,25 @@ File& FilesManager::getFile(const FileId t_fileId) {
 
 File& FilesManager::getFile() {
 	return files_.at(activeFileId_);
+}
+
+std::optional<FileId> FilesManager::getFileId(const std::string t_filename) {
+	const auto predicate = [t_filename](const File& file) {
+		return file.filesPath_.filename().string() == t_filename;
+	};
+
+	const auto it = std::ranges::find_if(files_.begin(), files_.end(), predicate);
+
+	if (it == files_.end()) {
+		return std::nullopt;
+	}
+
+	return it->fileId_;
+}
+
+void FilesManager::saveFile(const FileId t_fileId) {
+	const auto file = getFile(t_fileId);
+	fileHandler_.writeToFile(file);
 }
 
 FileId FilesManager::switchToNextFile() {

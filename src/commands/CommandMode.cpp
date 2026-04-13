@@ -33,11 +33,12 @@ CommandMode::CommandMode() {
 	commands_ = {
 		{"q", &CommandMode::closeProgramme},	  {"w", &CommandMode::writeToFile},			{"e", &CommandMode::openFile},
 		{"bn", &CommandMode::switchToNextBuffer}, {"bp", &CommandMode::switchToPrevBuffer},
+		{std::string{1, static_cast<char>(SpecialKeys::LeftArrow)}, &CommandMode::moveCursorLeft},
+		{std::string{1, static_cast<char>(SpecialKeys::RightArrow)}, &CommandMode::moveCursorRight}
 	};
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FilesManager& files,
-									  PanesManager& t_panesManager) {
+void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FilesManager& files, PanesManager& t_panesManager) {
 	if (t_io.input_.empty())
 		return;
 
@@ -59,13 +60,12 @@ void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& 
 			t_io.cleanInputs();
 			state.currentMode_ = Modes::Normal;
 		} else {
-			t_io.commandLineMessage_ = UnknownCommand + com.command_;
-			t_io.commandLineError_ = true;
+			t_io.setError(UnknownCommand + com.command_);
 		}
 	} else {
-		if (t_io.commandLineError_) {
+		if (t_io.commandLineState_ != CommandLineState::None) {
 			t_io.cleanInputs();
-			t_io.commandLineError_ = false;
+			t_io.commandLineState_ = CommandLineState::None;
 		}
 	}
 }
@@ -77,18 +77,23 @@ void CommandMode::writeToFile(EditorState&, EditorInputAndOutput&, FilesManager&
 	if (com.args_.empty()) {
 		t_filesManager.saveCurrentFile();
 	} else {
-		for (const auto& filename: com.args_) {
-			
+		for (const auto& filename : com.args_) {
+			const auto result = t_filesManager.getFileId(filename);
+
+			if (result.has_value()) {
+				const auto fileId = *result;
+				t_filesManager.saveFile(fileId);
+			}
 		}
 	}
 }
 
-void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FilesManager& files, PanesManager&, const CommandStructure& com) const {
+void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FilesManager& files, PanesManager&,
+						   const CommandStructure& com) const {
 	std::cout << "Opening file...\n";
 
 	if (com.args_.empty()) {
-		t_io.commandLineMessage_ = NotEnoughArguments;
-		t_io.commandLineError_ = true;
+		t_io.setError(NotEnoughArguments);
 		return;
 	}
 
@@ -102,19 +107,17 @@ void CommandMode::openFile(EditorState&, EditorInputAndOutput& t_io, FilesManage
 void CommandMode::closeProgramme(EditorState& state, EditorInputAndOutput& t_io, FilesManager&, PanesManager&,
 								 const CommandStructure& com) const {
 	if (not com.args_.empty()) {
-		t_io.commandLineMessage_ = TooMuchArguments;
-		t_io.commandLineError_ = true;
+		t_io.setError(TooMuchArguments);
 		return;
 	}
 	state.running_ = false;
 }
 
-void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput& t_io, FilesManager& t_fileManager,
-									 PanesManager& t_panesManager, const CommandStructure& t_com) const {
+void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput& t_io, FilesManager& t_fileManager, PanesManager& t_panesManager,
+									 const CommandStructure& t_com) const {
 
 	if (not t_com.args_.empty()) {
-		t_io.commandLineMessage_ = TooMuchArguments;
-		t_io.commandLineError_ = true;
+		t_io.setError(TooMuchArguments);
 		return;
 	}
 
@@ -123,14 +126,20 @@ void CommandMode::switchToNextBuffer(EditorState&, EditorInputAndOutput& t_io, F
 	currPane.switchFileId(nextFileId);
 }
 
-void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, FilesManager& t_fileManager,
-									 PanesManager& t_panesManager, const CommandStructure& t_com) const {
+void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, FilesManager& t_fileManager, PanesManager& t_panesManager,
+									 const CommandStructure& t_com) const {
 	if (not t_com.args_.empty()) {
-		t_io.commandLineMessage_ = TooMuchArguments;
-		t_io.commandLineError_ = true;
+		t_io.setError(TooMuchArguments);
 		return;
 	}
 	const auto prevFileId = t_fileManager.switchToPrevFile();
 	auto& currPane = t_panesManager.getCurrPane();
 	currPane.switchFileId(prevFileId);
+}
+
+void CommandMode::moveCursorRight(EditorState&, EditorInputAndOutput& t_io, FilesManager&, PanesManager&, const CommandStructure&) const {
+}
+
+void CommandMode::moveCursorLeft(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const {
+
 }

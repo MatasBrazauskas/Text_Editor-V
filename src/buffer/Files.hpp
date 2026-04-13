@@ -4,14 +4,13 @@
 #include <stack>
 #include <unordered_map>
 #include <vector>
+#include <optional>
+
+#include "utils/FileHandler.hpp"
 
 using namespace std::string_literals;
 
-class FileHandler;
-
-inline constexpr int framesToSkip = 4;
-
-using FileId = uint_fast64_t;
+using FileId = std::uint_fast64_t;
 
 enum class LineInfo : char { None, Insert, Changed };
 
@@ -92,7 +91,9 @@ class FilesManager final {
 	bool regularFile(FileId);
 
 	void saveCurrentFile();
+	void saveFile(FileId);
 
+	[[nodiscard]] std::optional<FileId> getFileId(std::string);
 	[[nodiscard]] File& getFile(FileId);
 	[[nodiscard]] File& getFile();
 

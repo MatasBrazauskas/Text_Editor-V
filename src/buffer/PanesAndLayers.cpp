@@ -286,7 +286,7 @@ void PaneHistoryManager::addPane(const PaneId t_paneId) {
 	historyArr[historySize++] = t_paneId;
 }
 
-void PaneHistoryManager::pushUpPane(const PaneId t_paneId){
+void PaneHistoryManager::pushUpPane(const PaneId t_paneId) {
 	removePane(t_paneId);
 	historyArr[historySize++] = t_paneId;
 }

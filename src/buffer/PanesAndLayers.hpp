@@ -3,9 +3,9 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <unordered_map>
 #include <variant>
 #include <vector>
-#include <unordered_map>
 
 using FileId = std::uint_fast64_t;
 using PaneId = uint_fast64_t;
@@ -228,11 +228,9 @@ class LayoutManager final {
 
   private:
 	void addTabLayout(const FilesManager&, const Settings&);
-	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&,
-						int& t_left);
-	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager,
-						 int t_tabOffsetY, int t_leftSideOffsetX, const EditorState&);
-	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig,
-							  const EditorState& t_editorState, const EditorInputAndOutput& t_io,
-							  FilesManager& t_filesManager);
+	void addPanesLayout(FilesManager&, const PanesManager&, const Settings&, int t_tabOffsetY, const Config&, int& t_left);
+	void addCursorLayout(PanesManager& t_paneManager, const Settings& t_config, FilesManager& t_filesManager, int t_tabOffsetY,
+						 int t_leftSideOffsetX, const EditorState&);
+	void addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig, const EditorState& t_editorState,
+							  const EditorInputAndOutput& t_io, FilesManager& t_filesManager);
 };
