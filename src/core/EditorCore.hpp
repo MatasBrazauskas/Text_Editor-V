@@ -47,7 +47,7 @@ class EditorState final {
 	bool running_;
 };
 
-enum class CommandLineState: char {None, Error, Info};
+enum class CommandLineState : char { None, Error, Info };
 
 class EditorInputAndOutput final {
   public:

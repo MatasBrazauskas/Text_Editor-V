@@ -463,9 +463,8 @@ std::optional<SplitNode*> PanesManager::getPanePointer(const PaneId t_paneId) {
 TabLayout::TabLayout(const int activeTab_t, const int t_tabCapLines, const std::vector<std::string>& tabs_t)
 	: activeTab{activeTab_t}, tabCapturedLinesOffsetY{t_tabCapLines}, tabs{tabs_t} {}
 
-CommandLineLayout::CommandLineLayout(const Modes mode_t, std::string t_modeName, std::string t_commandInfo, std::string t_lineAndCharInfo,
-									 std::string t_commandArgs)
-	: mode{mode_t}, modeName{t_modeName}, commandInfo{t_commandInfo}, fileInfo{t_lineAndCharInfo}, commandLineArgs{t_commandArgs} {}
+CommandLineLayout::CommandLineLayout(Modes t_mode, std::string t_modeName, std::string t_inputInfo, std::string t_fileInto, CommandLineState t_state,int t_cursorX, std::string t):
+	mode{t_mode}, modeName{t_modeName}, inputInfo{t_inputInfo}, fileInfo{t_fileInto}, commandLineState{t_state}, cursorIndexX{t_cursorX}, commandLineInfo{t} {}
 
 PanesLayout::PanesLayout(const PanesSnippets t_panesSnippet, const int t_startX, const int t_startY, const int t_endX, const int t_endY,
 						 const int t_leftDataOffsetX, const std::vector<std::string>& t_leftData, const std::vector<std::string>& t_lines)
@@ -662,28 +661,25 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	cursorLayout = CursorLayout{visible, cursorX, cursorY, letters, cursorWidth, cursorType};
 }
 
-void LayoutManager::addCommandLineLayout(PanesManager& t_panesManager, const Settings& t_constConfig, const EditorState& t_editorState,
-										 const EditorInputAndOutput& t_io, FilesManager& t_filesManager) {
+void LayoutManager::addCommandLineLayout(PanesManager&, const Settings&, const EditorState& t_editorState, const EditorInputAndOutput& t_io, FilesManager& t_filesManager) {
+	const static std::unordered_map<Modes, std::string> modeNameMap = {
+		{Modes::Normal, "  Normal"},
+		{Modes::Insert, "  Insert"},
+		{Modes::Command, "  Command"},
+		{Modes::WindowMode, "  Window"},
+		{Modes::FileMode, "   Files"}
+	};
+
 	const Modes mode = t_editorState.currentMode_;
-	std::string modeText = "  Normal";
+	const auto modeName = modeNameMap.at(mode);
 
-	if (mode == Modes::Insert) {
-		modeText = "  Insert";
-	} else if (mode == Modes::Command) {
-		modeText = "  Command";
-	} else if (mode == Modes::WindowMode) {
-		modeText = "   Window";
-	} else if (mode == Modes::FileMode) {
-		modeText = "   Files";
-	}
-
-	const std::string commandInfo = std::format("{:<15}", t_io.commandLineMessage_);
+	const auto inputInfo = std::format("{:<}", t_io.commandLineMessage_);
 
 	const int charCount = t_filesManager.getFile().textBuffer_.getCharCount();
 	const int lineCount = t_filesManager.getFile().textBuffer_.getLinesCount();
-	const std::string fileInfo = std::format("Lines: {}, Chars: {}", lineCount, charCount);
+	const auto fileInfo = std::format("Lines: {}, Chars: {}", lineCount, charCount);
 
-	const std::string commandLineArgs = t_io.commandLineMessage_;
+	const auto commandLineInfo = t_io.commandLineMessage_;
 
-	commandLineLayout = CommandLineLayout(mode, modeText, commandInfo, fileInfo, commandLineArgs);
+	commandLineLayout = CommandLineLayout(mode, modeName, inputInfo, fileInfo, t_io.commandLineState_, t_io.cursorIndexX, commandLineInfo);
 }

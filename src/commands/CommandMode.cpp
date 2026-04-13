@@ -30,12 +30,13 @@ CommandStructure CommandMode::parseCommand(std::string input) const {
 }
 
 CommandMode::CommandMode() {
-	commands_ = {
-		{"q", &CommandMode::closeProgramme},	  {"w", &CommandMode::writeToFile},			{"e", &CommandMode::openFile},
-		{"bn", &CommandMode::switchToNextBuffer}, {"bp", &CommandMode::switchToPrevBuffer},
-		{std::string{1, static_cast<char>(SpecialKeys::LeftArrow)}, &CommandMode::moveCursorLeft},
-		{std::string{1, static_cast<char>(SpecialKeys::RightArrow)}, &CommandMode::moveCursorRight}
-	};
+	commands_ = {{"q", &CommandMode::closeProgramme},
+				 {"w", &CommandMode::writeToFile},
+				 {"e", &CommandMode::openFile},
+				 {"bn", &CommandMode::switchToNextBuffer},
+				 {"bp", &CommandMode::switchToPrevBuffer},
+				 {std::string{1, static_cast<char>(SpecialKeys::LeftArrow)}, &CommandMode::moveCursorLeft},
+				 {std::string{1, static_cast<char>(SpecialKeys::RightArrow)}, &CommandMode::moveCursorRight}};
 }
 
 void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FilesManager& files, PanesManager& t_panesManager) {
@@ -138,8 +139,9 @@ void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, F
 }
 
 void CommandMode::moveCursorRight(EditorState&, EditorInputAndOutput& t_io, FilesManager&, PanesManager&, const CommandStructure&) const {
+	t_io.cursorIndexX = std::min(t_io.cursorIndexX + 1, static_cast<int>(t_io.commandLineMessage_.length()));
 }
 
-void CommandMode::moveCursorLeft(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const {
-
+void CommandMode::moveCursorLeft(EditorState&, EditorInputAndOutput& t_io, FilesManager&, PanesManager&, const CommandStructure&) const {
+	t_io.cursorIndexX = std::max(t_io.cursorIndexX - 1, 0);
 }

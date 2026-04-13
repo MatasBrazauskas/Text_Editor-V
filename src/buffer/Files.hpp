@@ -1,12 +1,12 @@
 #pragma once
 
+#include "utils/FileHandler.hpp"
+
 #include <filesystem>
+#include <optional>
 #include <stack>
 #include <unordered_map>
 #include <vector>
-#include <optional>
-
-#include "utils/FileHandler.hpp"
 
 using namespace std::string_literals;
 

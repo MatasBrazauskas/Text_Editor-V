@@ -22,6 +22,7 @@ using PaneId = std::uint_fast64_t;
 
 enum class Modes : uint8_t;
 enum class NormalModeModes : char;
+enum class CommandLineState: char;
 
 enum class SplitType : char { Vertical, Horizontal };
 enum class PaneDirection : char { Top, Bottom, Right, Left };
@@ -168,15 +169,18 @@ class TabLayout final {
 class CommandLineLayout final {
   public:
 	CommandLineLayout() = default;
-	CommandLineLayout(Modes mode_t, std::string, std::string, std::string, std::string);
+	CommandLineLayout(Modes mode_t, std::string, std::string, std::string, CommandLineState t_state,int t_cursorX, std::string);
 	~CommandLineLayout() noexcept = default;
 
 	Modes mode;
-
 	std::string modeName;
-	std::string commandInfo;
+
+	std::string inputInfo;
 	std::string fileInfo;
-	std::string commandLineArgs;
+
+	CommandLineState commandLineState;
+	int cursorIndexX;
+	std::string commandLineInfo;
 };
 
 enum class PanesSnippets { TextSnippet, FilesSnippet };

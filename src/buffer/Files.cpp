@@ -1,6 +1,5 @@
 #include "Files.hpp"
 
-
 #include <SDL.h>
 #include <algorithm>
 #include <numeric>
@@ -208,9 +207,7 @@ File& FilesManager::getFile() {
 }
 
 std::optional<FileId> FilesManager::getFileId(const std::string t_filename) {
-	const auto predicate = [t_filename](const File& file) {
-		return file.filesPath_.filename().string() == t_filename;
-	};
+	const auto predicate = [t_filename](const File& file) { return file.filesPath_.filename().string() == t_filename; };
 
 	const auto it = std::ranges::find_if(files_.begin(), files_.end(), predicate);
 

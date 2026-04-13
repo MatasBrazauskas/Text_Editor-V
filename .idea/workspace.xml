@@ -44,10 +44,9 @@
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/NormalModeSubModes.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +61,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -369,6 +367,7 @@
       <workItem from="1776000401096" duration="932000" />
       <workItem from="1776018979842" duration="5136000" />
       <workItem from="1776061832707" duration="4369000" />
+      <workItem from="1776077650386" duration="4083000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />
@@ -396,6 +395,17 @@
     <isAutomaticCheckingOnLaunch value="false" />
     <isAutomaticFoundErrors value="true" />
     <isAutomaticReloadCMake value="true" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Merge branch 'main' of https://github.com/MatasBrazauskas/Text_Editor&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml" />
