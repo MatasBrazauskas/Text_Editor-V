@@ -29,9 +29,10 @@ class CommandMode final {
   public:
 	CommandMode();
 	~CommandMode() noexcept = default;
-	void HandleKeyboardInput(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&);
+	void HandleKeyboardInput(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const char t_inputChar);
 
 	using Func = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	using Func2 = void (CommandMode::*)(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&) const;
 
 	void writeToFile(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 	void openFile(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
@@ -40,10 +41,13 @@ class CommandMode final {
 	void switchToNextBuffer(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 	void switchToPrevBuffer(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
 
-	void moveCursorRight(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
-	void moveCursorLeft(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&, const CommandStructure&) const;
+	void moveCursorRight(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&) const;
+	void moveCursorLeft(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&) const;
+	void deleteChar(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&) const;
+	void executeCommand(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&) const;
 
   private:
 	CommandStructure parseCommand(std::string input) const;
 	std::unordered_map<std::string, Func> commands_;
+	std::unordered_map<char, Func2> specialKeybinds_;
 };

@@ -30,40 +30,34 @@ CommandStructure CommandMode::parseCommand(std::string input) const {
 }
 
 CommandMode::CommandMode() {
-	commands_ = {{"q", &CommandMode::closeProgramme},
-				 {"w", &CommandMode::writeToFile},
-				 {"e", &CommandMode::openFile},
-				 {"bn", &CommandMode::switchToNextBuffer},
-				 {"bp", &CommandMode::switchToPrevBuffer},
-				 {std::string{1, static_cast<char>(SpecialKeys::LeftArrow)}, &CommandMode::moveCursorLeft},
-				 {std::string{1, static_cast<char>(SpecialKeys::RightArrow)}, &CommandMode::moveCursorRight}};
+	commands_ = {
+		{"q", &CommandMode::closeProgramme},
+		{"w", &CommandMode::writeToFile},
+		{"e", &CommandMode::openFile},
+		{"bn", &CommandMode::switchToNextBuffer},
+		{"bp", &CommandMode::switchToPrevBuffer}
+	};
+
+	specialKeybinds_ = {
+		{static_cast<char>(SpecialKeys::LeftArrow), &CommandMode::moveCursorLeft},
+		{static_cast<char>(SpecialKeys::RightArrow), &CommandMode::moveCursorRight},
+		{static_cast<char>(SpecialKeys::Backspace), &CommandMode::deleteChar},
+		{static_cast<char>(SpecialKeys::Enter), &CommandMode::executeCommand},
+	};
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& state, EditorInputAndOutput& t_io, FilesManager& files, PanesManager& t_panesManager) {
+void CommandMode::HandleKeyboardInput(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager& t_filesManager, PanesManager& t_panesManager, const char t_inputChar) {
 	if (t_io.input_.empty())
 		return;
 
-	if (t_io.input_.back() == static_cast<char>(SpecialKeys::Backspace)) {
-		if (t_io.input_.length() > 2) {
-			t_io.removeLastInputChar();
-		} else {
-			t_io.cleanInputs();
-			state.currentMode_ = Modes::Normal;
-		}
+	t_io.input_.pop_back();
 
-	} else if (t_io.input_.back() == static_cast<char>(SpecialKeys::Enter)) {
-		const auto& com = parseCommand(t_io.input_);
-
-		if (const auto it = commands_.find(com.command_); it != commands_.end()) {
-			const auto& func = it->second;
-			(this->*func)(state, t_io, files, t_panesManager, com);
-
-			t_io.cleanInputs();
-			state.currentMode_ = Modes::Normal;
-		} else {
-			t_io.setError(UnknownCommand + com.command_);
-		}
+	if (const auto it = specialKeybinds_.find(t_inputChar);it != specialKeybinds_.end()) {
+		(this->*it->second)(t_state, t_io, t_filesManager, t_panesManager);
 	} else {
+		t_io.commandLineMessage_.insert(t_io.cursorIndexX, 1, t_inputChar);
+		t_io.cursorIndexX++;
+
 		if (t_io.commandLineState_ != CommandLineState::None) {
 			t_io.cleanInputs();
 			t_io.commandLineState_ = CommandLineState::None;
@@ -138,10 +132,33 @@ void CommandMode::switchToPrevBuffer(EditorState&, EditorInputAndOutput& t_io, F
 	currPane.switchFileId(prevFileId);
 }
 
-void CommandMode::moveCursorRight(EditorState&, EditorInputAndOutput& t_io, FilesManager&, PanesManager&, const CommandStructure&) const {
+void CommandMode::moveCursorRight(EditorState&, EditorInputAndOutput& t_io, FilesManager&, PanesManager&) const {
 	t_io.cursorIndexX = std::min(t_io.cursorIndexX + 1, static_cast<int>(t_io.commandLineMessage_.length()));
 }
 
-void CommandMode::moveCursorLeft(EditorState&, EditorInputAndOutput& t_io, FilesManager&, PanesManager&, const CommandStructure&) const {
+void CommandMode::moveCursorLeft(EditorState&, EditorInputAndOutput& t_io, FilesManager&, PanesManager&) const {
 	t_io.cursorIndexX = std::max(t_io.cursorIndexX - 1, 0);
+}
+
+void CommandMode::deleteChar(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager&, PanesManager&) const {
+	if (t_io.commandLineMessage_.length() > 0) {
+		t_io.removeLastInputChar();
+	} else {
+		t_io.cleanInputs();
+		t_state.currentMode_ = Modes::Normal;
+	}
+}
+
+void CommandMode::executeCommand(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager& t_filesManager, PanesManager& t_panesManager) const {
+	const auto& com = parseCommand(t_io.input_);
+
+	if (const auto it = commands_.find(com.command_); it != commands_.end()) {
+		const auto& func = it->second;
+		(this->*func)(t_state, t_io, t_filesManager, t_panesManager, com);
+
+		t_io.cleanInputs();
+		t_state.currentMode_ = Modes::Normal;
+	} else {
+		t_io.setError(UnknownCommand + com.command_);
+	}
 }

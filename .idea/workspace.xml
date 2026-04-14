@@ -39,12 +39,12 @@
   <component name="ChangeListManager">
     <list default="true" id="511de143-5ca5-49bd-a62a-4da9163be987" name="Changes" comment="Temp">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Files.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/buffer/Files.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/Files.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/buffer/PanesAndLayers.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/CommandMode.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/CommandMode.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/EditorCore.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/EditorCore.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/Renderer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/Renderer.hpp" afterDir="false" />
     </list>
@@ -61,10 +61,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -368,6 +364,7 @@
       <workItem from="1776018979842" duration="5136000" />
       <workItem from="1776061832707" duration="4369000" />
       <workItem from="1776077650386" duration="4083000" />
+      <workItem from="1776192947851" duration="2533000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />

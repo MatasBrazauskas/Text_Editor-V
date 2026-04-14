@@ -17,8 +17,8 @@ void EditorInputAndOutput::cleanInputs() {
 }
 
 void EditorInputAndOutput::removeLastInputChar() {
-	input_.erase(input_.end() - 2, input_.end());
-	commandLineMessage_.erase(commandLineMessage_.end() - 2, commandLineMessage_.end());
+	input_.pop_back();
+	commandLineMessage_.pop_back();
 
 	cursorIndexX = std::min(static_cast<int>(commandLineMessage_.size()), cursorIndexX);
 }
@@ -119,8 +119,13 @@ void EditorCore::HandleKeyboardInput(const Config& t_config) {
 			const auto specialCase = std::get<SpecialCases>(input);
 			HandleSpecialCases(specialCase, event);
 		} else {
-			editorInputAndOutput_.input_.append(std::get<std::string>(input));
-			editorInputAndOutput_.commandLineMessage_.append(std::get<std::string>(input));
+			const auto str = std::get<std::string>(input);
+
+			if (str.empty()) {
+				return;
+			}
+
+			editorInputAndOutput_.input_.append(str);
 
 			auto& file = filesManager_.getFile();
 			auto& cursor = panesManager_.getCurrPane().getCursor();
@@ -133,7 +138,7 @@ void EditorCore::HandleKeyboardInput(const Config& t_config) {
 				insertMode_.HandleKeyboardInput(editorInputAndOutput_, file, cursor, t_config);
 				break;
 			case Modes::Command:
-				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, filesManager_, panesManager_);
+				commandMode_.HandleKeyboardInput(editorState_, editorInputAndOutput_, filesManager_, panesManager_, str.back());
 				break;
 			case Modes::WindowMode:
 				windowSubCommand_.ExecuteCommand(panesManager_, winSettings, editorInputAndOutput_.input_.back());

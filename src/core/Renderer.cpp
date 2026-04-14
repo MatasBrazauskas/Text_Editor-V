@@ -12,8 +12,8 @@ Renderer::Renderer(const Config& t_config, const Settings& t_settings) : config_
 		throw std::runtime_error(SDL_GetError());
 	}
 
-	window_ = SDL_CreateWindow(config_.window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-							   config_.window.width, config_.window.height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	window_ = SDL_CreateWindow(config_.window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, config_.window.width,
+							   config_.window.height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
 	SDL_SetWindowMinimumSize(window_, t_config.window.minWidth, t_config.window.minHeight);
 
@@ -47,11 +47,8 @@ Renderer::Renderer(const Config& t_config, const Settings& t_settings) : config_
 	}
 
 	colorMap_ = {
-		{Modes::Normal, {137, 180, 250}},
-		{Modes::Insert, {195, 232, 141}},
-		{Modes::Command, {254, 198, 118}},
-		{Modes::WindowMode, {203, 166, 247}},
-		{Modes::FileMode, {245, 194, 231}},
+		{Modes::Normal, {137, 180, 250}},	  {Modes::Insert, {195, 232, 141}},	  {Modes::Command, {254, 198, 118}},
+		{Modes::WindowMode, {203, 166, 247}}, {Modes::FileMode, {245, 194, 231}},
 	};
 }
 
@@ -135,8 +132,7 @@ void Renderer::RenderTabs(const TabLayout& t_tabLayout) const {
 		SDL_RenderFillRect(renderer_, &tabRect);
 
 		SDL_SetRenderDrawColor(renderer_, 20, 20, 20, 255);
-		SDL_RenderDrawLine(renderer_, currentX + tabWidth - 1, currentY, currentX + tabWidth - 1,
-						   charStg.uiCharHeight + 2);
+		SDL_RenderDrawLine(renderer_, currentX + tabWidth - 1, currentY, currentX + tabWidth - 1, charStg.uiCharHeight + 2);
 
 		SDL_Surface* surface = TTF_RenderText_Blended(uiFont_, filename.c_str(), tabTextColor);
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, surface);
@@ -274,55 +270,46 @@ void Renderer::RenderCommandLine(const CommandLineLayout& t_layout) const {
 	const auto& [mode, modeName, inputInfo, fileInfo, commandLineState, cursorIndexX, commandLineInfo] = t_layout;
 
 	const SDL_Color modeBg = colorMap_.at(mode);
-	const int barY = h - (2 * charStg.uiCharHeight);
+	const int firstRow = h - (2 * charStg.uiCharHeight);
+	const int secondRow = h - charStg.uiCharHeight;
 
-	const SDL_Rect barRect = {0, barY, w, 2 * charStg.uiCharHeight};
+	const SDL_Rect barRect = {0, firstRow, w, 2 * charStg.uiCharHeight};
 	SDL_SetRenderDrawColor(renderer_, config_.theme.foreground.r, config_.theme.foreground.g, config_.theme.foreground.b, 255);
 	SDL_RenderFillRect(renderer_, &barRect);
 
 	const int modeBarWidth = charStg.uiCharWidth * 11;
-	const SDL_Rect modeRect = {0, barY, modeBarWidth, charStg.uiCharHeight};
+	const SDL_Rect modeRect = {0, firstRow, modeBarWidth, charStg.uiCharHeight};
 	SDL_SetRenderDrawColor(renderer_, modeBg.r, modeBg.g, modeBg.b, 255);
 	SDL_RenderFillRect(renderer_, &modeRect);
 
-	SDL_Surface* s = TTF_RenderText_Blended(uiFont_, modeName.c_str(), config_.theme.uiText);
-	SDL_Texture* t = SDL_CreateTextureFromSurface(renderer_, s);
+	const auto drawText = [&](const std::string& text, SDL_Color color, int x, int y) {
+		if (text.empty())
+			return;
+		SDL_Surface* s = TTF_RenderText_Blended(uiFont_, text.c_str(), color);
+		if (!s)
+			return;
+		SDL_Texture* t = SDL_CreateTextureFromSurface(renderer_, s);
 
-	SDL_Rect dst = {0, barY, s->w, s->h};
-	SDL_RenderCopy(renderer_, t, nullptr, &dst);
+		SDL_Rect dst = {x, y, s->w, s->h};
+		SDL_RenderCopy(renderer_, t, nullptr, &dst);
 
-	SDL_FreeSurface(s);
-	SDL_DestroyTexture(t);
+		SDL_FreeSurface(s);
+		SDL_DestroyTexture(t);
+	};
 
-	auto* input = TTF_RenderText_Blended(uiFont_, inputInfo.c_str(), config_.theme.uiText);
-	if (input) {
-		auto* textureInput = SDL_CreateTextureFromSurface(renderer_, input);
+	drawText(modeName, config_.theme.uiText, 0, firstRow);
 
-		dst = {modeBarWidth + 5, barY, input->w, input->h};
-		SDL_RenderCopy(renderer_, textureInput, nullptr, &dst);
-
-		SDL_FreeSurface(input);
-		SDL_DestroyTexture(textureInput);
+	if (mode != Modes::Command) {
+		drawText(inputInfo, config_.theme.uiText, modeBarWidth + 5, firstRow);
 	}
 
+	drawText(fileInfo, modeBg, w - fileInfo.length() * charStg.uiCharWidth - 5, firstRow);
 
-	SDL_SetRenderDrawColor(renderer_, modeBg.r, modeBg.g, modeBg.b, 255);
-	auto* file = TTF_RenderText_Blended(uiFont_, fileInfo.c_str(), config_.theme.uiText);
-	if (file) {
-		auto* textureInput = SDL_CreateTextureFromSurface(renderer_, file);
+	if (mode == Modes::Command) {
+		drawText(commandLineInfo, config_.theme.uiText, 0, secondRow);
 
-		dst = {w - file->w - 5, barY, file->w, file->h};
-		SDL_RenderCopy(renderer_, textureInput, nullptr, &dst);
-
-		SDL_FreeSurface(file);
-		SDL_DestroyTexture(textureInput);
+		const SDL_Rect cursor = {cursorIndexX * charStg.uiCharWidth, secondRow, 1, charStg.uiCharHeight};
+		SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
+		SDL_RenderFillRect(renderer_, &cursor);
 	}
-
-	/*drawText(modeName, config_.theme.uiText, 0, barY);
-	drawText(commandInfo, config_.theme.uiText, modeBarWidth + 5, barY);
-
-	int fileInfoWidth = 0;
-	TTF_SizeText(uiFont_, fileInfo.c_str(), &fileInfoWidth, nullptr);
-
-	drawText(fileInfo, modeBg, w - fileInfoWidth - 5, barY);*/
 }

@@ -13,7 +13,7 @@ class CursorLayout;
 class CommandLineLayout;
 class LayoutManager;
 
-enum class Modes: uint8_t;
+enum class Modes : uint8_t;
 
 class Renderer final {
   public:
