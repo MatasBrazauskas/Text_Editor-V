@@ -16,13 +16,6 @@ void EditorInputAndOutput::cleanInputs() {
 	commandLineState_ = CommandLineState::None;
 }
 
-void EditorInputAndOutput::removeLastInputChar() {
-	input_.pop_back();
-	commandLineMessage_.pop_back();
-
-	cursorIndexX = std::min(static_cast<int>(commandLineMessage_.size()), cursorIndexX);
-}
-
 void EditorInputAndOutput::setError(const std::string t_error) {
 	cursorIndexX = 0;
 	commandLineMessage_ = t_error;
@@ -148,6 +141,19 @@ void EditorCore::HandleKeyboardInput(const Config& t_config) {
 				break;
 			}
 		}
+	}
+}
+
+void EditorCore::HandleCursor() {
+	auto& cursor = panesManager_.getCurrPane().getCursor();
+	if (editorState_.currentMode_ == Modes::Command) {
+		cursor.setVisible(true);
+	}
+
+	if (cursor.absent_ == 0) {
+		cursor.setVisible(not cursor.isVisible());
+	} else {
+		cursor.absent_--;
 	}
 }
 

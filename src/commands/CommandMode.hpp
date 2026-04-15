@@ -47,7 +47,7 @@ class CommandMode final {
 	void executeCommand(EditorState&, EditorInputAndOutput&, FilesManager&, PanesManager&) const;
 
   private:
-	CommandStructure parseCommand(std::string input) const;
+	CommandStructure parseCommand(const std::string&) const;
 	std::unordered_map<std::string, Func> commands_;
 	std::unordered_map<char, Func2> specialKeybinds_;
 };

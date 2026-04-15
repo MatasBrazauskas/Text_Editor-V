@@ -5,14 +5,12 @@
 #include <iostream>
 #include <sstream>
 
-CommandStructure CommandMode::parseCommand(std::string input) const {
-	if (input.empty()) {
+CommandStructure CommandMode::parseCommand(const std::string& t_input) const {
+	if (t_input.empty()) {
 		abort();
 	}
 
-	input.pop_back();
-
-	std::stringstream ss{input};
+	std::stringstream ss{t_input};
 	CommandStructure com;
 
 	std::string arg;
@@ -30,13 +28,11 @@ CommandStructure CommandMode::parseCommand(std::string input) const {
 }
 
 CommandMode::CommandMode() {
-	commands_ = {
-		{"q", &CommandMode::closeProgramme},
-		{"w", &CommandMode::writeToFile},
-		{"e", &CommandMode::openFile},
-		{"bn", &CommandMode::switchToNextBuffer},
-		{"bp", &CommandMode::switchToPrevBuffer}
-	};
+	commands_ = {{"q", &CommandMode::closeProgramme},
+				 {"w", &CommandMode::writeToFile},
+				 {"e", &CommandMode::openFile},
+				 {"bn", &CommandMode::switchToNextBuffer},
+				 {"bp", &CommandMode::switchToPrevBuffer}};
 
 	specialKeybinds_ = {
 		{static_cast<char>(SpecialKeys::LeftArrow), &CommandMode::moveCursorLeft},
@@ -46,13 +42,14 @@ CommandMode::CommandMode() {
 	};
 }
 
-void CommandMode::HandleKeyboardInput(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager& t_filesManager, PanesManager& t_panesManager, const char t_inputChar) {
+void CommandMode::HandleKeyboardInput(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager& t_filesManager,
+									  PanesManager& t_panesManager, const char t_inputChar) {
 	if (t_io.input_.empty())
 		return;
 
 	t_io.input_.pop_back();
 
-	if (const auto it = specialKeybinds_.find(t_inputChar);it != specialKeybinds_.end()) {
+	if (const auto it = specialKeybinds_.find(t_inputChar); it != specialKeybinds_.end()) {
 		(this->*it->second)(t_state, t_io, t_filesManager, t_panesManager);
 	} else {
 		t_io.commandLineMessage_.insert(t_io.cursorIndexX, 1, t_inputChar);
@@ -142,15 +139,17 @@ void CommandMode::moveCursorLeft(EditorState&, EditorInputAndOutput& t_io, Files
 
 void CommandMode::deleteChar(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager&, PanesManager&) const {
 	if (t_io.commandLineMessage_.length() > 0) {
-		t_io.removeLastInputChar();
+		t_io.cursorIndexX = std::max(t_io.cursorIndexX - 1, 0);
+		t_io.commandLineMessage_.erase(t_io.cursorIndexX);
 	} else {
 		t_io.cleanInputs();
 		t_state.currentMode_ = Modes::Normal;
 	}
 }
 
-void CommandMode::executeCommand(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager& t_filesManager, PanesManager& t_panesManager) const {
-	const auto& com = parseCommand(t_io.input_);
+void CommandMode::executeCommand(EditorState& t_state, EditorInputAndOutput& t_io, FilesManager& t_filesManager,
+								 PanesManager& t_panesManager) const {
+	const auto& com = parseCommand(t_io.commandLineMessage_);
 
 	if (const auto it = commands_.find(com.command_); it != commands_.end()) {
 		const auto& func = it->second;

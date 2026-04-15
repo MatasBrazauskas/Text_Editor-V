@@ -11,13 +11,20 @@ int main(const int argc, char** argv) {
 
 	const Uint64 freq = SDL_GetPerformanceFrequency();
 	Uint64 renderStart = SDL_GetPerformanceCounter();
+	Uint64 cursorStart = SDL_GetPerformanceCounter();
 
 	while (editorCore.Running()) {
 
 		const Uint64 end = SDL_GetPerformanceCounter();
 		const double renderTime = static_cast<double>(end - renderStart) / static_cast<double>(freq);
+		const double cursorTime = static_cast<double>(end - cursorStart) / static_cast<double>(freq);
 
 		editorCore.HandleKeyboardInput(config);
+
+		if (cursorTime >= config.editor.feel.cursorBlinkMs / 1000.0) {
+			cursorStart = end;
+			editorCore.HandleCursor();
+		}
 
 		if (renderTime >= settings.windowSettings.ticksPerFrame) {
 			renderStart = end;

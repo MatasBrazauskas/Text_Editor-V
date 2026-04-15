@@ -19,7 +19,7 @@
         "enabled": false, 
         "interval_s": 30
       },
-      "cursor_blink_ms": 1000,
+      "cursor_blink_ms": 500,
       "wrap_text": false
     },
     "view": 

@@ -61,7 +61,6 @@ class EditorInputAndOutput final {
 	CommandLineState commandLineState_;
 
 	void cleanInputs();
-	void removeLastInputChar();
 	void setError(std::string);
 	void setInfo(std::string);
 };
@@ -84,6 +83,7 @@ class EditorCore final {
 	~EditorCore() noexcept = default;
 
 	void HandleKeyboardInput(const Config&);
+	void HandleCursor();
 	bool Running() const;
 
 	FilesManager filesManager_;

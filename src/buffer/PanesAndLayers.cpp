@@ -12,7 +12,7 @@ Coordinates::Coordinates(int sx, int sy, int ex, int ey) : startX{sx}, startY{sy
 
 TextIndex::TextIndex(const int t_indexX, const int t_indexY) : indexX{t_indexX}, indexY{t_indexY} {}
 
-Cursor::Cursor() : x_{}, y_{}, visible_{true}, absent_{} {}
+Cursor::Cursor() : absent_{}, x_{}, y_{}, visible_{true} {}
 
 void Cursor::incrementX() {
 	this->setX(x_ + 1);
@@ -634,9 +634,10 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 	const auto& [paneId, fileId, textIndex, cursor, coords] = *std::ranges::find_if(
 		panesInfo, [&](const PaneInfo& t_paneInfo) { return std::get<0>(t_paneInfo) == t_panesManager.activePaneId_; });
 
+	const auto& cur = t_panesManager.getPane(paneId).getCursor();
+
 	const auto& file = t_filesManager.getFile(fileId);
 
-	const bool visible{true};
 	if (t_filesManager.specialFile(fileId)) {
 		t_leftSideOffsetX = 0;
 	}
@@ -660,7 +661,7 @@ void LayoutManager::addCursorLayout(PanesManager& t_panesManager, const Settings
 		cursorWidth = letters.length() * t_settings.charSettings.codeCharWidth;
 	}
 
-	cursorLayout = CursorLayout{visible, cursorX, cursorY, letters, cursorWidth, cursorType};
+	cursorLayout = CursorLayout{cur.isVisible(), cursorX, cursorY, letters, cursorWidth, cursorType};
 }
 
 void LayoutManager::addCommandLineLayout(PanesManager&, const Settings&, const EditorState& t_editorState, const EditorInputAndOutput& t_io,

@@ -65,11 +65,11 @@ class Cursor final {
 	[[nodiscard]] bool isVisible() const;
 	void setVisible(bool);
 
+	int absent_;
   private:
 	int x_;
 	int y_;
 	bool visible_;
-	int absent_;
 };
 
 class Pane final {
