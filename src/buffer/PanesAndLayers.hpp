@@ -66,6 +66,7 @@ class Cursor final {
 	void setVisible(bool);
 
 	int absent_;
+
   private:
 	int x_;
 	int y_;

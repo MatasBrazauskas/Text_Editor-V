@@ -67,10 +67,11 @@ Cursor& Pane::getCursor() {
 }
 
 void Pane::switchFileId(const FileId t_fileId) {
-	if (not cursors_.contains(t_fileId)) {
-		cursors_.insert({t_fileId, Cursor()});
+	if (cursors_.contains(fileId_)) {
+		cursors_.erase(fileId_);
 	}
 
+	cursors_.insert({t_fileId, Cursor()});
 	fileId_ = t_fileId;
 }
 
@@ -502,16 +503,20 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 		return sv;
 	};
 
-	const auto temp = files.files_ | std::views::transform(to_filename_view);
+	const auto filterSpecialFiles = [&files](const File& t_file) {
+		return files.regularFile(t_file.fileId_);
+	};
 
-	const std::vector<std::string> tabVec{temp.begin(), temp.end()};
+	auto temp = files.files_ | std::views::filter(filterSpecialFiles) | std::views::transform(to_filename_view);
+
+	std::vector<std::string> tabVec{temp.begin(), temp.end()};
 
 	int lineCount = 1;
 	int currentX = 0;
 	int paddingX = uiCharWidth * 2;
 
 	for (const auto& tab : tabVec) {
-		int tabWidth = (tab.length() * uiCharWidth) + paddingX;
+		const int tabWidth = (tab.length() * uiCharWidth) + paddingX;
 
 		if (currentX + tabWidth > windowWidth) {
 			lineCount++;
@@ -538,7 +543,10 @@ static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, in
 
 	const auto addNumber = [](const int lineNumber) { return std::format("{:^5}", lineNumber); };
 	const auto addRelativeNumber = [](const int lineNumber, const int cursorY) {
-		const int lineIndex = lineNumber == cursorY ? cursorY : std::abs(lineNumber - cursorY);
+		if (lineNumber == cursorY) {
+			return std::format("{:^4}", cursorY) + " ";
+		}
+		const int lineIndex = std::abs(lineNumber - cursorY);
 		return std::format("{:^5}", lineIndex);
 	};
 
@@ -568,6 +576,26 @@ static std::vector<std::string> leftSideNumbers(int startIndex, int endIndex, in
 	return leftSide;
 }
 
+static std::string expandTabs(const std::string_view line, const int tabWidth) {
+	std::string result;
+	result.reserve(line.size());
+
+	int visualCol = 0;
+
+	for (char c : line) {
+		if (c == '\t') {
+			int spaces = tabWidth - (visualCol % tabWidth);
+			result.append(spaces, ' ');
+			visualCol += spaces;
+		} else {
+			result.push_back(c);
+			++visualCol;
+		}
+	}
+
+	return result;
+}
+
 void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesManager& t_panesManager, const Settings& t_settings,
 								   const int t_tabOffsetY, const Config& t_config, int& t_left) {
 	const int w = t_settings.windowSettings.width;
@@ -581,8 +609,8 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 		const int charWidthCount = std::floor((coords.endX - coords.startX) / t_settings.charSettings.codeCharWidth);
 		const int charHeightCount = std::floor((coords.endY - coords.startY) / t_settings.charSettings.codeCharHeight);
 
-		const int startIndexX = textIndex.indexX; // std::floor(coords.startX / t_settings.charSettings.codeCharWidth);
-		const int startIndexY = textIndex.indexY; // std::floor(coords.startY / t_settings.charSettings.codeCharWidth);
+		const int startIndexX = textIndex.indexX;
+		const int startIndexY = textIndex.indexY;
 
 		const int endIndexY = std::min(startIndexY + charHeightCount, file.textBuffer_.getLinesCount());
 
@@ -594,7 +622,8 @@ void LayoutManager::addPanesLayout(FilesManager& t_filesManager, const PanesMana
 		const int endIndexX = leftSide.empty() ? 0 : startIndexX + charWidthCount - leftSide.at(0).length();
 
 		for (auto it = file.textBuffer_.forwardIterator(startIndexY); !it.end(endIndexY); it.next()) {
-			const std::string_view strView = it.getLine();
+			const auto line = expandTabs(it.getLine(), t_config.editor.feel.indentSize);
+			const auto strView = std::string_view{line};
 
 			if (strView.length() < startIndexX) {
 				linesVec.push_back("");

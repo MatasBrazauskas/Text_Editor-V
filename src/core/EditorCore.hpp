@@ -55,6 +55,8 @@ class EditorInputAndOutput final {
 	~EditorInputAndOutput() noexcept = default;
 
 	std::string input_;
+	bool shiftPressed_;
+	bool ctrlPressed_;
 
 	int cursorIndexX;
 	std::string commandLineMessage_;

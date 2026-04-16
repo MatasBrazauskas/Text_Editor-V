@@ -133,8 +133,6 @@ MatrixIterator Matrix::backwardIterator(const size_t startCount_t) const {
 File::File(const Matrix& text_t, std::filesystem::path path_t, const FileId t_fileId)
 	: textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{t_fileId} {}
 
-File::File(const Matrix& t_matrix, const FileId t_fileId) : textBuffer_{t_matrix}, fileId_{t_fileId} {}
-
 FilesManager::FilesManager(const int argc, char** argv) : activeFileId_{} {
 	if (argc < 1 || argv == nullptr) {
 		return;
@@ -166,7 +164,8 @@ FileId FilesManager::addRegularFile(const std::filesystem::path& t_filePath) {
 
 FileId FilesManager::addSpecialFile() {
 	auto dirContents = Matrix{fileHandler_.readDirectory()};
-	const auto specialFile = File{std::move(dirContents), fileIdCounter_};
+	const auto currPath = std::filesystem::current_path() / "";
+	const auto specialFile = File{std::move(dirContents), currPath, fileIdCounter_};
 	files_.push_back(std::move(specialFile));
 
 	fileIdCounter_++;
@@ -176,7 +175,7 @@ FileId FilesManager::addSpecialFile() {
 
 FileId FilesManager::addEmptyFile() {
 	auto emptyText = Matrix{{""}};
-	const std::filesystem::path someFilePath = "Un";
+	const std::filesystem::path someFilePath = std::filesystem::current_path() / "New Document";
 
 	const auto regularFile = File{std::move(emptyText), someFilePath, fileIdCounter_};
 	files_.push_back(std::move(regularFile));
@@ -185,11 +184,11 @@ FileId FilesManager::addEmptyFile() {
 	return regularFile.fileId_;
 }
 
-bool FilesManager::specialFile(const FileId t_fileId) {
+bool FilesManager::specialFile(const FileId t_fileId) const {
 	return std::ranges::contains(specialFiles_, t_fileId);
 }
 
-bool FilesManager::regularFile(const FileId t_fileId) {
+bool FilesManager::regularFile(const FileId t_fileId) const {
 	return !specialFile(t_fileId);
 }
 

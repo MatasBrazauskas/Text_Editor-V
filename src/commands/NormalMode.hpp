@@ -141,7 +141,6 @@ class NormalMode final {
 	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&);
 
   private:
-	bool shift{};
 	NormalModeTable table;
 	NormalModeParser parser;
 	NormalModeExecutor executor;

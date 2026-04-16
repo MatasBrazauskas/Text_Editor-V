@@ -203,12 +203,9 @@ NormalMode::NormalMode() : parser{table}, executor{table} {}
 void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState& state, EditorInputAndOutput& inOut) {
 	auto& [text, stack, path, id] = file_t;
 
-	if (not shift && inOut.input_.back() == static_cast<char>(SpecialKeys::Shift)) {
-		shift = true;
-		return;
-	}
+	std::cout << "Pressed: " << inOut.input_ << std::endl;
 
-	if (shift) {
+	if (inOut.ctrlPressed_) {
 		switch (inOut.input_.back()) {
 		case 'f':
 			state.currentMode_ = Modes::FileMode;
@@ -217,7 +214,6 @@ void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState
 			state.currentMode_ = Modes::WindowMode;
 			break;
 		}
-		shift = false;
 		inOut.input_.clear();
 		inOut.commandLineMessage_.clear();
 		return;

@@ -68,7 +68,6 @@ class File final {
   public:
 	File() = delete;
 	explicit File(const Matrix&, std::filesystem::path, FileId);
-	explicit File(const Matrix&, FileId);
 	~File() noexcept = default;
 
 	Matrix textBuffer_;
@@ -87,8 +86,8 @@ class FilesManager final {
 	FileId addSpecialFile();
 	FileId addEmptyFile();
 
-	bool specialFile(FileId);
-	bool regularFile(FileId);
+	bool specialFile(FileId) const;
+	bool regularFile(FileId) const;
 
 	void saveCurrentFile();
 	void saveFile(FileId);

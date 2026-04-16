@@ -96,13 +96,19 @@ void FileSubCommand::moveDown(PanesManager& t_panesManager, FilesManager&, Windo
 }
 
 void FileSubCommand::open(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
-	const auto buffer = t_filesManager.getFile().textBuffer_;
-
 	auto& pane = t_panesManager.getCurrPane();
-	const auto cursor = t_panesManager.getCurrPane().getCursor();
+	const auto& cursor = pane.getCursor();
+	const auto& file = t_filesManager.getFile(pane.fileId_);
 
-	const auto filepath = buffer.getLine(cursor.getY());
+	const auto filename = file.textBuffer_.getLine(cursor.getY());
+	const auto filePath = std::filesystem::path{file.filesPath_.string() + std::string{filename}};
 
-	const auto fileId = t_filesManager.addRegularFile(filepath);
-	pane.fileId_ = fileId;
+	if (std::filesystem::is_directory(filePath)) {
+		return;
+	} else if (std::filesystem::is_regular_file(filePath)){
+		const auto fileId = t_filesManager.addRegularFile(std::filesystem::path(filePath));
+
+		pane.switchFileId(fileId);
+		t_filesManager.activeFileId_ = fileId;
+	}
 }
