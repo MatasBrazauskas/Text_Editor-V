@@ -104,8 +104,9 @@ void FileSubCommand::open(PanesManager& t_panesManager, FilesManager& t_filesMan
 	const auto filePath = std::filesystem::path{file.filesPath_.string() + std::string{filename}};
 
 	if (std::filesystem::is_directory(filePath)) {
-		return;
-	} else if (std::filesystem::is_regular_file(filePath)){
+		t_filesManager.changeSpecialFile(file.fileId_, filePath);
+		pane.cursors_.at(file.fileId_) = Cursor();
+	} else if (std::filesystem::is_regular_file(filePath)) {
 		const auto fileId = t_filesManager.addRegularFile(std::filesystem::path(filePath));
 
 		pane.switchFileId(fileId);

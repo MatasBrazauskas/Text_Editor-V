@@ -243,3 +243,12 @@ FileId FilesManager::switchToPrevFile() {
 	activeFileId_ = files_.at(index).fileId_;
 	return activeFileId_;
 }
+
+void FilesManager::changeSpecialFile(const FileId t_fileId, const std::filesystem::path t_path) {
+	auto dirContents = Matrix{fileHandler_.readDirectory(t_path)};
+	const auto newPath = t_path / "";
+
+	auto& file = this->getFile(t_fileId);
+	file.filesPath_ = newPath;
+	file.textBuffer_ = dirContents;
+}

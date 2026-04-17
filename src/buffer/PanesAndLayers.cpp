@@ -503,9 +503,7 @@ void LayoutManager::addTabLayout(const FilesManager& files, const Settings& t_se
 		return sv;
 	};
 
-	const auto filterSpecialFiles = [&files](const File& t_file) {
-		return files.regularFile(t_file.fileId_);
-	};
+	const auto filterSpecialFiles = [&files](const File& t_file) { return files.regularFile(t_file.fileId_); };
 
 	auto temp = files.files_ | std::views::filter(filterSpecialFiles) | std::views::transform(to_filename_view);
 

@@ -99,6 +99,8 @@ class FilesManager final {
 	[[nodiscard]] FileId switchToNextFile();
 	[[nodiscard]] FileId switchToPrevFile();
 
+	void changeSpecialFile(FileId, std::filesystem::path);
+
 	std::vector<File> files_;
 	FileId activeFileId_;
 	inline static FileId fileIdCounter_{0};

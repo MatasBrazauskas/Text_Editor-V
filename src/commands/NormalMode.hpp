@@ -87,8 +87,7 @@ enum class ParsingStages : char { Start, WaitingForMotion, WaitingForMotionTarge
 class NormalModeCommand {
   public:
 	NormalModeCommand() = delete;
-	NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar,
-					  ParsingStages);
+	NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar, ParsingStages);
 	~NormalModeCommand() noexcept = default;
 
 	char operation;
@@ -103,8 +102,8 @@ class NormalModeCommand {
 class NormalModeParser {
   public:
 	explicit NormalModeParser(const NormalModeTable&);
-	explicit NormalModeParser(const NormalModeTable&, char operation, char motion, char targetMotion, char targetCommand,
-							  char targetChar, ParsingStages stage);
+	explicit NormalModeParser(const NormalModeTable&, char operation, char motion, char targetMotion, char targetCommand, char targetChar,
+							  ParsingStages stage);
 	~NormalModeParser() noexcept = default;
 
 	void parseCommand(char);

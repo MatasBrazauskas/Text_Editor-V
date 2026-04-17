@@ -1,13 +1,14 @@
 #include "EditorCore.hpp"
 
 #include "utils/ConfigAndSettings.hpp"
-#include <iostream>
 
 #include <SDL.h>
+#include <iostream>
 
 EditorState::EditorState() : currentMode_{Modes::Normal}, running_{true} {}
 
-EditorInputAndOutput::EditorInputAndOutput() :shiftPressed_{false},ctrlPressed_{false}, cursorIndexX{}, commandLineState_{CommandLineState::None} {}
+EditorInputAndOutput::EditorInputAndOutput()
+	: shiftPressed_{false}, ctrlPressed_{false}, cursorIndexX{}, commandLineState_{CommandLineState::None} {}
 
 void EditorInputAndOutput::cleanInputs() {
 	input_.clear();
