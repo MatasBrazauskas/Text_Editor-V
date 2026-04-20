@@ -99,7 +99,7 @@ The editor is highly configurable via `config.json`:
 
 <figure>
   <img width="1864" height="1107" alt="image" src="https://github.com/user-attachments/assets/a59c0b17-c1e0-4d65-b4e4-3581c6ede9f7" />
-  <figcaption>Screenshot 4: Normal Mode</figcaption>
+  <figcaption>Screenshot 4: Window mode with panes and splits</figcaption>
 </figure>
 
 <figure>
