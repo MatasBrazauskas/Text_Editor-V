@@ -54,12 +54,11 @@ void WindowSubCommand::equalizePanes(PanesManager& t_panesManager, WindowSetting
 
 FileSubCommand::FileSubCommand() {
 	functionMap_ = {
-		{'s', &FileSubCommand::openInHorizontal},
-		{'v', &FileSubCommand::openInVertical},
 		{'k', &FileSubCommand::moveUp},
 		{'j', &FileSubCommand::moveDown},
-		{static_cast<char>(SpecialKeys::Enter), &FileSubCommand::open},
-		/*{'r', &FileSubCommand::refresh},*/
+		{'e', &FileSubCommand::open},
+		{'c', &FileSubCommand::close},
+		{'h', &FileSubCommand::moveUpParentDir},
 	};
 }
 
@@ -71,18 +70,15 @@ void FileSubCommand::ExecuteCommand(PanesManager& t_panesManager, FilesManager& 
 	}
 }
 
-void FileSubCommand::openInVertical(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
-	const auto fileId = t_filesManager.addSpecialFile();
-	const auto& pane = t_panesManager.getCurrPane();
-
-	t_panesManager.addPane(pane.paneId_, fileId, PaneDirection::Left);
-}
-
-void FileSubCommand::openInHorizontal(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
-	const auto fileId = t_filesManager.addSpecialFile();
-	const auto& pane = t_panesManager.getCurrPane();
-
-	t_panesManager.addPane(pane.paneId_, fileId, PaneDirection::Bottom);
+void FileSubCommand::openFileMode(PanesManager& t_panesManager, FilesManager& t_filesManager) const {
+	if (t_filesManager.specialFile_ == std::nullopt) {
+		const auto fileId = t_filesManager.addSpecialFile();
+		t_filesManager.activeFileId_ = fileId;
+		t_panesManager.addSpecialPane(fileId);
+	} else {
+		t_filesManager.activeFileId_ = t_filesManager.specialFile_.value();
+		t_panesManager.setActivePaneToSpecialPane();
+	}
 }
 
 void FileSubCommand::moveUp(PanesManager& t_panesManager, FilesManager&, WindowSettings&) const {
@@ -112,4 +108,16 @@ void FileSubCommand::open(PanesManager& t_panesManager, FilesManager& t_filesMan
 		pane.switchFileId(fileId);
 		t_filesManager.activeFileId_ = fileId;
 	}
+}
+
+void FileSubCommand::close(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
+	t_panesManager.removeSpecialPane();
+	t_filesManager.removeFile(t_filesManager.activeFileId_);
+}
+
+void FileSubCommand::moveUpParentDir(PanesManager& t_panesManager, FilesManager& t_filesManager, WindowSettings&) const {
+	auto& pane = t_panesManager.getCurrPane();
+	const auto filePath = t_filesManager.getFile().filesPath_ / "..";
+	t_filesManager.changeSpecialFile(t_filesManager.activeFileId_, filePath);
+	pane.cursors_.at(t_filesManager.activeFileId_) = Cursor();
 }

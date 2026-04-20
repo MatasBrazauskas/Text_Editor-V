@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <optional>
 #include <stack>
-#include <unordered_map>
 #include <vector>
 
 using namespace std::string_literals;
@@ -86,6 +85,8 @@ class FilesManager final {
 	FileId addSpecialFile();
 	FileId addEmptyFile();
 
+	void removeFile(FileId);
+
 	bool specialFile(FileId) const;
 	bool regularFile(FileId) const;
 
@@ -106,5 +107,5 @@ class FilesManager final {
 	inline static FileId fileIdCounter_{0};
 
 	FileHandler fileHandler_;
-	std::vector<FileId> specialFiles_;
+	std::optional<FileId> specialFile_;
 };

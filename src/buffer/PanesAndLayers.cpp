@@ -132,11 +132,36 @@ void PanesManager::addPane(const PaneId t_parentId, const FileId t_fileId, const
 				paneHistoryManager_.addPane(pane.paneId_);
 			}
 
+			activePaneId_ = pane.paneId_;
+
 			return;
 		}
 
 		throw std::runtime_error{"No split node found"};
 	}
+}
+
+
+void PanesManager::addSpecialPane(const FileId t_fileId) {
+	const auto fileModePane = Pane(paneIdCounter_++, t_fileId);
+	auto* newHead = new SplitNode(SplitType::Vertical);
+	newHead->leftChildRation = 0.25f;
+
+	newHead->rightChild = std::unique_ptr<SplitNode>(head_);
+	newHead->leftChild = std::make_unique<SplitNode>(fileModePane);
+
+	head_ = newHead;
+	activePaneId_ = fileModePane.paneId_;
+}
+
+void PanesManager::setActivePaneToSpecialPane() {
+	const auto& fileModePane = get<Pane>(head_->leftChild->nodeType);
+	activePaneId_ = fileModePane.paneId_;
+}
+
+void PanesManager::removeSpecialPane() {
+	activePaneId_ = paneHistoryManager_.getLastPaneId();
+	head_ = head_->rightChild.get();
 }
 
 void PanesManager::removePane(const PaneId t_paneId) {

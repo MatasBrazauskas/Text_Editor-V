@@ -133,7 +133,7 @@ MatrixIterator Matrix::backwardIterator(const size_t startCount_t) const {
 File::File(const Matrix& text_t, std::filesystem::path path_t, const FileId t_fileId)
 	: textBuffer_{std::move(text_t)}, filesPath_{std::move(path_t)}, fileId_{t_fileId} {}
 
-FilesManager::FilesManager(const int argc, char** argv) : activeFileId_{} {
+FilesManager::FilesManager(const int argc, char** argv) : activeFileId_{}, specialFile_{std::nullopt} {
 	if (argc < 1 || argv == nullptr) {
 		return;
 	}
@@ -169,7 +169,7 @@ FileId FilesManager::addSpecialFile() {
 	files_.push_back(std::move(specialFile));
 
 	fileIdCounter_++;
-	specialFiles_.push_back(specialFile.fileId_);
+	specialFile_ = specialFile.fileId_;
 	return specialFile.fileId_;
 }
 
@@ -185,7 +185,7 @@ FileId FilesManager::addEmptyFile() {
 }
 
 bool FilesManager::specialFile(const FileId t_fileId) const {
-	return std::ranges::contains(specialFiles_, t_fileId);
+	return specialFile_ ==  t_fileId;
 }
 
 bool FilesManager::regularFile(const FileId t_fileId) const {
@@ -251,4 +251,14 @@ void FilesManager::changeSpecialFile(const FileId t_fileId, const std::filesyste
 	auto& file = this->getFile(t_fileId);
 	file.filesPath_ = newPath;
 	file.textBuffer_ = dirContents;
+}
+
+void FilesManager::removeFile(const FileId t_fileId) {
+	const auto predicate = [t_fileId](const File& file) {
+		return file.fileId_ == t_fileId;
+	};
+
+	std::ranges::remove_if(files_, predicate);
+
+	activeFileId_ = files_.at(0).fileId_;
 }

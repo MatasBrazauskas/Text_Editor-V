@@ -143,7 +143,7 @@ void EditorCore::HandleKeyboardInput(const Config& t_config) {
 
 			switch (editorState_.currentMode_) {
 			case Modes::Normal:
-				normalMode_.HandleKeyboardInput(file, cursor, editorState_, editorInputAndOutput_);
+				normalMode_.HandleKeyboardInput(file, cursor, editorState_, editorInputAndOutput_, fileSubCommand_, panesManager_, filesManager_);
 				break;
 			case Modes::Insert:
 				insertMode_.HandleKeyboardInput(editorInputAndOutput_, file, cursor, t_config);

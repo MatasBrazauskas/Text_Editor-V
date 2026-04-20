@@ -81,3 +81,63 @@ INSTANTIATE_TEST_SUITE_P(
 			NormalModeCommand{32, 'd', 2, ' ', ' ', ' ', false, ParsingStages::Count2MotionTextObject}},
 	ParseParameters{"32d20f",
 			NormalModeCommand{32, 'd', 20, ' ', 'f', ' ', false, ParsingStages::WaitingForTargetChar}}));*/
+
+#include <commands/NormalMode.hpp>
+#include <gtest/gtest.h>
+
+struct NormalModeParseParameters {
+	std::string input;
+	NormalModeCommand command;
+};
+
+class NormalModeCommandParsingTest : public testing::TestWithParam<NormalModeParseParameters> {};
+
+TEST_P(NormalModeCommandParsingTest, HandlesRangedInputs) {
+	const auto& [input, expected] = GetParam();
+
+	const NormalModeTable table;
+	NormalModeParser parser{table};
+
+	for (const char inputChar : input) {
+		parser.parseCommand(inputChar);
+	}
+
+	const auto actual = parser.getCommand();
+
+	EXPECT_EQ(actual.count1, expected.count1);
+	EXPECT_EQ(actual.operation, expected.operation);
+	EXPECT_EQ(actual.count2, expected.count2);
+	EXPECT_EQ(actual.motion, expected.motion);
+	EXPECT_EQ(actual.targetMotion, expected.targetMotion);
+	EXPECT_EQ(actual.targetCommand, expected.targetCommand);
+	EXPECT_EQ(actual.targetChar, expected.targetChar);
+	EXPECT_EQ(actual.ignoreCount, expected.ignoreCount);
+	EXPECT_EQ(actual.stage, expected.stage);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+	RangedCommandParsing, NormalModeCommandParsingTest,
+	testing::Values(
+		NormalModeParseParameters{"l", NormalModeCommand{0, ' ', 0, 'l', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"32l", NormalModeCommand{32, ' ', 0, 'l', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"dl", NormalModeCommand{0, 'd', 0, 'l', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"32dl", NormalModeCommand{32, 'd', 0, 'l', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"d21l", NormalModeCommand{0, 'd', 21, 'l', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"30d21l", NormalModeCommand{30, 'd', 21, 'l', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"0", NormalModeCommand{0, ' ', 0, '0', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"d0", NormalModeCommand{0, 'd', 0, '0', ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"dd", NormalModeCommand{0, 'd', 0, lineChar, ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"32dd", NormalModeCommand{32, 'd', 0, lineChar, ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"d2d", NormalModeCommand{0, 'd', 2, lineChar, ' ', ' ', ' ', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"fp", NormalModeCommand{0, ' ', 0, ' ', 'f', ' ', 'p', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"32fp", NormalModeCommand{32, ' ', 0, ' ', 'f', ' ', 'p', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"dfp", NormalModeCommand{0, 'd', 0, ' ', 'f', ' ', 'p', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"d20fp", NormalModeCommand{0, 'd', 20, ' ', 'f', ' ', 'p', false, ParsingStages::Finish}},
+		NormalModeParseParameters{"rp", NormalModeCommand{0, ' ', 0, ' ', ' ', 'r', 'p', true, ParsingStages::Finish}},
+		NormalModeParseParameters{"32rp", NormalModeCommand{32, ' ', 0, ' ', ' ', 'r', 'p', true, ParsingStages::Finish}},
+		NormalModeParseParameters{"3", NormalModeCommand{3, ' ', 0, ' ', ' ', ' ', ' ', false, ParsingStages::Start}},
+		NormalModeParseParameters{"d", NormalModeCommand{0, 'd', 0, ' ', ' ', ' ', ' ', false, ParsingStages::WaitingForMotion}},
+		NormalModeParseParameters{"32d2", NormalModeCommand{32, 'd', 2, ' ', ' ', ' ', ' ', false, ParsingStages::WaitingForMotion}},
+		NormalModeParseParameters{"32d20f",
+								  NormalModeCommand{32, 'd', 20, ' ', 'f', ' ', ' ', false,
+													ParsingStages::WaitingForMotionTarget}}));

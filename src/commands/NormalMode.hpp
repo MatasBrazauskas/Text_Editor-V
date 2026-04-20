@@ -87,23 +87,29 @@ enum class ParsingStages : char { Start, WaitingForMotion, WaitingForMotionTarge
 class NormalModeCommand {
   public:
 	NormalModeCommand() = delete;
-	NormalModeCommand(char operation, char motion, char targetMotion, char targetCommand, char targetChar, ParsingStages);
+	NormalModeCommand(int count1, char operation, int count2, char motion, char targetMotion, char targetCommand, char targetChar,
+					  bool ignoreCount, ParsingStages);
 	~NormalModeCommand() noexcept = default;
+
+	int count1;
+	int count2;
 
 	char operation;
 	char motion;
+
 	char targetMotion;
 	char targetCommand;
 	char targetChar;
 
+	bool ignoreCount;
 	ParsingStages stage;
 };
 
 class NormalModeParser {
   public:
 	explicit NormalModeParser(const NormalModeTable&);
-	explicit NormalModeParser(const NormalModeTable&, char operation, char motion, char targetMotion, char targetCommand, char targetChar,
-							  ParsingStages stage);
+	explicit NormalModeParser(const NormalModeTable&, int count1, char operation, int count2, char motion, char targetMotion,
+							  char targetCommand, char targetChar, bool ignoreCount, ParsingStages stage);
 	~NormalModeParser() noexcept = default;
 
 	void parseCommand(char);
@@ -112,9 +118,13 @@ class NormalModeParser {
 	NormalModeCommand getCommand() const;
 
   private:
+	bool parseCount1(char inputChar) const;
+	bool parseCount2(char inputChar) const;
+
 	bool parseAction(char inputChar) const;
 	bool parseOperation(char inputChar) const;
 	bool parseMotion(char inputChar) const;
+
 	bool parseTargetMotion(char inputChar) const;
 	bool parseTargetCommand(char inputChar) const;
 
@@ -137,7 +147,7 @@ class NormalMode final {
   public:
 	NormalMode();
 	~NormalMode() noexcept = default;
-	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&);
+	void HandleKeyboardInput(File&, Cursor&, EditorState&, EditorInputAndOutput&, FileSubCommand&, PanesManager&, FilesManager&);
 
   private:
 	NormalModeTable table;

@@ -113,6 +113,7 @@ class PaneHistoryManager {
 	void addPane(PaneId);
 	void pushUpPane(PaneId);
 	void removePane(PaneId);
+
 	PaneId getLastPaneId() const;
 
 	auto begin() const {
@@ -141,6 +142,10 @@ class PanesManager final {
 
 	void shiftPane(PaneId, PaneSizeChange);
 	void resetRatios();
+
+	void addSpecialPane(FileId);
+	void removeSpecialPane();
+	void setActivePaneToSpecialPane();
 
 	std::vector<PaneInfo> getPaneCoordinates(int t_height, int t_width) const;
 	PaneId activePaneId_;

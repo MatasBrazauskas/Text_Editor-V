@@ -44,7 +44,7 @@ void FileHandler::writeToFile(const File& doc) const {
 }
 
 std::vector<std::string> FileHandler::readDirectory(const std::filesystem::path t_path) const {
-	std::vector dirContent = {"../"s};
+	std::vector<std::string> dirContent = {};
 
 	for (const auto& file : std::filesystem::directory_iterator{t_path}) {
 		const auto filePath = file.path().string();
