@@ -83,6 +83,7 @@ The editor is highly configurable via `config.json`:
 - **Theme**: Full color customization (background, foreground, UI, cursor, highlights)
 
 <img width="1864" height="1107" alt="image" src="https://github.com/user-attachments/assets/43ea7369-b759-4eee-8f82-f68dfafac633" />
+*Normal Mode*
 <img width="1864" height="1107" alt="image" src="https://github.com/user-attachments/assets/85c2dd2b-8e81-4b7c-aee2-708e97ff9947" />
 <img width="1864" height="1107" alt="image" src="https://github.com/user-attachments/assets/54e86629-2b99-4f2d-8760-9b1601223333" />
 <img width="1864" height="1107" alt="image" src="https://github.com/user-attachments/assets/a59c0b17-c1e0-4d65-b4e4-3581c6ede9f7" />
