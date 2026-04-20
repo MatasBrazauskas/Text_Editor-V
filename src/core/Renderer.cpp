@@ -1,7 +1,8 @@
 #include "Renderer.hpp"
 
 #include "EditorCore.hpp"
-#include "buffer/PanesAndLayers.hpp"
+#include "buffer/Panes.hpp"
+#include "buffer/Layers.hpp"
 #include "utils/ConfigAndSettings.hpp"
 
 #include <format>

@@ -91,9 +91,9 @@ NormalModeCommand::NormalModeCommand(const int count1_t, const char operation_t,
 NormalModeParser::NormalModeParser(const NormalModeTable& table_t)
 	: NormalModeParser(table_t, 0, ' ', 0, ' ', ' ', ' ', ' ', false, ParsingStages::Start) {}
 
-NormalModeParser::NormalModeParser(const NormalModeTable& table_t, const int count1, const char operation,
-								   const int count2, const char motion, const char targetMotion, const char targetCommand,
-								   const char targetChar, const bool ignoreCount, const ParsingStages stage)
+NormalModeParser::NormalModeParser(const NormalModeTable& table_t, const int count1, const char operation, const int count2,
+								   const char motion, const char targetMotion, const char targetCommand, const char targetChar,
+								   const bool ignoreCount, const ParsingStages stage)
 	: table{table_t}, command{count1, operation, count2, motion, targetMotion, targetCommand, targetChar, ignoreCount, stage} {}
 
 void NormalModeParser::parseCommand(char inputChar) {
@@ -250,7 +250,8 @@ void NormalModeExecutor::executeNormalModeCommand(Matrix& text, Cursor& t_cursor
 
 NormalMode::NormalMode() : parser{table}, executor{table} {}
 
-void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState& state, EditorInputAndOutput& inOut, FileSubCommand& t_f, PanesManager& t_p, FilesManager& t_files) {
+void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState& state, EditorInputAndOutput& inOut, FileSubCommand& t_f,
+									 PanesManager& t_p, FilesManager& t_files) {
 	auto& [text, stack, path, id] = file_t;
 
 	std::cout << "Pressed: " << inOut.input_ << std::endl;
@@ -274,10 +275,10 @@ void NormalMode::HandleKeyboardInput(File& file_t, Cursor& t_cursor, EditorState
 
 	const auto command = parser.getCommand();
 
-	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ", count1: " << command.count1
-			  << ", operation: " << command.operation << ", count2: " << command.count2 << ", motion: " << command.motion
-			  << ", target motion: " << command.targetMotion << ", target command: " << command.targetCommand
-			  << ", target char: " << command.targetChar << ", ignore count: " << command.ignoreCount << '\n';
+	std::cout << "Parse mode: " << static_cast<int>(command.stage) << ", count1: " << command.count1 << ", operation: " << command.operation
+			  << ", count2: " << command.count2 << ", motion: " << command.motion << ", target motion: " << command.targetMotion
+			  << ", target command: " << command.targetCommand << ", target char: " << command.targetChar
+			  << ", ignore count: " << command.ignoreCount << '\n';
 
 	if (parser.executeCommand()) {
 		executor.executeNormalModeCommand(text, t_cursor, state, command);

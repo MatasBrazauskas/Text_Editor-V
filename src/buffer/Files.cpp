@@ -185,7 +185,7 @@ FileId FilesManager::addEmptyFile() {
 }
 
 bool FilesManager::specialFile(const FileId t_fileId) const {
-	return specialFile_ ==  t_fileId;
+	return specialFile_ == t_fileId;
 }
 
 bool FilesManager::regularFile(const FileId t_fileId) const {
@@ -254,9 +254,7 @@ void FilesManager::changeSpecialFile(const FileId t_fileId, const std::filesyste
 }
 
 void FilesManager::removeFile(const FileId t_fileId) {
-	const auto predicate = [t_fileId](const File& file) {
-		return file.fileId_ == t_fileId;
-	};
+	const auto predicate = [t_fileId](const File& file) { return file.fileId_ == t_fileId; };
 
 	std::ranges::remove_if(files_, predicate);
 

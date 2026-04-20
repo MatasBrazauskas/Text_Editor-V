@@ -1,6 +1,6 @@
 #pragma once
 
-#include "buffer/PanesAndLayers.hpp"
+#include "buffer/Panes.hpp"
 
 #include <unordered_map>
 
@@ -47,7 +47,6 @@ class FileSubCommand final {
 	void close(PanesManager&, FilesManager&, WindowSettings&) const;
 	void moveUpParentDir(PanesManager&, FilesManager&, WindowSettings&) const;
 	void refresh() const;
-
 
 	std::unordered_map<char, Func> functionMap_;
 };

@@ -54,11 +54,8 @@ void WindowSubCommand::equalizePanes(PanesManager& t_panesManager, WindowSetting
 
 FileSubCommand::FileSubCommand() {
 	functionMap_ = {
-		{'k', &FileSubCommand::moveUp},
-		{'j', &FileSubCommand::moveDown},
-		{'e', &FileSubCommand::open},
-		{'c', &FileSubCommand::close},
-		{'h', &FileSubCommand::moveUpParentDir},
+		{'k', &FileSubCommand::moveUp}, {'j', &FileSubCommand::moveDown},		 {'e', &FileSubCommand::open},
+		{'c', &FileSubCommand::close},	{'h', &FileSubCommand::moveUpParentDir},
 	};
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "buffer/Files.hpp"
-#include "buffer/PanesAndLayers.hpp"
+#include "buffer/Panes.hpp"
 #include "commands/CommandMode.hpp"
 #include "commands/InsertMode.hpp"
 #include "commands/NormalMode.hpp"

@@ -139,5 +139,4 @@ INSTANTIATE_TEST_SUITE_P(
 		NormalModeParseParameters{"d", NormalModeCommand{0, 'd', 0, ' ', ' ', ' ', ' ', false, ParsingStages::WaitingForMotion}},
 		NormalModeParseParameters{"32d2", NormalModeCommand{32, 'd', 2, ' ', ' ', ' ', ' ', false, ParsingStages::WaitingForMotion}},
 		NormalModeParseParameters{"32d20f",
-								  NormalModeCommand{32, 'd', 20, ' ', 'f', ' ', ' ', false,
-													ParsingStages::WaitingForMotionTarget}}));
+								  NormalModeCommand{32, 'd', 20, ' ', 'f', ' ', ' ', false, ParsingStages::WaitingForMotionTarget}}));
