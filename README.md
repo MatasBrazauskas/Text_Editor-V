@@ -6,13 +6,13 @@
 In Normal Mode, users can perform a variety of operations efficiently. Users can navigate and manipulate text using several commands designed for quick access and extensive functionality.
 
 - **Navigating Text:** Use `h`, `j`, `k`, `l` for left, down, up, and right navigation.
-- **Editing Text:** Operations such as `x` to delete a character, `dd` to delete a line, and `yy` to copy a line.
+- **Editing Text:** Operations such as `x` to delete a character, `d` operation to delete, `f` and `F` to find characters, `r` replace character.
 
 ### 2. Motions
 The Editor supports various motions to make cursor navigation seamless:
 
 - **Word Motions:** `w` to jump to the start of the next word and `b` to go back to the beginning of the previous word.
-- **Screen Motions:** Use `Ctrl + f` to scroll forward a page, and `Ctrl + b` to scroll backward.
+- **Screen Motions:** Use `ctrl - w` to switch to Window mode in order to navigate panes with `h`, `j`, `k` and `l`.
 
 ### 3. Text Objects
 Text objects allow users to select and manipulate blocks of text easily:
