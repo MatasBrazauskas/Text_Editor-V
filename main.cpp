@@ -1,7 +1,7 @@
+#include "buffer/Layers.hpp"
 #include "core/EditorCore.hpp"
 #include "core/Renderer.hpp"
 #include "utils/ConfigAndSettings.hpp"
-#include "buffer/Layers.hpp"
 
 int main(const int argc, char** argv) {
 	Config config{};
